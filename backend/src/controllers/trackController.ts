@@ -3,7 +3,7 @@ import Track from "../models/trackModel";
 import Challenge from "../models/challengeModel";
 import User from "../models/userModel";
 import Project from "../models/projectModel";
-import { uploadToCloudinary } from "../utils/cloudinary";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/cloudinary";
 
 interface AuthRequest extends Request {
   user?: { id: string; role?: string };
@@ -120,10 +120,13 @@ export const deleteTrack = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (track.icon) {
-      const iconPath = path.join(__dirname, "../..", track.icon);
-      if (fs.existsSync(iconPath)) {
-        fs.unlinkSync(iconPath);
+    // Delete icon from Cloudinary if it exists
+    if (track.icon && track.icon.includes('cloudinary.com')) {
+      try {
+        await deleteFromCloudinary(track.icon);
+      } catch (error) {
+        console.error('Error deleting icon from Cloudinary:', error);
+        // Continue with track deletion even if icon deletion fails
       }
     }
 
