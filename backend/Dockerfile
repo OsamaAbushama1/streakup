@@ -37,7 +37,9 @@ RUN apk add --no-cache \
     jpeg \
     pango \
     giflib \
-    pixman
+    pixman \
+    fontconfig \
+    ttf-dejavu
 
 WORKDIR /app
 
@@ -51,8 +53,17 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
 
-# Create uploads directory
-RUN mkdir -p uploads
+# Create uploads directory (must be at root level for path resolution)
+# Set proper permissions for uploads directory
+RUN mkdir -p uploads && \
+    chmod 755 uploads
+
+# Verify public directory structure exists
+RUN if [ ! -d "public/templates" ]; then \
+      echo "Warning: public/templates directory not found"; \
+    else \
+      echo "Public templates directory found"; \
+    fi
 
 # Expose port
 EXPOSE 5000
