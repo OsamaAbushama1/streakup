@@ -1,7 +1,7 @@
 const nextConfig = {
   output: 'standalone', // Required for Docker deployment
   images: {
-    unoptimized: false, // Ensure image optimization is enabled
+    unoptimized: true, // Disable optimization for standalone mode compatibility
     remotePatterns: [
       {
         protocol: "http",

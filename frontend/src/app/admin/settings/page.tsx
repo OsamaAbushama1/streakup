@@ -249,9 +249,13 @@ const Settings: React.FC = () => {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to logout");
-      router.push("/login");
+      // Force navigation and clear cache
+      window.location.href = "/login";
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      // Navigate to login even on error
+      window.location.href = "/login";
     }
   };
 

@@ -35,15 +35,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       if (!response.ok) {
         throw new Error("Failed to logout");
       }
-      router.push("/login");
+      // Force navigation and clear cache
+      window.location.href = "/login";
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Logout error:", error.message);
-        alert(`Failed to logout. ${error.message}`);
       } else {
         console.error("Logout error:", error);
-        alert("Failed to logout. Please try again.");
       }
+      // Navigate to login even on error
+      window.location.href = "/login";
     }
   };
 

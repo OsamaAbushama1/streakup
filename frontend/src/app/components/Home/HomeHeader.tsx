@@ -195,10 +195,22 @@ const HomeHeader: React.FC = () => {
       });
 
       if (res.ok) {
-        router.push("/login");
+        // Clear any client-side state
+        setUser(null);
+        setIsMenuOpen(false);
+        setIsProfileDropdownOpen(false);
+        setIsNotificationsDropdownOpen(false);
+        // Force navigation and clear cache
+        window.location.href = "/login";
+      } else {
+        console.error("Logout failed:", res.statusText);
+        // Still try to navigate even if request fails
+        window.location.href = "/login";
       }
     } catch (error) {
       console.error("Error during logout:", error);
+      // Navigate to login even on error
+      window.location.href = "/login";
     }
   };
 
