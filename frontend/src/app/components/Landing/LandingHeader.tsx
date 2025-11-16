@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/config/api";
 
 const LandingHeader: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
