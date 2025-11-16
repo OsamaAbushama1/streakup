@@ -15,6 +15,10 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 
+# Accept build arguments for environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
