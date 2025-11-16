@@ -47,10 +47,12 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-# Use --omit=dev (npm 7+) or fallback to --production (npm 6)
-RUN npm install --omit=dev --no-audit --no-fund || \
-    npm install --production --no-audit --no-fund
+# Copy node_modules from builder (includes compiled canvas)
+# This avoids recompiling native modules in production stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Remove dev dependencies if they exist (optional cleanup)
+RUN npm prune --production || true
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
