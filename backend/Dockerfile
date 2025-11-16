@@ -19,7 +19,8 @@ COPY package*.json ./
 COPY tsconfig.json ./
 
 # Install dependencies
-RUN npm ci
+# npm ci requires exact match, fallback to npm install if it fails
+RUN npm ci || npm install
 
 # Copy source code
 COPY src ./src
@@ -47,7 +48,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+# Use --omit=dev (npm 7+) or fallback to --production (npm 6)
+RUN npm install --omit=dev --no-audit --no-fund || \
+    npm install --production --no-audit --no-fund
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
