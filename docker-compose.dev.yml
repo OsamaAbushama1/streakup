@@ -1,0 +1,76 @@
+version: '3.8'
+
+# Development docker-compose file
+# Use: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: streakup-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data_dev:/data/db
+    networks:
+      - streakup-network-dev
+
+  # Backend API Service (Development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: streakup-backend-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/streakup?authSource=admin
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend/src:/app/src  # Mount source for hot reload
+      - ./backend/public:/app/public
+      - ./backend/uploads:/app/uploads
+      - ./backend/tsconfig.json:/app/tsconfig.json
+    command: npm run dev  # Override to use dev command
+    depends_on:
+      - mongodb
+    networks:
+      - streakup-network-dev
+
+  # Frontend Next.js Service (Development)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: streakup-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+    volumes:
+      - ./frontend/src:/app/src  # Mount source for hot reload
+      - ./frontend/public:/app/public
+      - ./frontend/next.config.ts:/app/next.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+    command: npm run dev  # Override to use dev command
+    depends_on:
+      - backend
+    networks:
+      - streakup-network-dev
+
+volumes:
+  mongodb_data_dev:
+
+networks:
+  streakup-network-dev:
+    driver: bridge
+
