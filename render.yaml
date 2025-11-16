@@ -1,0 +1,45 @@
+services:
+  # Backend API Service
+  - type: web
+    name: streakup-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false  # Set this in Render dashboard
+      - key: FRONTEND_URL
+        sync: false  # Set this to your frontend URL after deployment
+      # Add other environment variables as needed
+      # - key: JWT_SECRET
+      #   sync: false
+      # - key: STRIPE_SECRET_KEY
+      #   sync: false
+      # - key: EMAIL_USER
+      #   sync: false
+      # - key: EMAIL_PASS
+      #   sync: false
+
+  # Frontend Next.js Service
+  - type: web
+    name: streakup-frontend
+    env: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: streakup-backend
+          property: host
+      # Note: You may need to manually set NEXT_PUBLIC_API_URL to the full URL
+      # (e.g., https://streakup-backend.onrender.com) in the Render dashboard
+

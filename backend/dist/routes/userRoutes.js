@@ -1,0 +1,53 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const userController_1 = require("../controllers/userController");
+const multer_1 = __importDefault(require("multer"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const projectController_1 = require("../controllers/projectController");
+const trackController_1 = require("../controllers/trackController");
+const notificationController_1 = require("../controllers/notificationController");
+const router = express_1.default.Router();
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path_1.default.join(__dirname, "../uploads");
+        if (!fs_1.default.existsSync(uploadDir)) {
+            fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+const upload = (0, multer_1.default)({ storage });
+router.get("/check", authMiddleware_1.protect, userController_1.checkAuth);
+router.post("/register", upload.single("profilePicture"), userController_1.registerUser);
+router.get("/check-username", userController_1.checkUsername);
+router.post("/login", userController_1.loginUser);
+router.get("/profile", userController_1.authenticateToken, userController_1.getUserProfile);
+router.post("/logout", userController_1.logoutUser);
+router.post("/heartbeat", authMiddleware_1.protect, userController_1.heartbeat);
+router.post("/forget-password", userController_1.forgetPassword);
+router.post("/reset-password", userController_1.resetPassword);
+router.put("/update-profile", userController_1.authenticateToken, upload.single("profilePicture"), userController_1.updateProfile);
+router.get("/analytics", userController_1.authenticateToken, userController_1.getAnalytics);
+router.get("/rewards", userController_1.authenticateToken, userController_1.getRewards);
+router.post("/redeem-reward", authMiddleware_1.protect, userController_1.redeemReward);
+router.get("/profile/:username", userController_1.getPublicProfile);
+router.get("/projects", authMiddleware_1.protect, projectController_1.getAllProjects);
+router.get("/tracks", trackController_1.getPublicTracks);
+router.get("/certificate", authMiddleware_1.protect, userController_1.downloadCertificate);
+router.get("/certificates", userController_1.authenticateToken, userController_1.getUserCertificates);
+router.post("/certificates/unlock", userController_1.authenticateToken, userController_1.unlockCertificate);
+router.get("/top-creators", authMiddleware_1.protect, userController_1.getTopCreators);
+router.get("/next-challenge", authMiddleware_1.protect, userController_1.getNextChallenge);
+router.get("/notifications", authMiddleware_1.protect, notificationController_1.getNotifications);
+router.put("/notifications/read", authMiddleware_1.protect, notificationController_1.markNotificationsAsRead);
+router.get("/rank-requirements", userController_1.authenticateToken, userController_1.getRankRequirements);
+exports.default = router;

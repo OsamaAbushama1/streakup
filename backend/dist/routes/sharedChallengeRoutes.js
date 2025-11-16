@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const sharedChallengeController_1 = require("../controllers/sharedChallengeController");
+const router = (0, express_1.Router)();
+router.use(authMiddleware_1.protect);
+router.get("/", sharedChallengeController_1.getSharedChallenges);
+router.get("/my", sharedChallengeController_1.getMySharedChallenges);
+router.get("/my-non-highlighted", sharedChallengeController_1.getMyNonHighlightedSharedChallenges);
+router.get("/by-username/:username", sharedChallengeController_1.getSharedChallengesByUsername);
+router.get("/:challengeId", sharedChallengeController_1.getSharedChallengeById);
+router.post("/:challengeId/view", sharedChallengeController_1.incrementSharedChallengeViews);
+router.post("/:challengeId/like", sharedChallengeController_1.likeSharedChallenge);
+router.get("/:challengeId/like-status", sharedChallengeController_1.checkLikeStatus);
+router.get("/:username/:challengeId", sharedChallengeController_1.getSharedChallengeByUsernameAndId);
+router.get("/username/:challengeId", sharedChallengeController_1.getUsernameBySharedChallengeId);
+exports.default = router;

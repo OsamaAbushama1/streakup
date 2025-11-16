@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const commentController_1 = require("../controllers/commentController");
+const router = (0, express_1.Router)();
+router.use(authMiddleware_1.protect);
+router.post("/shared/:sharedChallengeId", commentController_1.addComment);
+router.get("/shared/:sharedChallengeId", commentController_1.getComments);
+router.post("/:commentId/like", commentController_1.likeComment);
+router.post("/:commentId/report", commentController_1.reportComment);
+exports.default = router;
