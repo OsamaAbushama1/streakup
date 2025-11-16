@@ -14,6 +14,7 @@ import {
   generateCertificate,
   sendCertificateEmail,
 } from "../utils/generateCertificate";
+import { uploadToCloudinary } from "../utils/cloudinary";
 
 interface AuthRequest extends Request {
   user?: { id: string };
@@ -91,7 +92,15 @@ export const registerUser = async (req: Request, res: Response) => {
           : "Username already taken",
     });
   }
-  const profilePicture = req.file ? `uploads/${req.file.filename}` : undefined;
+  let profilePicture: string | undefined;
+  if (req.file) {
+    try {
+      profilePicture = await uploadToCloudinary(req.file, 'streakup/users');
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      return res.status(500).json({ message: "Error uploading profile picture" });
+    }
+  }
 
   console.log("Received data:", {
     firstName,
@@ -265,8 +274,8 @@ export const logoutUser = async (req: Request, res: Response) => {
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,     // مهم على Render HTTPS
+    sameSite: "none",
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
@@ -353,9 +362,16 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const { firstName, lastName, email, password, track, skillLevel } =
       req.body;
-    const profilePicture = req.file
-      ? `uploads/${req.file.filename}`
-      : undefined;
+    
+    let profilePicture: string | undefined;
+    if (req.file) {
+      try {
+        profilePicture = await uploadToCloudinary(req.file, 'streakup/users');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading profile picture" });
+      }
+    }
 
     const updatedData: any = {};
     if (firstName) updatedData.firstName = firstName;

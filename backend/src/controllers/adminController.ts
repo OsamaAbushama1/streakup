@@ -7,6 +7,7 @@ import Track from "../models/trackModel";
 import Project from "../models/projectModel";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { uploadToCloudinary, uploadMultipleToCloudinary } from "../utils/cloudinary";
 
 interface PopulatedUser {
   _id: mongoose.Types.ObjectId;
@@ -102,9 +103,15 @@ export const createChallenge = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const previewImages = Array.isArray(req.files)
-      ? req.files.map((file) => `/uploads/${file.filename}`)
-      : [];
+    let previewImages: string[] = [];
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      try {
+        previewImages = await uploadMultipleToCloudinary(req.files, 'streakup/challenges');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading preview images" });
+      }
+    }
 
     const challengeId = await generateChallengeId(category);
 
@@ -206,7 +213,15 @@ export const updateChallenge = async (req: AuthRequest, res: Response) => {
     }
 
     const files = Array.isArray(req.files) ? req.files : [];
-    const newImages = files.map((file) => `/uploads/${file.filename}`);
+    let newImages: string[] = [];
+    if (files.length > 0) {
+      try {
+        newImages = await uploadMultipleToCloudinary(files, 'streakup/challenges');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading preview images" });
+      }
+    }
     const previewImages = [
       ...(existingImages
         ? Array.isArray(existingImages)
@@ -888,9 +903,15 @@ export const registerAdmin = async (req: AuthRequest, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("Password hashed");
-    const profilePicture = req.file
-      ? `/uploads/${req.file.filename}`
-      : undefined;
+    let profilePicture: string | undefined;
+    if (req.file) {
+      try {
+        profilePicture = await uploadToCloudinary(req.file, 'streakup/users');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading profile picture" });
+      }
+    }
     console.log("Profile picture:", profilePicture);
 
     const user = await User.create({

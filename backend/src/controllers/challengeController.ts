@@ -10,6 +10,7 @@ import {
   generateCertificate,
   sendCertificateEmail,
 } from "../utils/generateCertificate";
+import { uploadMultipleToCloudinary } from "../utils/cloudinary";
 
 interface AuthRequest extends Request {
   user?: { id: string; role?: string };
@@ -316,7 +317,15 @@ export const shareChallenge = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: "Description is required" });
 
     const files = Array.isArray(req.files) ? req.files : [];
-    const images = files.map((f: any) => `uploads/${f.filename}`);
+    let images: string[] = [];
+    if (files.length > 0) {
+      try {
+        images = await uploadMultipleToCloudinary(files, 'streakup/shared-challenges');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading images" });
+      }
+    }
 
     const sharedChallengeId = await generateSharedChallengeId(
       id,

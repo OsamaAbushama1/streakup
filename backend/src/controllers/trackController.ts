@@ -3,8 +3,7 @@ import Track from "../models/trackModel";
 import Challenge from "../models/challengeModel";
 import User from "../models/userModel";
 import Project from "../models/projectModel";
-import path from "path";
-import fs from "fs";
+import { uploadToCloudinary } from "../utils/cloudinary";
 
 interface AuthRequest extends Request {
   user?: { id: string; role?: string };
@@ -68,7 +67,12 @@ export const addTrack = async (req: AuthRequest, res: Response) => {
 
     let iconPath: string | undefined;
     if (iconFile) {
-      iconPath = `/uploads/${iconFile.filename}`; // تأكد من المسار
+      try {
+        iconPath = await uploadToCloudinary(iconFile, 'streakup/tracks');
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return res.status(500).json({ message: "Error uploading track icon" });
+      }
     }
 
     const track = await Track.create({
