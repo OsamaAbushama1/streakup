@@ -130,6 +130,19 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   const backendUrl = API_BASE_URL;
+
+  const getImageUrl = (
+    path: string | undefined | null,
+    fallback: string = "/imgs/default-profile.jpg"
+  ): string => {
+    if (!path) return fallback;
+    const normalized = path.trim();
+    if (!normalized) return fallback;
+    if (normalized.startsWith("http")) return normalized;
+    return `${backendUrl}${
+      normalized.startsWith("/") ? normalized : `/${normalized}`
+    }`;
+  };
   const tabs = [
     "My Challenges",
     "Analytics",
@@ -716,11 +729,7 @@ const Profile: React.FC = () => {
             <div className="flex items-start space-x-3 sm:space-x-4">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden">
                 <Image
-                  src={
-                    userData.profilePicture
-                      ? `${backendUrl}/${userData.profilePicture}`
-                      : "/imgs/default-profile.jpg"
-                  }
+                  src={getImageUrl(userData.profilePicture)}
                   alt="Profile Picture"
                   width={48}
                   height={48}
@@ -864,16 +873,14 @@ const Profile: React.FC = () => {
                       >
                         <div className="relative">
                           <Image
-                            src={
+                            src={getImageUrl(
                               shared.images &&
-                              shared.images.length > 0 &&
-                              shared.images[0] &&
-                              shared.images[0].trim()
-                                ? `${backendUrl}/${shared.images[0]
-                                    .trim()
-                                    .replace(/^\/+/, "")}`
-                                : "/imgs/default-challenge.jpg"
-                            }
+                                shared.images.length > 0 &&
+                                shared.images[0]
+                                ? shared.images[0]
+                                : undefined,
+                              "/imgs/default-challenge.jpg"
+                            )}
                             alt={
                               shared.challenge.name || "Shared Challenge Image"
                             }

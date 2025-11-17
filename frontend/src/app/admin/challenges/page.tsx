@@ -106,6 +106,19 @@ const ChallengesManagement: React.FC = () => {
 
   const backendUrl = API_BASE_URL;
 
+  const getImageUrl = (
+    path: string | undefined,
+    fallback: string = "/imgs/default-challenge.jpg"
+  ): string => {
+    if (!path) return fallback;
+    const normalized = path.trim();
+    if (!normalized) return fallback;
+    if (normalized.startsWith("http")) return normalized;
+    return `${backendUrl}${
+      normalized.startsWith("/") ? normalized : `/${normalized}`
+    }`;
+  };
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -905,7 +918,7 @@ const ChallengesManagement: React.FC = () => {
                       {challengeFormData.previewImages.map((img, idx) => (
                         <div key={idx} className="relative">
                           <Image
-                            src={`${backendUrl}${img}`}
+                            src={getImageUrl(img)}
                             alt="Preview"
                             width={60}
                             height={60}

@@ -37,6 +37,19 @@ const ChallengeCenter: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const backendUrl = API_BASE_URL;
+
+  const getImageUrl = (
+    path: string | undefined,
+    fallback: string = "/imgs/default-challenge.jpg"
+  ): string => {
+    if (!path) return fallback;
+    const normalized = path.trim();
+    if (!normalized) return fallback;
+    if (normalized.startsWith("http")) return normalized;
+    return `${backendUrl}${
+      normalized.startsWith("/") ? normalized : `/${normalized}`
+    }`;
+  };
   const tabs = ["All Challenges", "Active", "Completed", "Missed"] as const;
 
   useEffect(() => {
@@ -164,7 +177,7 @@ const ChallengeCenter: React.FC = () => {
                     src={
                       challenge.previewImages &&
                       challenge.previewImages.length > 0
-                        ? `${backendUrl}${challenge.previewImages[0]}`
+                        ? getImageUrl(challenge.previewImages[0])
                         : "/imgs/default-challenge.jpg"
                     }
                     alt={challenge.name || "Challenge Image"}

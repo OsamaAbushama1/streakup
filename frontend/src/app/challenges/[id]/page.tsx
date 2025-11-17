@@ -54,6 +54,19 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
 
   const backendUrl = API_BASE_URL;
 
+  const getImageUrl = (
+    path: string | undefined,
+    fallback: string = "/imgs/projectImage.png"
+  ): string => {
+    if (!path) return fallback;
+    const normalized = path.trim();
+    if (!normalized) return fallback;
+    if (normalized.startsWith("http")) return normalized;
+    return `${backendUrl}${
+      normalized.startsWith("/") ? normalized : `/${normalized}`
+    }`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -286,7 +299,7 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
                         className="relative w-full rounded-xl overflow-hidden flex justify-center items-center "
                       >
                         <Image
-                          src={`${backendUrl}${image}`}
+                          src={getImageUrl(image)}
                           alt={`${challenge.name} Preview ${index + 1}`}
                           width={800}
                           height={400}
@@ -300,7 +313,7 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
                     {challenge.previewImages.map((image, index) => (
                       <Image
                         key={index}
-                        src={`${backendUrl}${image}`}
+                        src={getImageUrl(image)}
                         alt={`${challenge.name} Preview ${index + 1}`}
                         width={800}
                         height={400}
