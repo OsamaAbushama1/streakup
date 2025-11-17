@@ -15,6 +15,7 @@ const challengeModel_1 = __importDefault(require("../models/challengeModel"));
 const sharedChallengeModel_1 = __importDefault(require("../models/sharedChallengeModel"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const generateCertificate_1 = require("../utils/generateCertificate");
+const cloudinary_1 = require("../utils/cloudinary");
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
@@ -75,7 +76,16 @@ const registerUser = async (req, res) => {
                 : "Username already taken",
         });
     }
-    const profilePicture = req.file ? `uploads/${req.file.filename}` : undefined;
+    let profilePicture;
+    if (req.file) {
+        try {
+            profilePicture = await (0, cloudinary_1.uploadToCloudinary)(req.file, 'streakup/users');
+        }
+        catch (error) {
+            console.error('Error uploading to Cloudinary:', error);
+            return res.status(500).json({ message: "Error uploading profile picture" });
+        }
+    }
     console.log("Received data:", {
         firstName,
         lastName,
@@ -112,8 +122,8 @@ const registerUser = async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ id: newUser._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
             maxAge: 3600000,
         });
         res.status(201).json({
@@ -151,8 +161,8 @@ const loginUser = async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
             maxAge: 3600000,
         });
         res.status(200).json({
@@ -224,8 +234,8 @@ const logoutUser = async (req, res) => {
     }
     res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true, // مهم على Render HTTPS
+        sameSite: "none",
     });
     res.status(200).json({ message: "Logged out successfully" });
 };
@@ -305,9 +315,16 @@ const updateProfile = async (req, res) => {
     try {
         const userId = req.user?.id;
         const { firstName, lastName, email, password, track, skillLevel } = req.body;
-        const profilePicture = req.file
-            ? `uploads/${req.file.filename}`
-            : undefined;
+        let profilePicture;
+        if (req.file) {
+            try {
+                profilePicture = await (0, cloudinary_1.uploadToCloudinary)(req.file, 'streakup/users');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading profile picture" });
+            }
+        }
         const updatedData = {};
         if (firstName)
             updatedData.firstName = firstName;

@@ -8,23 +8,10 @@ const express_1 = require("express");
 const challengeController_1 = require("../controllers/challengeController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const userController_1 = require("../controllers/userController");
 const router = (0, express_1.Router)();
-// إعداد Multer للتحديات
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path_1.default.join(__dirname, "../uploads");
-        if (!fs_1.default.existsSync(uploadDir)) {
-            fs_1.default.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+// Use memory storage for Cloudinary uploads
+const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage });
 // === مسارات التحديات (User) ===
 router.get("/", authMiddleware_1.protect, challengeController_1.getAllChallenges);

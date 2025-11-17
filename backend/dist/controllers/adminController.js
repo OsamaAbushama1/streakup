@@ -11,6 +11,7 @@ const sharedChallengeModel_1 = __importDefault(require("../models/sharedChalleng
 const trackModel_1 = __importDefault(require("../models/trackModel"));
 const projectModel_1 = __importDefault(require("../models/projectModel"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const cloudinary_1 = require("../utils/cloudinary");
 const FIXED_TRACKS = ["UI/UX Design", "Graphic Design", "Frontend Development"];
 const isValidTrack = async (trackName) => {
     if (FIXED_TRACKS.includes(trackName))
@@ -72,9 +73,16 @@ const createChallenge = async (req, res) => {
                 });
             }
         }
-        const previewImages = Array.isArray(req.files)
-            ? req.files.map((file) => `/uploads/${file.filename}`)
-            : [];
+        let previewImages = [];
+        if (Array.isArray(req.files) && req.files.length > 0) {
+            try {
+                previewImages = await (0, cloudinary_1.uploadMultipleToCloudinary)(req.files, 'streakup/challenges');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading preview images" });
+            }
+        }
         const challengeId = await generateChallengeId(category);
         const challenge = await challengeModel_1.default.create({
             name,
@@ -151,7 +159,16 @@ const updateChallenge = async (req, res) => {
             }
         }
         const files = Array.isArray(req.files) ? req.files : [];
-        const newImages = files.map((file) => `/uploads/${file.filename}`);
+        let newImages = [];
+        if (files.length > 0) {
+            try {
+                newImages = await (0, cloudinary_1.uploadMultipleToCloudinary)(files, 'streakup/challenges');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading preview images" });
+            }
+        }
         const previewImages = [
             ...(existingImages
                 ? Array.isArray(existingImages)
@@ -752,9 +769,16 @@ const registerAdmin = async (req, res) => {
         }
         const hashedPassword = await bcryptjs_1.default.hash(password, 10);
         console.log("Password hashed");
-        const profilePicture = req.file
-            ? `/uploads/${req.file.filename}`
-            : undefined;
+        let profilePicture;
+        if (req.file) {
+            try {
+                profilePicture = await (0, cloudinary_1.uploadToCloudinary)(req.file, 'streakup/users');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading profile picture" });
+            }
+        }
         console.log("Profile picture:", profilePicture);
         const user = await userModel_1.default.create({
             firstName,

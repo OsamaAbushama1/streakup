@@ -72,11 +72,7 @@ const LandingHeader: React.FC = () => {
         </div>
 
         <div>
-          {loading ? (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-[#A855F7] border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : isAuthenticated ? (
+          { isAuthenticated ? (
             <button
               onClick={handleLogout}
               className="px-3 py-1.5 sm:px-5 sm:py-2 text-sm sm:text-base bg-white/50 text-purple-600 rounded-full font-medium shadow hover:bg-white/80 transition"

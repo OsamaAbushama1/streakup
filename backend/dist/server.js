@@ -24,7 +24,7 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 app.use(express_1.default.json());
-app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "uploads")));
+app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 // === كل الـ Routes في مكان واحد ===
 app.use("/api", routes_1.default); // كل شيء من هنا
 // === Health Check ===

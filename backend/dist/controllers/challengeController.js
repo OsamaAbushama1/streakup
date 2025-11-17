@@ -9,6 +9,7 @@ const sharedChallengeModel_1 = __importDefault(require("../models/sharedChalleng
 const userModel_1 = __importDefault(require("../models/userModel"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const generateCertificate_1 = require("../utils/generateCertificate");
+const cloudinary_1 = require("../utils/cloudinary");
 const generateSharedChallengeId = async (challengeId, challengeObjectId) => {
     const count = await sharedChallengeModel_1.default.countDocuments({
         challenge: challengeObjectId,
@@ -256,7 +257,16 @@ const shareChallenge = async (req, res) => {
         if (!description?.trim())
             return res.status(400).json({ message: "Description is required" });
         const files = Array.isArray(req.files) ? req.files : [];
-        const images = files.map((f) => `uploads/${f.filename}`);
+        let images = [];
+        if (files.length > 0) {
+            try {
+                images = await (0, cloudinary_1.uploadMultipleToCloudinary)(files, 'streakup/shared-challenges');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading images" });
+            }
+        }
         const sharedChallengeId = await generateSharedChallengeId(id, challenge._id);
         const sharedChallenge = await sharedChallengeModel_1.default.create({
             sharedChallengeId,

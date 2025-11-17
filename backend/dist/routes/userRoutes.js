@@ -6,25 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const userController_1 = require("../controllers/userController");
 const multer_1 = __importDefault(require("multer"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const projectController_1 = require("../controllers/projectController");
 const trackController_1 = require("../controllers/trackController");
 const notificationController_1 = require("../controllers/notificationController");
 const router = express_1.default.Router();
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path_1.default.join(__dirname, "../uploads");
-        if (!fs_1.default.existsSync(uploadDir)) {
-            fs_1.default.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+// Use memory storage for Cloudinary uploads
+const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage });
 router.get("/check", authMiddleware_1.protect, userController_1.checkAuth);
 router.post("/register", upload.single("profilePicture"), userController_1.registerUser);

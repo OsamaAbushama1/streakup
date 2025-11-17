@@ -8,8 +8,7 @@ const trackModel_1 = __importDefault(require("../models/trackModel"));
 const challengeModel_1 = __importDefault(require("../models/challengeModel"));
 const userModel_1 = __importDefault(require("../models/userModel"));
 const projectModel_1 = __importDefault(require("../models/projectModel"));
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
+const cloudinary_1 = require("../utils/cloudinary");
 // جلب كل الـ Tracks للعامة (اسم وأيقونة فقط)
 const getPublicTracks = async (req, res) => {
     try {
@@ -66,7 +65,13 @@ const addTrack = async (req, res) => {
         }
         let iconPath;
         if (iconFile) {
-            iconPath = `/uploads/${iconFile.filename}`; // تأكد من المسار
+            try {
+                iconPath = await (0, cloudinary_1.uploadToCloudinary)(iconFile, 'streakup/tracks');
+            }
+            catch (error) {
+                console.error('Error uploading to Cloudinary:', error);
+                return res.status(500).json({ message: "Error uploading track icon" });
+            }
         }
         const track = await trackModel_1.default.create({
             name: name.trim(),
@@ -109,10 +114,14 @@ const deleteTrack = async (req, res) => {
                 message: "Cannot delete track because it is used in challenges, users, or projects",
             });
         }
-        if (track.icon) {
-            const iconPath = path_1.default.join(__dirname, "../..", track.icon);
-            if (fs_1.default.existsSync(iconPath)) {
-                fs_1.default.unlinkSync(iconPath);
+        // Delete icon from Cloudinary if it exists
+        if (track.icon && track.icon.includes('cloudinary.com')) {
+            try {
+                await (0, cloudinary_1.deleteFromCloudinary)(track.icon);
+            }
+            catch (error) {
+                console.error('Error deleting icon from Cloudinary:', error);
+                // Continue with track deletion even if icon deletion fails
             }
         }
         await trackModel_1.default.deleteOne({ _id: track._id });

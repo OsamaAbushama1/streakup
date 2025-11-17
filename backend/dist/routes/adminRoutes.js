@@ -8,26 +8,14 @@ const express_1 = require("express");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const restrictToAdmin_1 = require("../middleware/restrictToAdmin");
 const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const adminController_1 = require("../controllers/adminController");
 const projectController_1 = require("../controllers/projectController");
 const trackController_1 = require("../controllers/trackController");
 const adminController_2 = require("../controllers/adminController");
 const challengeController_1 = require("../controllers/challengeController");
 const router = (0, express_1.Router)();
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path_1.default.join(__dirname, "../uploads");
-        if (!fs_1.default.existsSync(uploadDir)) {
-            fs_1.default.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+// Use memory storage for Cloudinary uploads
+const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage });
 /* -------------------------------------------------
    Middleware لكل الـ admin routes (protect + admin)
