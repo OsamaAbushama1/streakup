@@ -15,6 +15,9 @@ import {
   FiLinkedin,
   FiFlag,
 } from "react-icons/fi";
+import { Skeleton, SkeletonCard } from "../../components/Skeleton";
+import { useButtonDisable } from "../../hooks/useButtonDisable";
+import { Metadata } from "../../components/Metadata/Metadata";
 
 interface Project {
   _id: string;
@@ -122,6 +125,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
     null
   );
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (path: string | undefined): string => {
     if (!path) return "/imgs/default-profile.jpg";
@@ -283,56 +287,60 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
   }, [loading, comments, highlightCommentId]);
 
   const handleLike = async () => {
-    const { id } = await params;
-    if (!id) return;
+    await handleButtonClick(async () => {
+      const { id } = await params;
+      if (!id) return;
 
-    try {
-      const res = await fetch(`${backendUrl}/api/shared/${id}/like`, {
-        method: "POST",
-        credentials: "include",
-      });
+      try {
+        const res = await fetch(`${backendUrl}/api/shared/${id}/like`, {
+          method: "POST",
+          credentials: "include",
+        });
 
-      if (!res.ok) {
-        throw new Error("Failed to like/unlike shared challenge");
+        if (!res.ok) {
+          throw new Error("Failed to like/unlike shared challenge");
+        }
+
+        const data = await res.json();
+        setIsLiked(data.isLiked);
+        setSharedChallenge((prev) =>
+          prev
+            ? {
+                ...prev,
+                likes: data.likes,
+              }
+            : prev
+        );
+      } catch (error) {
+        console.error("Error liking/unliking shared challenge:", error);
       }
-
-      const data = await res.json();
-      setIsLiked(data.isLiked);
-      setSharedChallenge((prev) =>
-        prev
-          ? {
-              ...prev,
-              likes: data.likes,
-            }
-          : prev
-      );
-    } catch (error) {
-      console.error("Error liking/unliking shared challenge:", error);
-    }
+    });
   };
 
   const handleLikeComment = async (commentId: string) => {
-    try {
-      const res = await fetch(`${backendUrl}/api/comments/${commentId}/like`, {
-        method: "POST",
-        credentials: "include",
-      });
+    await handleButtonClick(async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/comments/${commentId}/like`, {
+          method: "POST",
+          credentials: "include",
+        });
 
-      if (!res.ok) {
-        throw new Error("Failed to like/unlike comment");
+        if (!res.ok) {
+          throw new Error("Failed to like/unlike comment");
+        }
+
+        const data = await res.json();
+        setComments((prev) =>
+          prev.map((comment) =>
+            comment._id === commentId
+              ? { ...comment, likes: data.likes, isLiked: data.isLiked }
+              : comment
+          )
+        );
+      } catch (error) {
+        console.error("Error liking/unliking comment:", error);
       }
-
-      const data = await res.json();
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment._id === commentId
-            ? { ...comment, likes: data.likes, isLiked: data.isLiked }
-            : comment
-        )
-      );
-    } catch (error) {
-      console.error("Error liking/unliking comment:", error);
-    }
+    });
   };
 
   const handleReportComment = async (commentId: string) => {
@@ -430,17 +438,33 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
   };
 
   const handleProfileClick = () => {
-    if (isOwner) {
-      router.push("/profile");
-    } else {
-      router.push(`/profile/${sharedChallenge?.user.username}`);
-    }
+    handleButtonClick(() => {
+      if (isOwner) {
+        router.push("/profile");
+      } else {
+        router.push(`/profile/${sharedChallenge?.user.username}`);
+      }
+    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#ffffff] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#ffffff]">
+        <HomeHeader />
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl py-10">
+          <div className="flex items-center gap-4 mb-6">
+            <Skeleton variant="avatar" width={64} height={64} />
+            <Skeleton variant="text" width="30%" height={32} />
+          </div>
+          <Skeleton variant="image" width="100%" height={500} className="mb-6 rounded-xl" />
+          <Skeleton variant="text" width="100%" height={24} className="mb-2" />
+          <Skeleton variant="text" width="80%" height={20} className="mb-4" />
+          <div className="flex gap-4">
+            <Skeleton variant="rectangular" width={100} height={40} />
+            <Skeleton variant="rectangular" width={100} height={40} />
+            <Skeleton variant="rectangular" width={100} height={40} />
+          </div>
+        </main>
       </div>
     );
   }
@@ -457,11 +481,17 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
 
   return (
     <div className="min-h-screen bg-[#ffffff]">
+      <Metadata 
+        title={sharedChallenge?.challenge.name || "Shared Challenge"}
+        description={sharedChallenge?.description || "View this creative challenge"}
+        keywords={`${sharedChallenge?.challenge.category || ''}, shared challenge, creative`}
+      />
       <HomeHeader />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl py-10">
         <div
           className="flex items-center gap-4 mb-6 cursor-pointer"
           onClick={handleProfileClick}
+          style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
         >
           <Image
             src={getImageUrl(sharedChallenge.user.profilePicture)}
@@ -538,9 +568,10 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
           <div className="flex items-center gap-4">
             <button
               onClick={handleLike}
+              disabled={isButtonDisabled}
               className={`flex items-center gap-2 transition ${
                 isLiked ? "text-red-500" : "text-[#2E2E38] hover:text-red-600"
-              }`}
+              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <FiHeart className={`text-lg ${isLiked ? "fill-red-500" : ""}`} />
               <span>{sharedChallenge.likes}</span>
@@ -631,12 +662,12 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
                         <div className="flex items-center justify-between mt-2">
                           <button
                             onClick={() => handleLikeComment(comment._id)}
+                            disabled={isButtonDisabled || !!comment.deletedAt}
                             className={`flex items-center gap-2 transition ${
                               comment.isLiked
                                 ? "text-red-500"
                                 : "text-[#2E2E38] hover:text-red-600"
-                            }`}
-                            disabled={!!comment.deletedAt}
+                            } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             <FiHeart
                               className={`text-sm ${

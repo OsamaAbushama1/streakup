@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton } from "../Skeleton";
+import { useButtonDisable } from "../../hooks/useButtonDisable";
 
 interface Notification {
   _id: string;
@@ -67,6 +69,7 @@ const HomeHeader: React.FC = () => {
   const notificationsDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   // جلب بيانات المستخدم
   useEffect(() => {
@@ -219,39 +222,41 @@ const HomeHeader: React.FC = () => {
     challengeId: string | null,
     commentId?: string | null
   ) => {
-    if (!challengeId) return;
+    await handleButtonClick(async () => {
+      if (!challengeId) return;
 
-    let finalUsername = username;
+      let finalUsername = username;
 
-    // لو مفيش username → نجيبه من الـ API
-    if (!finalUsername) {
-      try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/shared/username/${challengeId}`,
-          { credentials: "include" }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          finalUsername = data.username;
+      // لو مفيش username → نجيبه من الـ API
+      if (!finalUsername) {
+        try {
+          const res = await fetch(
+            `${API_BASE_URL}/api/shared/username/${challengeId}`,
+            { credentials: "include" }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            finalUsername = data.username;
+          }
+        } catch (err) {
+          console.error("Failed to fetch username:", err);
         }
-      } catch (err) {
-        console.error("Failed to fetch username:", err);
       }
-    }
 
-    if (!finalUsername) {
-      alert("Challenge not found");
-      return;
-    }
+      if (!finalUsername) {
+        alert("Challenge not found");
+        return;
+      }
 
-    // احفظ commentId في localStorage
-    if (commentId) {
-      localStorage.setItem("scrollToComment", commentId);
-    } else {
-      localStorage.removeItem("scrollToComment");
-    }
+      // احفظ commentId في localStorage
+      if (commentId) {
+        localStorage.setItem("scrollToComment", commentId);
+      } else {
+        localStorage.removeItem("scrollToComment");
+      }
 
-    router.push(`/${finalUsername}/${challengeId}`);
+      router.push(`/${finalUsername}/${challengeId}`);
+    });
   };
 
   if (error) {
@@ -326,7 +331,7 @@ const HomeHeader: React.FC = () => {
 
                 <div className="p-2 flex items-center relative">
                   {loading ? (
-                    <div className="w-6 h-6 border-2 border-[#000000] border-t-transparent rounded-full animate-spin"></div>
+                    <Skeleton variant="avatar" width={24} height={24} />
                   ) : (
                     <>
                       <Image
@@ -394,13 +399,12 @@ const HomeHeader: React.FC = () => {
                         className={`p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50 transition ${
                           !notif.read ? "bg-blue-50" : ""
                         }`}
-                        onClick={() =>
-                          goToSharedChallenge(
-                            notif.username,
-                            notif.challengeLinkId,
-                            notif.commentId
-                          )
-                        }
+                        onClick={() => goToSharedChallenge(
+                          notif.username,
+                          notif.challengeLinkId,
+                          notif.commentId
+                        )}
+                        style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
                       >
                         <div className="flex items-start gap-3">
                           <Image
@@ -450,7 +454,7 @@ const HomeHeader: React.FC = () => {
             {/* Profile */}
             <div className="relative">
               {loading ? (
-                <div className="w-8 h-8 border-2 border-[#000000] border-t-transparent rounded-full animate-spin"></div>
+                <Skeleton variant="avatar" width={36} height={36} />
               ) : (
                 <>
                   <Image
@@ -477,10 +481,11 @@ const HomeHeader: React.FC = () => {
                         </div>
                       </Link>
                       <div
-                        className="p-3 hover:bg-gray-100 cursor-pointer text-black text-sm border-t"
-                        onClick={handleLogout}
+                        className={`p-3 hover:bg-gray-100 cursor-pointer text-black text-sm border-t ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={() => handleButtonClick(() => handleLogout())}
+                        style={{ pointerEvents: isButtonDisabled ? 'none' : 'auto' }}
                       >
-                        Logout
+                        {isButtonDisabled ? "Logging out..." : "Logout"}
                       </div>
                     </div>
                   )}
@@ -517,6 +522,7 @@ const HomeHeader: React.FC = () => {
                     );
                     setIsNotificationsDropdownOpen(false);
                   }}
+                  style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
                 >
                   <div className="flex gap-3">
                     <Image

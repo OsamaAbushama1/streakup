@@ -13,6 +13,9 @@ import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../../components/Skeleton";
+import { useButtonDisable } from "../../hooks/useButtonDisable";
+import { Metadata } from "../../components/Metadata/Metadata";
 
 interface Project {
   _id: string;
@@ -53,6 +56,7 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
   const { id } = React.use(params);
 
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (
     path: string | undefined,
@@ -154,29 +158,43 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
   }, [id, router]);
 
   const handleAcceptChallenge = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/challenges/start/${id}`, {
-        method: "PUT",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to start challenge");
+    await handleButtonClick(async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/challenges/start/${id}`, {
+          method: "PUT",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to start challenge");
+        }
+        setChallenge((prev) => (prev ? { ...prev, status: "Started" } : prev));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+        console.error("Error starting challenge:", err);
       }
-      setChallenge((prev) => (prev ? { ...prev, status: "Started" } : prev));
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-      console.error("Error starting challenge:", err);
-    }
+    });
   };
 
   const handleShareChallenge = () => {
-    router.push(`/share-challenge/${id}`);
+    handleButtonClick(() => router.push(`/share-challenge/${id}`));
   };
 
   if (loading)
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="bg-white min-h-screen">
+        <HomeHeader />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl mt-6 sm:mt-10 mb-10">
+          <Skeleton variant="text" width="40%" height={48} className="mb-4" />
+          <Skeleton variant="image" width="100%" height={400} className="mb-6 rounded-xl" />
+          <Skeleton variant="text" width="100%" height={24} className="mb-2" />
+          <Skeleton variant="text" width="80%" height={20} className="mb-4" />
+          <Skeleton variant="text" width="100%" height={16} className="mb-2" />
+          <Skeleton variant="text" width="90%" height={16} className="mb-6" />
+          <div className="flex gap-4">
+            <Skeleton variant="rectangular" width={150} height={48} />
+            <Skeleton variant="rectangular" width={150} height={48} />
+          </div>
+        </div>
       </div>
     );
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
@@ -193,6 +211,11 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
 
   return (
     <div className="bg-white min-h-screen">
+      <Metadata 
+        title={challenge.name}
+        description={challenge.overview}
+        keywords={`${challenge.category}, challenge, ${challenge.project?.name || ''}`}
+      />
       <HomeHeader />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl mt-6 sm:mt-10 mb-10">
         {/* Project Name */}
@@ -374,14 +397,16 @@ const ChallengeDetailsPage: React.FC<ChallengeDetailsPageProps> = ({
           {challenge.status === "Active" ? (
             <button
               onClick={handleAcceptChallenge}
-              className="w-1/2 sm:w-auto px-4 py-2 sm:px-6 sm:py-2 bg-[#A333FF] hover:bg-[#9225e5] text-white rounded-lg text-sm sm:text-base transition"
+              disabled={isButtonDisabled}
+              className="w-1/2 sm:w-auto px-4 py-2 sm:px-6 sm:py-2 bg-[#A333FF] hover:bg-[#9225e5] text-white rounded-lg text-sm sm:text-base transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Accept Challenge
+              {isButtonDisabled ? "Processing..." : "Accept Challenge"}
             </button>
           ) : challenge.status === "Started" ? (
             <button
               onClick={handleShareChallenge}
-              className="w-1/2 sm:w-auto px-4 py-2 sm:px-6 sm:py-2 bg-[#A333FF] hover:bg-[#9225e5] text-white rounded-lg text-sm sm:text-base flex items-center transition"
+              disabled={isButtonDisabled}
+              className="w-1/2 sm:w-auto px-4 py-2 sm:px-6 sm:py-2 bg-[#A333FF] hover:bg-[#9225e5] text-white rounded-lg text-sm sm:text-base flex items-center transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FiShare2 className="mr-2" /> Share Challenge
             </button>

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { Metadata } from "../components/Metadata/Metadata";
 
 type FormData = {
   password: string;
@@ -71,7 +72,9 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#F4E5FF] flex flex-col items-center justify-center min-h-screen p-4 relative">
+    <>
+      <Metadata title="Reset Password" description="Set a new password for your StreakUp account" keywords="reset password, new password, StreakUp" />
+      <div className="bg-[#F4E5FF] flex flex-col items-center justify-center min-h-screen p-4 relative">
       <h1 className="text-4xl font-bold text-center text-black mb-4">
         Reset Your Password
       </h1>
@@ -149,6 +152,7 @@ const ResetPassword: React.FC = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

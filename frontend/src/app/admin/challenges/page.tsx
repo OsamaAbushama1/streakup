@@ -4,6 +4,8 @@ import { FiEdit, FiTrash2, FiPlus, FiX, FiSearch } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../../components/Skeleton";
+import { Metadata } from "../../components/Metadata/Metadata";
 
 interface Challenge {
   _id: string;
@@ -573,12 +575,26 @@ const ChallengesManagement: React.FC = () => {
   };
 
   if (loading)
-    return <p className="text-center text-[#A333FF] pt-20">Loading...</p>;
+    return (
+      <>
+        <Metadata title="Challenges Management" description="Manage and create challenges" />
+        <div className="min-h-screen bg-white w-full px-4 py-6">
+          <Skeleton variant="text" width="40%" height={32} className="mb-2" />
+          <Skeleton variant="text" width="60%" height={20} className="mb-6" />
+          <Skeleton variant="rectangular" width="100%" height={400} className="rounded-lg mb-8" />
+          <Skeleton variant="text" width="40%" height={32} className="mb-2" />
+          <Skeleton variant="text" width="60%" height={20} className="mb-6" />
+          <Skeleton variant="rectangular" width="100%" height={400} className="rounded-lg" />
+        </div>
+      </>
+    );
   if (error)
     return <p className="text-center text-red-500 pt-20">Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-white w-full px-4 py-6">
+    <>
+      <Metadata title="Challenges Management" description="Manage and create challenges to engage users" />
+      <div className="min-h-screen bg-white w-full px-4 py-6">
       <div>
         {/* جدول التحديات */}
         <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2">
@@ -1086,6 +1102,7 @@ const ChallengesManagement: React.FC = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

@@ -8,6 +8,9 @@ import { CroppedAreaPixels, getCroppedImg } from "./cropImage";
 import Image from "next/image";
 import Link from "next/link";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
+import { Metadata } from "../components/Metadata/Metadata";
 
 type FormData = {
   firstName: string;
@@ -39,6 +42,7 @@ const SignupForm: React.FC = () => {
   const [usernameError, setUsernameError] = useState("");
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -196,8 +200,9 @@ const SignupForm: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-    const body = new FormData();
+    handleButtonClick(async () => {
+      setLoading(true);
+      const body = new FormData();
     body.append("firstName", formData.firstName);
     body.append("lastName", formData.lastName);
     body.append("email", formData.email);
@@ -226,9 +231,10 @@ const SignupForm: React.FC = () => {
     } catch (err) {
       console.error(err);
       setError("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+      } finally {
+        setLoading(false);
+      }
+    });
   };
 
   const handleContinue = () => {
@@ -392,11 +398,11 @@ const SignupForm: React.FC = () => {
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <button
                 type="submit"
-                className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#540099] transition-colors flex items-center justify-center"
+                className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#540099] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 suppressHydrationWarning
-                disabled={loading || !!usernameError}
+                disabled={loading || isButtonDisabled || !!usernameError}
               >
-                {loading ? (
+                {loading || isButtonDisabled ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
                     <span>Processing...</span>
@@ -522,12 +528,12 @@ const SignupForm: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={handleContinue}
-                  className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#540099] flex items-center justify-center"
+                  onClick={() => handleButtonClick(() => handleContinue())}
+                  className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#540099] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   suppressHydrationWarning
-                  disabled={loading || !formData.track}
+                  disabled={loading || isButtonDisabled || !formData.track}
                 >
-                  {loading ? (
+                  {loading || isButtonDisabled ? (
                     <div className="flex items-center space-x-2">
                       <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
                       <span>Processing...</span>
@@ -809,9 +815,16 @@ const SignupForm: React.FC = () => {
   };
 
   return (
-    <section className="min-h-screen bg-[#F4E5FF] flex items-center justify-center p-4 pt-8 md:pt-4">
-      {renderStep()}
-    </section>
+    <>
+      <Metadata 
+        title="Sign Up"
+        description="Create your StreakUp account and start your creative journey"
+        keywords="sign up, register, creative challenges, StreakUp account"
+      />
+      <section className="min-h-screen bg-[#F4E5FF] flex items-center justify-center p-4 pt-8 md:pt-4">
+        {renderStep()}
+      </section>
+    </>
   );
 };
 

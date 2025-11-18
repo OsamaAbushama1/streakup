@@ -6,6 +6,9 @@ import LandingFooter from "../components/Landing/LandingFooter";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
+import { Metadata } from "../components/Metadata/Metadata";
 
 interface SharedChallenge {
   _id: string;
@@ -44,6 +47,7 @@ export default function CommunityFeedPage() {
 
   const router = useRouter();
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (path: string | undefined): string => {
     if (!path) return "/imgs/profileImage.png";
@@ -114,14 +118,22 @@ export default function CommunityFeedPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <>
+        <Metadata title="Community Feed" description="Explore the latest challenges shared by the StreakUp community" />
+        <div className="min-h-screen bg-white">
+          <HomeHeader />
+          <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
+            <SkeletonCard count={6} />
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <Metadata title="Community Feed" description="Explore the latest challenges shared by the StreakUp community and get inspired by creative projects" keywords="community feed, shared challenges, creative projects, StreakUp" />
+      <div className="min-h-screen bg-white">
       <HomeHeader />
 
       {/* === HERO SECTION (نفس الـ Home) === */}
@@ -151,10 +163,11 @@ export default function CommunityFeedPage() {
         </p>
 
         <button
-          onClick={() => router.push("/challenge-center")}
-          className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#A333FF] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
+          onClick={() => handleButtonClick(() => router.push("/challenge-center"))}
+          disabled={isButtonDisabled}
+          className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#A333FF] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Go to Challenge Center
+          {isButtonDisabled ? "Loading..." : "Go to Challenge Center"}
         </button>
       </div>
 
@@ -199,14 +212,7 @@ export default function CommunityFeedPage() {
         {error ? (
           <div className="text-center py-20 text-red-500">{error}</div>
         ) : loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-100 rounded-lg animate-pulse h-80"
-              ></div>
-            ))}
-          </div>
+          <SkeletonCard count={6} />
         ) : activeTab === "trending" ? (
           <div className="text-center py-20">
             <p className="text-[#2E2E38] text-lg">
@@ -232,7 +238,8 @@ export default function CommunityFeedPage() {
                   <div
                     key={item._id}
                     className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
-                    onClick={() => router.push(route)}
+                    onClick={() => handleButtonClick(() => router.push(route))}
+                    style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
                   >
                     <Image
                       src={
@@ -335,5 +342,6 @@ export default function CommunityFeedPage() {
 
       <LandingFooter />
     </div>
+    </>
   );
 }

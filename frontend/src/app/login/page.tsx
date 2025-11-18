@@ -3,6 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
+import { Metadata } from "../components/Metadata/Metadata";
 
 type FormData = {
   email: string;
@@ -18,6 +21,7 @@ const Login: React.FC = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [loading, setLoading] = useState(false); // New loading state
   const router = useRouter();
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -59,9 +63,10 @@ const Login: React.FC = () => {
       return;
     }
 
-    setLoading(true); // Start loading
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    handleButtonClick(async () => {
+      setLoading(true); // Start loading
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,27 +101,35 @@ const Login: React.FC = () => {
           setError("Failed to fetch user profile");
         }
       }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong");
-    } finally {
-      setLoading(false); // Stop loading
-    }
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong");
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    });
   };
 
   if (isCheckingAuth) {
     return (
       <div className="min-h-screen bg-[#F4E5FF] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+        <div className="bg-white space-y-4 w-full max-w-lg p-6 rounded-xl">
+          <Skeleton variant="text" width="60%" height={32} className="mx-auto mb-4" />
+          <Skeleton variant="rectangular" width="100%" height={48} className="mb-2" />
+          <Skeleton variant="rectangular" width="100%" height={48} className="mb-4" />
+          <Skeleton variant="rectangular" width="100%" height={48} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#F4E5FF] flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-4xl font-bold text-center text-black mb-4">
-        Welcome Back
-      </h1>
+    <>
+      <Metadata title="Login" description="Sign in to your StreakUp account and continue your creative journey" keywords="login, sign in, StreakUp account" />
+      <div className="bg-[#F4E5FF] flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-4xl font-bold text-center text-black mb-4">
+          Welcome Back
+        </h1>
       <p className="text-center text-[#2E2E38] mb-6 text-lg">
         Continue your creative journey and pick up where you left off
       </p>
@@ -168,10 +181,10 @@ const Login: React.FC = () => {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#8E4BA3] transition-colors flex items-center justify-center"
-          disabled={loading} // Disable button during loading
+          className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#8E4BA3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || isButtonDisabled}
         >
-          {loading ? (
+          {loading || isButtonDisabled ? (
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
               <span>Processing...</span>
@@ -188,6 +201,7 @@ const Login: React.FC = () => {
         </Link>
       </p>
     </div>
+    </>
   );
 };
 

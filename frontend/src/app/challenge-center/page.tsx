@@ -7,6 +7,9 @@ import LandingFooter from "../components/Landing/LandingFooter";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
+import { Metadata } from "../components/Metadata/Metadata";
 
 interface Project {
   _id: string;
@@ -37,6 +40,7 @@ const ChallengeCenter: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (
     path: string | undefined,
@@ -109,15 +113,25 @@ const ChallengeCenter: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A855F7] border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <section className="bg-white">
+        <HomeHeader />
+        <div className="container mx-auto xl:max-w-7xl px-4 sm:px-0 lg:px-0 mt-10 mb-10">
+          <Skeleton variant="text" width="40%" height={48} className="mb-4" />
+          <Skeleton variant="text" width="60%" height={24} className="mb-6" />
+          <SkeletonCard count={6} />
+        </div>
+      </section>
     );
   }
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
     <section className="bg-white">
+      <Metadata 
+        title="Challenge Center"
+        description="Browse and start creative challenges to level up your skills"
+        keywords="challenges, creative challenges, skill development, StreakUp"
+      />
       <HomeHeader />
       <div className="container mx-auto xl:max-w-7xl px-4 sm:px-0 lg:px-0 mt-10 mb-10">
         <div className="text-left mb-5">
@@ -218,12 +232,13 @@ const ChallengeCenter: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() =>
+                  onClick={() => handleButtonClick(() =>
                     router.push(`/challenges/${challenge.challengeId}`)
-                  }
-                  className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-medium rounded-lg px-3 sm:px-4 py-2 sm:py-2 mt-auto flex items-center justify-center gap-2 transition-all text-xs sm:text-sm"
+                  )}
+                  disabled={isButtonDisabled}
+                  className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-medium rounded-lg px-3 sm:px-4 py-2 sm:py-2 mt-auto flex items-center justify-center gap-2 transition-all text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  View Details →
+                  {isButtonDisabled ? "Loading..." : "View Details →"}
                 </button>
               </div>
             ))

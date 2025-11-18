@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { FiSearch, FiTrash2, FiCheck, FiSlash } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../../components/Skeleton";
+import { Metadata } from "../../components/Metadata/Metadata";
 
 interface Report {
   _id: string;
@@ -205,11 +207,25 @@ const ReportsManagement: React.FC = () => {
     router.push(`/${username}/${challengeId}`);
   };
 
-  if (loading) return <p className="text-center text-lg">Loading...</p>;
+  if (loading)
+    return (
+      <>
+        <Metadata title="Reports & Feedback" description="Review flagged content and user-reported issues" />
+        <div className="min-h-screen bg-white">
+          <div className="w-full px-4 py-6">
+            <Skeleton variant="text" width="40%" height={32} className="mb-2" />
+            <Skeleton variant="text" width="60%" height={20} className="mb-6" />
+            <Skeleton variant="rectangular" width="100%" height={400} className="rounded-xl" />
+          </div>
+        </div>
+      </>
+    );
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <Metadata title="Reports & Feedback" description="Review flagged content and user-reported issues" />
+      <div className="min-h-screen bg-white">
       <div className="w-full px-4 py-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2">
           Reports & Feedback
@@ -353,6 +369,7 @@ const ReportsManagement: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
