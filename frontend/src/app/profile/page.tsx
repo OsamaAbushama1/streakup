@@ -15,6 +15,8 @@ import { BsLightbulb } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import HomeHeader from "../components/Home/HomeHeader";
 import LandingFooter from "../components/Landing/LandingFooter";
+import { Skeleton, SkeletonCard } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
 
 interface User {
   _id: string;
@@ -130,6 +132,7 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (
     path: string | undefined | null,
@@ -713,8 +716,35 @@ const Profile: React.FC = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A855F7] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-white">
+        <HomeHeader />
+        <div className="container mx-auto max-w-full px-4 py-6 sm:max-w-3xl sm:px-6 sm:py-8 md:max-w-4xl lg:max-w-5xl xl:max-w-7xl">
+          <div className="bg-[#F4E5FF] rounded-xl p-4 sm:p-6 mb-6">
+            <div className="flex items-start gap-4 mb-4">
+              <Skeleton variant="avatar" width={48} height={48} />
+              <div className="flex-1">
+                <Skeleton variant="text" width="40%" height={24} className="mb-2" />
+                <Skeleton variant="text" width="60%" height={16} className="mb-4" />
+                <div className="flex gap-2">
+                  <Skeleton variant="rectangular" width={100} height={24} />
+                  <Skeleton variant="rectangular" width={100} height={24} />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 sm:flex sm:justify-evenly">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="text-center">
+                  <Skeleton variant="text" width={60} height={24} className="mx-auto mb-1" />
+                  <Skeleton variant="text" width={80} height={16} className="mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-6">
+            <Skeleton variant="text" width="30%" height={32} className="mb-4" />
+            <SkeletonCard count={6} />
+          </div>
+        </div>
       </div>
     );
   if (error) return <p>Error: {error}</p>;
@@ -863,13 +893,13 @@ const Profile: React.FC = () => {
                       <div
                         key={shared._id}
                         className="bg-[#FFFFFF] rounded-xl text-white shadow-lg hover:shadow-xl transition-shadow duration-300 p-2 sm:p-3"
-                        onClick={() => {
+                        onClick={() => handleButtonClick(() => {
                           handleView(shared.challenge.challengeId, index);
                           router.push(
                             `/${userData.username}/${shared.challenge.challengeId}`
                           );
-                        }}
-                        style={{ cursor: "pointer" }}
+                        })}
+                        style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
                       >
                         <div className="relative">
                           <Image
@@ -900,11 +930,13 @@ const Profile: React.FC = () => {
                             <span
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleLike(shared._id, index);
+                                if (!isButtonDisabled) {
+                                  handleButtonClick(() => handleLike(shared._id, index));
+                                }
                               }}
                               className={`flex items-center gap-1 cursor-pointer rounded-full px-2 py-1 transition ${
                                 shared.isLiked ? "bg-[#FFE6F1]" : "bg-[#F5F5F7]"
-                              }`}
+                              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                             >
                               {shared.isLiked ? (
                                 <FaHeart className="text-[#FF3366] transition-all duration-200" />
@@ -1064,18 +1096,20 @@ const Profile: React.FC = () => {
                           {/* زر الإجراء */}
                           {isPaid ? (
                             <button
-                              onClick={() => downloadCertificate(rank)}
-                              className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-md"
+                              onClick={() => handleButtonClick(() => downloadCertificate(rank))}
+                              disabled={isButtonDisabled}
+                              className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Download Certificate
+                              {isButtonDisabled ? "Processing..." : "Download Certificate"}
                             </button>
                           ) : isCurrentRank && isUnlocked ? (
                             <button
-                              onClick={() => {
+                              onClick={() => handleButtonClick(() => {
                                 setSelectedRank(rank);
                                 setShowPayment(true);
-                              }}
-                              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition shadow-md"
+                              })}
+                              disabled={isButtonDisabled}
+                              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               Unlock for 50 EGP
                             </button>
@@ -1214,10 +1248,11 @@ const Profile: React.FC = () => {
                           {reward.points} points
                         </span>
                         <button
-                          className="px-3 py-2 bg-[#A333FF] text-white rounded-lg text-xs hover:bg-[#9225e5] transition font-medium"
-                          onClick={() => handleRedeem(reward.name)}
+                          className="px-3 py-2 bg-[#A333FF] text-white rounded-lg text-xs hover:bg-[#9225e5] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handleButtonClick(() => handleRedeem(reward.name))}
+                          disabled={isButtonDisabled}
                         >
-                          Redeem
+                          {isButtonDisabled ? "Processing..." : "Redeem"}
                         </button>
                       </div>
                     </div>

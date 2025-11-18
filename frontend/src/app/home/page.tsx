@@ -8,6 +8,8 @@ import { IoFlame, IoStar } from "react-icons/io5";
 import { FaFire } from "react-icons/fa";
 import Link from "next/link";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "../components/Skeleton";
+import { useButtonDisable } from "../hooks/useButtonDisable";
 
 interface Project {
   _id: string;
@@ -80,6 +82,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const backendUrl = API_BASE_URL;
+  const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   const getImageUrl = (path: string | undefined): string => {
     if (!path) return "/imgs/profileImage.png";
@@ -301,8 +304,8 @@ export default function HomePage() {
             <p className="text-center text-red-500">{error}</p>
           </div>
         ) : loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+          <div className="px-4">
+            <SkeletonCard count={6} />
           </div>
         ) : sharedChallenges.length === 0 ? (
           <div className="flex justify-center items-center h-64">
@@ -324,7 +327,7 @@ export default function HomePage() {
                 <div
                   key={sharedChallenge._id}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer select-none"
-                  onClick={() => {
+                  onClick={() => handleButtonClick(() => {
                     if (!challengeId) {
                       alert(
                         "This challenge is missing an ID and cannot be opened."
@@ -351,7 +354,8 @@ export default function HomePage() {
                       );
                       router.push(fallbackRoute);
                     }
-                  }}
+                  })}
+                  style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
                 >
                   <Image
                     src={
@@ -423,10 +427,11 @@ export default function HomePage() {
 
         <div className="flex justify-center mt-8">
           <button
-            className="px-6 py-2 sm:px-10 sm:py-3 bg-[#A333FF] text-white rounded-[10px] font-semibold text-base sm:text-lg shadow-md hover:bg-[#9225e5] transition"
-            onClick={() => router.push("/community-feed")}
+            className="px-6 py-2 sm:px-10 sm:py-3 bg-[#A333FF] text-white rounded-[10px] font-semibold text-base sm:text-lg shadow-md hover:bg-[#9225e5] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handleButtonClick(() => router.push("/community-feed"))}
+            disabled={isButtonDisabled}
           >
-            Show More
+            {isButtonDisabled ? "Loading..." : "Show More"}
           </button>
         </div>
 
@@ -443,8 +448,21 @@ export default function HomePage() {
             </div>
 
             {loadingCreators ? (
-              <div className="flex justify-center py-8">
-                <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+              <div className="space-y-5">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 bg-gray-50 rounded-xl p-4">
+                    <Skeleton variant="avatar" width={72} height={72} className="flex-shrink-0" />
+                    <div className="flex-1 w-full">
+                      <Skeleton variant="text" width="60%" height={24} className="mb-2" />
+                      <Skeleton variant="text" width="40%" height={16} className="mb-4" />
+                      <div className="flex gap-5">
+                        <Skeleton variant="rectangular" width={80} height={40} />
+                        <Skeleton variant="rectangular" width={80} height={40} />
+                      </div>
+                    </div>
+                    <Skeleton variant="rectangular" width={120} height={36} className="w-full sm:w-auto" />
+                  </div>
+                ))}
               </div>
             ) : topCreators.length === 0 ? (
               <p className="text-center text-[#2E2E38] py-8">
@@ -497,17 +515,18 @@ export default function HomePage() {
 
                     <div className="w-full sm:w-auto mt-3 sm:mt-0">
                       <button
-                        onClick={() => {
+                        onClick={() => handleButtonClick(() => {
                           const username =
                             creator.username ||
                             `${creator.firstName}-${creator.lastName}`
                               .toLowerCase()
                               .replace(/\s+/g, "-");
                           router.push(`/profile/${username}`);
-                        }}
-                        className="w-full sm:w-auto px-5 py-2 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition text-sm shadow-sm"
+                        })}
+                        disabled={isButtonDisabled}
+                        className="w-full sm:w-auto px-5 py-2 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        View Profile
+                        {isButtonDisabled ? "Loading..." : "View Profile"}
                       </button>
                     </div>
                   </div>
@@ -550,8 +569,17 @@ export default function HomePage() {
             </p>
 
             {loadingChallenge ? (
-              <div className="flex justify-center py-12">
-                <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+              <div className="p-3">
+                <div className="flex flex-col md:flex-row gap-6 items-center">
+                  <Skeleton variant="image" width={300} height={200} className="w-full md:w-64 h-48 rounded-lg" />
+                  <div className="flex-1 w-full">
+                    <Skeleton variant="text" width="40%" height={24} className="mb-4" />
+                    <Skeleton variant="text" width="80%" height={20} className="mb-2" />
+                    <Skeleton variant="text" width="100%" height={16} className="mb-2" />
+                    <Skeleton variant="text" width="90%" height={16} className="mb-6" />
+                    <Skeleton variant="rectangular" width={150} height={40} className="mx-auto" />
+                  </div>
+                </div>
               </div>
             ) : nextChallenge ? (
               <div className="p-3">
@@ -607,15 +635,16 @@ export default function HomePage() {
 
                     <div className="flex justify-center">
                       <button
-                        onClick={() =>
+                        onClick={() => handleButtonClick(() =>
                           router.push(
                             `/challenges/${nextChallenge.challengeId}`
                           )
-                        }
-                        className="group flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#A333FF] to-[#C173FF] text-white rounded-lg font-medium hover:from-[#9225e5] hover:to-[#b05eff] transition-all shadow-md hover:shadow-lg"
+                        )}
+                        disabled={isButtonDisabled}
+                        className="group flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#A333FF] to-[#C173FF] text-white rounded-lg font-medium hover:from-[#9225e5] hover:to-[#b05eff] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <FaFire className="w-5 h-5 text-white bg-transparent group-hover:animate-pulse group-hover:scale-110 transition-all duration-200" />
-                        Start Challenge
+                        {isButtonDisabled ? "Loading..." : "Start Challenge"}
                       </button>
                     </div>
                   </div>
