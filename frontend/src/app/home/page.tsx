@@ -224,8 +224,11 @@ export default function HomePage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-[#ffffff] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#ffffff]">
+        <HomeHeader />
+        <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
+          <SkeletonCard count={6} />
+        </div>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "@/app/components/Skeleton";
 
 const SettingsPage: React.FC = () => {
   // Password change
@@ -95,11 +96,17 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  // عرض سبنر أثناء التحميل الأولي
+  // عرض Skeleton أثناء التحميل الأولي
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-white">
+        <HomeHeader />
+        <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
+          <Skeleton variant="text" width="30%" height={32} className="mb-6" />
+          <Skeleton variant="rectangular" width="100%" height={200} className="rounded-xl mb-6" />
+          <Skeleton variant="rectangular" width="100%" height={200} className="rounded-xl mb-6" />
+          <Skeleton variant="rectangular" width="100%" height={200} className="rounded-xl" />
+        </div>
       </div>
     );
   }

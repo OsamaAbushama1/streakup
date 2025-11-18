@@ -7,6 +7,7 @@ import LandingFooter from "@/app/components/Landing/LandingFooter";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "@/app/components/Skeleton";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import {
@@ -366,8 +367,19 @@ const SharedChallengeDetailsPage = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-white">
+        <HomeHeader />
+        <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
+          <Skeleton variant="image" width="100%" height={400} className="mb-6 rounded-xl" />
+          <Skeleton variant="text" width="100%" height={32} className="mb-4" />
+          <Skeleton variant="text" width="80%" height={24} className="mb-2" />
+          <Skeleton variant="text" width="60%" height={20} className="mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton variant="rectangular" width="100%" height={200} className="rounded-lg" />
+            <Skeleton variant="rectangular" width="100%" height={200} className="rounded-lg" />
+          </div>
+        </div>
+        <LandingFooter />
       </div>
     );
   }

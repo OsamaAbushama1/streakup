@@ -73,6 +73,7 @@ export const metadata: Metadata = {
   category: "education",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{

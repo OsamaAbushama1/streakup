@@ -271,25 +271,36 @@ const HomeHeader: React.FC = () => {
     <header className="bg-white p-4 border-b border-gray-300">
       <div className="container mx-auto xl:max-w-7xl flex justify-between items-center">
         {/* Logo */}
-        <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full">
-          <Image
-            src="/imgs/streakupLogo.png"
-            alt="Logo"
-            width={48}
-            height={48}
-            className="object-contain w-full h-full"
-          />
-        </div>
+        {/* Logo - يكبر + يودي للهوم لما تضغط عليه */}
+<Link href="/home" className="flex items-center">
+  <Image
+    src="/imgs/logo.png"
+    alt="Challenge Logo"
+    width={70}
+    height={70}
+    priority
+    className="
+      w-12 h-12
+      sm:w-12 sm:h-12
+      md:w-[45px] md:h-[45px]
+      lg:w-[55px] lg:h-[55px]
+      object-contain
+      cursor-pointer
+    "
+  />
+</Link>
 
         {/* Search + Icons */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Search Bar */}
           <div className="relative">
-            <input
-              type="text"
-              placeholder="Search Challenge, Creative..."
-              className="px-8 py-2 w-40 sm:w-60 md:w-80 border-none rounded-lg focus:outline-none bg-[#F5F5F7] placeholder-[#B0B0B8] text-sm sm:text-base text-black"
-            />
+          <input
+  type="text"
+  placeholder="Search Challenge, Creative..."
+  defaultValue=""  // الحل السحري
+  className="px-8 py-2 w-40 sm:w-60 md:w-80 border-none rounded-lg focus:outline-none bg-[#F5F5F7] placeholder-[#B0B0B8] text-sm sm:text-base text-black"
+  suppressHydrationWarning // احتياط إضافي (اختياري لكن مفيد جدًا)
+/>
             <FiSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#B0B0B8] text-lg sm:text-xl cursor-pointer" />
           </div>
 

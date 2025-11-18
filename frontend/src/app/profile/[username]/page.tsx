@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import HomeHeader from "@/app/components/Home/HomeHeader";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton, SkeletonCard } from "@/app/components/Skeleton";
 import LandingFooter from "@/app/components/Landing/LandingFooter";
 
 interface User {
@@ -608,8 +609,20 @@ const PublicProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#A333FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-white">
+        <HomeHeader />
+        <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
+          <div className="flex items-start gap-4 mb-6">
+            <Skeleton variant="avatar" width={120} height={120} className="rounded-full" />
+            <div className="flex-1">
+              <Skeleton variant="text" width="40%" height={32} className="mb-2" />
+              <Skeleton variant="text" width="60%" height={20} className="mb-4" />
+              <Skeleton variant="text" width="30%" height={16} />
+            </div>
+          </div>
+          <SkeletonCard count={6} />
+        </div>
+        <LandingFooter />
       </div>
     );
   }
