@@ -12,7 +12,7 @@ const LandingFooter: React.FC = () => {
           <div className="flex items-center justify-center sm:justify-start gap-2">
             {/* 👇 بدّل الصورة دي بمسار لوجو موقعك */}
             <Image
-              src="/imgs/streakupPoster.png" // ضع هنا مسار الصورة بتاعتك
+              src="/imgs/logofooter.png" // ضع هنا مسار الصورة بتاعتك
               alt="Pixel Bloom Logo"
               width={120} // تقدر تعدل العرض والارتفاع حسب حجم اللوجو
               height={40}
