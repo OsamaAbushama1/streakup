@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "StreakUp - Level Up Your Creative Skills",
     description: "Join StreakUp to level up your creative skills through structured challenges and community support.",
     creator: "@streakup",
-    images: ["https://streakup-frontend.onrender.com/imgs/og-image.png"],
+    images: ["https://streakup-frontend.onrender.com/imgs/logo.png"],
   },
   robots: {
     index: true,
@@ -66,8 +66,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "imgs/streakupLogo.png",
-    apple: "imgs/streakupLogo.png",
+    icon: "/imgs/streakupLogo.png",
+    apple: "/imgs/streakupLogo.png",
   },
   manifest: "/manifest.json",
   category: "education",
