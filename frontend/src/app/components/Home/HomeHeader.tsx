@@ -272,14 +272,14 @@ const HomeHeader: React.FC = () => {
       <div className="container mx-auto xl:max-w-7xl flex justify-between items-center">
         {/* Logo */}
         {/* Logo - يكبر + يودي للهوم لما تضغط عليه */}
-<Link href="/home" className="flex items-center">
-  <Image
-    src="/imgs/logo.png"
-    alt="Challenge Logo"
-    width={70}
-    height={70}
-    priority
-    className="
+        <Link href="/home" className="flex items-center">
+          <Image
+            src="/imgs/logo.png"
+            alt="Challenge Logo"
+            width={70}
+            height={70}
+            priority
+            className="
       w-12 h-12
       sm:w-12 sm:h-12
       md:w-[45px] md:h-[45px]
@@ -287,20 +287,20 @@ const HomeHeader: React.FC = () => {
       object-contain
       cursor-pointer
     "
-  />
-</Link>
+          />
+        </Link>
 
         {/* Search + Icons */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Search Bar */}
           <div className="relative">
-          <input
-  type="text"
-  placeholder="Search Challenge, Creative..."
-  defaultValue=""  // الحل السحري
-  className="px-8 py-2 w-40 sm:w-60 md:w-80 border-none rounded-lg focus:outline-none bg-[#F5F5F7] placeholder-[#B0B0B8] text-sm sm:text-base text-black"
-  suppressHydrationWarning // احتياط إضافي (اختياري لكن مفيد جدًا)
-/>
+            <input
+              type="text"
+              placeholder="Search Challenge, Creative..."
+              defaultValue=""  // الحل السحري
+              className="px-8 py-2 w-40 sm:w-60 md:w-80 border-none rounded-lg focus:outline-none bg-[#F5F5F7] placeholder-[#B0B0B8] text-sm sm:text-base text-black"
+              suppressHydrationWarning // احتياط إضافي (اختياري لكن مفيد جدًا)
+            />
             <FiSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#B0B0B8] text-lg sm:text-xl cursor-pointer" />
           </div>
 
@@ -348,7 +348,9 @@ const HomeHeader: React.FC = () => {
                       <Image
                         src={
                           user?.profilePicture
-                            ? `${API_BASE_URL}/${user.profilePicture}`
+                            ? user.profilePicture.startsWith("http")
+                              ? user.profilePicture
+                              : `${API_BASE_URL}/${user.profilePicture}`
                             : "/imgs/default-profile.jpg"
                         }
                         alt="Profile"
@@ -407,9 +409,8 @@ const HomeHeader: React.FC = () => {
                     notifications.map((notif) => (
                       <div
                         key={notif._id}
-                        className={`p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50 transition ${
-                          !notif.read ? "bg-blue-50" : ""
-                        }`}
+                        className={`p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50 transition ${!notif.read ? "bg-blue-50" : ""
+                          }`}
                         onClick={() => goToSharedChallenge(
                           notif.username,
                           notif.challengeLinkId,
@@ -421,7 +422,9 @@ const HomeHeader: React.FC = () => {
                           <Image
                             src={
                               notif.sender.profilePicture
-                                ? `${API_BASE_URL}/${notif.sender.profilePicture}`
+                                ? notif.sender.profilePicture.startsWith("http")
+                                  ? notif.sender.profilePicture
+                                  : `${API_BASE_URL}/${notif.sender.profilePicture}`
                                 : "/imgs/default-profile.jpg"
                             }
                             alt="Sender"
@@ -437,8 +440,8 @@ const HomeHeader: React.FC = () => {
                               {notif.type === "like" && notif.commentId
                                 ? "liked your comment"
                                 : notif.type === "like"
-                                ? "liked your challenge"
-                                : "commented on your challenge"}
+                                  ? "liked your challenge"
+                                  : "commented on your challenge"}
                             </p>
                             {notif.commentPreview && (
                               <p className="text-xs text-gray-700 truncate mt-1 italic">
@@ -471,7 +474,9 @@ const HomeHeader: React.FC = () => {
                   <Image
                     src={
                       user?.profilePicture
-                        ? `${API_BASE_URL}/${user.profilePicture}`
+                        ? user.profilePicture.startsWith("http")
+                          ? user.profilePicture
+                          : `${API_BASE_URL}/${user.profilePicture}`
                         : "/imgs/default-profile.jpg"
                     }
                     alt="Profile"
@@ -539,7 +544,9 @@ const HomeHeader: React.FC = () => {
                     <Image
                       src={
                         notif.sender.profilePicture
-                          ? `${API_BASE_URL}/${notif.sender.profilePicture}`
+                          ? notif.sender.profilePicture.startsWith("http")
+                            ? notif.sender.profilePicture
+                            : `${API_BASE_URL}/${notif.sender.profilePicture}`
                           : "/imgs/default-profile.jpg"
                       }
                       alt="Sender"
@@ -553,8 +560,8 @@ const HomeHeader: React.FC = () => {
                         {notif.type === "like" && notif.commentId
                           ? "liked your comment"
                           : notif.type === "like"
-                          ? "liked your challenge"
-                          : "commented on your challenge"}
+                            ? "liked your challenge"
+                            : "commented on your challenge"}
                       </p>
                       {notif.commentPreview && (
                         <p className="text-xs text-gray-700 italic mt-1 truncate">

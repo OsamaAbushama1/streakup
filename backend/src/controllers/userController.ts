@@ -45,7 +45,7 @@ export const authenticateToken = (
 ) => {
   // جرب الـ cookie أولاً
   let token = req.cookies.token;
-  
+
   // لو مفيش cookie، جرب الـ Authorization header
   if (!token) {
     const authHeader = req.headers.authorization;
@@ -54,8 +54,8 @@ export const authenticateToken = (
     }
   }
 
-  console.log('Auth attempt:', { 
-    hasToken: !!token, 
+  console.log('Auth attempt:', {
+    hasToken: !!token,
     tokenLength: token ? token.length : 0,
     userAgent: req.headers['user-agent']?.substring(0, 50)
   }); // للـ debugging
@@ -64,7 +64,7 @@ export const authenticateToken = (
     console.log('No token found');
     return res
       .status(401)
-      .json({ 
+      .json({
         message: "Authentication token is required",
         debug: process.env.NODE_ENV === 'development' ? {
           cookies: Object.keys(req.cookies),
@@ -79,14 +79,14 @@ export const authenticateToken = (
       email?: string;
       username?: string;
     };
-    
+
     console.log('Token decoded successfully for user:', decoded.id); // للـ debugging
-    
+
     req.user = { id: decoded.id };
     next();
   } catch (error: any) {
     console.error('Token verification failed:', error.message);
-    return res.status(403).json({ 
+    return res.status(403).json({
       message: "Invalid or expired token",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -94,14 +94,14 @@ export const authenticateToken = (
 };
 export const checkAuth = async (req: AuthRequest, res: Response) => {
   try {
-    console.log('checkAuth called:', { 
+    console.log('checkAuth called:', {
       hasUser: !!req.user,
       userId: req.user?.id,
       cookies: Object.keys(req.cookies)
     }); // للـ debugging
 
     if (!req.user?.id) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         message: "Unauthenticated",
         debug: process.env.NODE_ENV === 'development' ? {
           cookies: Object.keys(req.cookies),
@@ -116,8 +116,8 @@ export const checkAuth = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ 
-      message: "Authenticated", 
+    res.status(200).json({
+      message: "Authenticated",
       userId: req.user.id,
       email: user.email,
       username: user.username
@@ -209,7 +209,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     const token = jwt.sign(
-      { id: newUser._id },
+      { id: newUser._id, role: newUser.role },
       process.env.JWT_SECRET || "secret",
       { expiresIn: "1h" }
     );
@@ -253,10 +253,11 @@ export const loginUser = async (req: Request, res: Response) => {
     await user.save();
 
     const token = jwt.sign(
-      { 
+      {
         id: user._id.toString(),
         email: user.email,
-        username: user.username 
+        username: user.username,
+        role: user.role
       },
       process.env.JWT_SECRET || "secret",
       { expiresIn: "24h" }
@@ -420,7 +421,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     const userId = req.user?.id;
     const { firstName, lastName, email, password, track, skillLevel } =
       req.body;
-    
+
     let profilePicture: string | undefined;
     if (req.file) {
       try {
@@ -537,24 +538,24 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
 
     const badges = user.badges?.length
       ? user.badges.map((name: string, index: number) => ({
-          name,
-          isUnlocked:
-            index === 0
-              ? (user.completedChallenges || 0) >= 1
-              : index === 1
+        name,
+        isUnlocked:
+          index === 0
+            ? (user.completedChallenges || 0) >= 1
+            : index === 1
               ? (user.streak || 0) >= 7
               : index === 2
-              ? totalComments >= 20
-              : index === 3
-              ? totalLikes >= 20
-              : index === 4
-              ? (user.streak || 0) >= 30
-              : index === 5
-              ? user.points >= 2400
-              : false,
-          description:
-            defaultBadges[index]?.description || "No description available",
-        }))
+                ? totalComments >= 20
+                : index === 3
+                  ? totalLikes >= 20
+                  : index === 4
+                    ? (user.streak || 0) >= 30
+                    : index === 5
+                      ? user.points >= 2400
+                      : false,
+        description:
+          defaultBadges[index]?.description || "No description available",
+      }))
       : defaultBadges;
 
     const store = [

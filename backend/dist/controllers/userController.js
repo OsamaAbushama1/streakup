@@ -16,29 +16,86 @@ const sharedChallengeModel_1 = __importDefault(require("../models/sharedChalleng
 const mongoose_1 = __importDefault(require("mongoose"));
 const generateCertificate_1 = require("../utils/generateCertificate");
 const cloudinary_1 = require("../utils/cloudinary");
+const isProduction = process.env.NODE_ENV === "production";
+const baseCookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 3600000,
+};
+const cookieOptionsWithDomain = {
+    ...baseCookieOptions,
+    domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+};
 const authenticateToken = (req, res, next) => {
-    const token = req.cookies.token;
+    // جرب الـ cookie أولاً
+    let token = req.cookies.token;
+    // لو مفيش cookie، جرب الـ Authorization header
     if (!token) {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7);
+        }
+    }
+    console.log('Auth attempt:', {
+        hasToken: !!token,
+        tokenLength: token ? token.length : 0,
+        userAgent: req.headers['user-agent']?.substring(0, 50)
+    }); // للـ debugging
+    if (!token) {
+        console.log('No token found');
         return res
             .status(401)
-            .json({ message: "Authentication token is required" });
+            .json({
+            message: "Authentication token is required",
+            debug: process.env.NODE_ENV === 'development' ? {
+                cookies: Object.keys(req.cookies),
+                hasAuthorization: !!req.headers.authorization
+            } : undefined
+        });
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "secret");
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "your-secret-key-here");
+        console.log('Token decoded successfully for user:', decoded.id); // للـ debugging
         req.user = { id: decoded.id };
         next();
     }
     catch (error) {
-        return res.status(403).json({ message: "Invalid or expired token" });
+        console.error('Token verification failed:', error.message);
+        return res.status(403).json({
+            message: "Invalid or expired token",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 exports.authenticateToken = authenticateToken;
 const checkAuth = async (req, res) => {
     try {
+        console.log('checkAuth called:', {
+            hasUser: !!req.user,
+            userId: req.user?.id,
+            cookies: Object.keys(req.cookies)
+        }); // للـ debugging
         if (!req.user?.id) {
-            return res.status(401).json({ message: "Unauthenticated" });
+            return res.status(401).json({
+                message: "Unauthenticated",
+                debug: process.env.NODE_ENV === 'development' ? {
+                    cookies: Object.keys(req.cookies),
+                    authorization: !!req.headers.authorization
+                } : undefined
+            });
         }
-        res.status(200).json({ message: "Authenticated", userId: req.user.id });
+        // تحقق من وجود المستخدم في الـ database
+        const user = await userModel_1.default.findById(req.user.id).select('_id email username');
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            message: "Authenticated",
+            userId: req.user.id,
+            email: user.email,
+            username: user.username
+        });
     }
     catch (error) {
         console.error("[checkAuth] Error:", error);
@@ -119,13 +176,8 @@ const registerUser = async (req, res) => {
             profilePicture,
             lastLogin: new Date(),
         });
-        const token = jsonwebtoken_1.default.sign({ id: newUser._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 3600000,
-        });
+        const token = jsonwebtoken_1.default.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
+        res.cookie("token", token, cookieOptionsWithDomain);
         res.status(201).json({
             user: {
                 id: newUser._id,
@@ -158,13 +210,13 @@ const loginUser = async (req, res) => {
         user.lastLogin = new Date();
         user.isOnline = true;
         await user.save();
-        const token = jsonwebtoken_1.default.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 3600000,
-        });
+        const token = jsonwebtoken_1.default.sign({
+            id: user._id.toString(),
+            email: user.email,
+            username: user.username,
+            role: user.role
+        }, process.env.JWT_SECRET || "secret", { expiresIn: "24h" });
+        res.cookie("token", token, cookieOptionsWithDomain);
         res.status(200).json({
             user: {
                 id: user._id,
@@ -232,11 +284,7 @@ const logoutUser = async (req, res) => {
             // إذا كان التوكن منتهي أو غير صالح، لا نفعل شيئًا
         }
     }
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true, // مهم على Render HTTPS
-        sameSite: "none",
-    });
+    res.clearCookie("token", cookieOptionsWithDomain);
     res.status(200).json({ message: "Logged out successfully" });
 };
 exports.logoutUser = logoutUser;
