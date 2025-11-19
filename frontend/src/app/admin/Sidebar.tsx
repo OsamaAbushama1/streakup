@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         {isOpen && (
           <div className="flex items-center gap-2">
             <Image
-              src="/imgs/streakupLogo.png"
+              src="/imgs/logo.png"
               alt="Logo"
               width={32}
               height={32}
