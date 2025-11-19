@@ -43,30 +43,85 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.token;
+  // جرب الـ cookie أولاً
+  let token = req.cookies.token;
+  
+  // لو مفيش cookie، جرب الـ Authorization header
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  console.log('Auth attempt:', { 
+    hasToken: !!token, 
+    tokenLength: token ? token.length : 0,
+    userAgent: req.headers['user-agent']?.substring(0, 50)
+  }); // للـ debugging
 
   if (!token) {
+    console.log('No token found');
     return res
       .status(401)
-      .json({ message: "Authentication token is required" });
+      .json({ 
+        message: "Authentication token is required",
+        debug: process.env.NODE_ENV === 'development' ? {
+          cookies: Object.keys(req.cookies),
+          hasAuthorization: !!req.headers.authorization
+        } : undefined
+      });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key-here") as {
       id: string;
+      email?: string;
+      username?: string;
     };
+    
+    console.log('Token decoded successfully for user:', decoded.id); // للـ debugging
+    
     req.user = { id: decoded.id };
     next();
-  } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired token" });
+  } catch (error: any) {
+    console.error('Token verification failed:', error.message);
+    return res.status(403).json({ 
+      message: "Invalid or expired token",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 export const checkAuth = async (req: AuthRequest, res: Response) => {
   try {
+    console.log('checkAuth called:', { 
+      hasUser: !!req.user,
+      userId: req.user?.id,
+      cookies: Object.keys(req.cookies)
+    }); // للـ debugging
+
     if (!req.user?.id) {
-      return res.status(401).json({ message: "Unauthenticated" });
+      return res.status(401).json({ 
+        message: "Unauthenticated",
+        debug: process.env.NODE_ENV === 'development' ? {
+          cookies: Object.keys(req.cookies),
+          authorization: !!req.headers.authorization
+        } : undefined
+      });
     }
-    res.status(200).json({ message: "Authenticated", userId: req.user.id });
+
+    // تحقق من وجود المستخدم في الـ database
+    const user = await User.findById(req.user.id).select('_id email username');
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ 
+      message: "Authenticated", 
+      userId: req.user.id,
+      email: user.email,
+      username: user.username
+    });
   } catch (error: any) {
     console.error("[checkAuth] Error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -198,9 +253,13 @@ export const loginUser = async (req: Request, res: Response) => {
     await user.save();
 
     const token = jwt.sign(
-      { id: user._id },
+      { 
+        id: user._id.toString(),
+        email: user.email,
+        username: user.username 
+      },
       process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     res.cookie("token", token, cookieOptionsWithDomain);
