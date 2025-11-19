@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, CookieOptions } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
@@ -15,6 +15,19 @@ import {
   sendCertificateEmail,
 } from "../utils/generateCertificate";
 import { uploadToCloudinary } from "../utils/cloudinary";
+
+const isProduction = process.env.NODE_ENV === "production";
+const baseCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 3600000,
+};
+
+const cookieOptionsWithDomain: CookieOptions = {
+  ...baseCookieOptions,
+  domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+};
 
 interface AuthRequest extends Request {
   user?: { id: string };
@@ -146,12 +159,7 @@ export const registerUser = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none" ,
-      maxAge: 3600000,
-    });
+    res.cookie("token", token, cookieOptionsWithDomain);
 
     res.status(201).json({
       user: {
@@ -195,12 +203,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,  
-      sameSite: "none" ,
-      maxAge: 3600000,
-    });
+    res.cookie("token", token, cookieOptionsWithDomain);
 
     res.status(200).json({
       user: {
@@ -272,11 +275,7 @@ export const logoutUser = async (req: Request, res: Response) => {
     }
   }
 
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,     // مهم على Render HTTPS
-    sameSite: "none",
-  });
+  res.clearCookie("token", cookieOptionsWithDomain);
   res.status(200).json({ message: "Logged out successfully" });
 };
 
