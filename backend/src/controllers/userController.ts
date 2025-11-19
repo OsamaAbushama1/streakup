@@ -210,19 +210,16 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { id: newUser._id },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "1h" }
     );
 
     res.cookie("token", token, cookieOptionsWithDomain);
 
     res.status(201).json({
-      success: true,
-      token, // ← مهم جدًا
       user: {
         id: newUser._id,
         email: newUser.email,
-        username: newUser.username,
         firstName: newUser.firstName,
         lastName: newUser.lastName,
       },
@@ -256,22 +253,21 @@ export const loginUser = async (req: Request, res: Response) => {
     await user.save();
 
     const token = jwt.sign(
-      { id: user._id.toString() },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" } // 7 أيام أفضل من 1 ساعة
+      { 
+        id: user._id.toString(),
+        email: user.email,
+        username: user.username 
+      },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: "24h" }
     );
 
-    // 1. احط الكوكي (للويب)
     res.cookie("token", token, cookieOptionsWithDomain);
 
-    // 2. رجّع التوكن في الـ body (للموبايل)
     res.status(200).json({
-      success: true,
-      token, // ← ده المهم جدًا للآيفون
       user: {
         id: user._id,
         email: user.email,
-        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
       },
