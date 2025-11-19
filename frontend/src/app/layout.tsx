@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Join StreakUp to level up your creative skills through structured challenges and community support.",
     images: [
       {
-        url: "https://streakup-frontend.onrender.com/imgs/og-image.png",
+        url: "https://streakup-frontend.onrender.com/imgs/streakupLogo.png",
         width: 1200,
         height: 630,
         alt: "StreakUp - Creative Skills Platform",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "StreakUp - Level Up Your Creative Skills",
     description: "Join StreakUp to level up your creative skills through structured challenges and community support.",
     creator: "@streakup",
-    images: ["https://streakup-frontend.onrender.com/imgs/logo.png"],
+    images: ["https://streakup-frontend.onrender.com/imgs/streakupLogo.png"],
   },
   robots: {
     index: true,
