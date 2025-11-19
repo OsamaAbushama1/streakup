@@ -66,8 +66,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "imgs/logo.png",
-    apple: "/apple-touch-icon.png",
+    icon: "imgs/streakupLogo.png",
+    apple: "imgs/streakupLogo.png",
   },
   manifest: "/manifest.json",
   category: "education",
