@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, ReactNode } from "react";
 import { API_BASE_URL } from "@/config/api";
-import { FiCheckCircle, FiEye, FiHeart, FiLock, FiX } from "react-icons/fi";
+import { FiCheckCircle, FiEye, FiHeart, FiLock } from "react-icons/fi";
 import { BiComment } from "react-icons/bi";
 import {
   FaEye,
@@ -9,9 +9,6 @@ import {
   FaHeart,
   FaRocket,
   FaShieldAlt,
-  FaMedal,
-  FaStar,
-  FaCrown,
 } from "react-icons/fa";
 import Image from "next/image";
 import { BsLightbulb } from "react-icons/bs";
@@ -95,30 +92,6 @@ interface Certificate {
   paid: boolean;
 }
 
-const BADGE_DETAILS: Record<
-  string,
-  { icon: ReactNode; color: string; bg: string; description: string }
-> = {
-  "Community Helper": {
-    icon: <FaHeart />,
-    color: "text-red-500",
-    bg: "bg-red-100",
-    description: "Awarded for being a helpful member of the community.",
-  },
-  "Social Star": {
-    icon: <FaStar />,
-    color: "text-yellow-500",
-    bg: "bg-yellow-100",
-    description: "Awarded for high engagement and social activity.",
-  },
-  "Top Ranker": {
-    icon: <FaCrown />,
-    color: "text-purple-500",
-    bg: "bg-purple-100",
-    description: "Awarded for reaching the top ranks on the leaderboard.",
-  },
-};
-
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("My Challenges");
   const [userData, setUserData] = useState<User | null>(null);
@@ -155,10 +128,6 @@ const Profile: React.FC = () => {
     Gold: 0,
     Platinum: 0,
   });
-
-  // Badge Pop-up State
-  const [showBadgePopup, setShowBadgePopup] = useState(false);
-  const [newBadge, setNewBadge] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -294,36 +263,6 @@ const Profile: React.FC = () => {
 
     fetchUserProfile();
   }, [router]);
-
-  // Check for new badges
-  useEffect(() => {
-    if (userData && userData.badges) {
-      const storedBadges = JSON.parse(
-        localStorage.getItem("user_badges") || "[]"
-      );
-      const currentBadges = userData.badges;
-
-      const newBadges = currentBadges.filter(
-        (badge) => !storedBadges.includes(badge)
-      );
-
-      if (newBadges.length > 0) {
-        setNewBadge(newBadges[0]); // Show the first new badge
-        setShowBadgePopup(true);
-        localStorage.setItem("user_badges", JSON.stringify(currentBadges));
-      } else {
-        // Ensure localStorage is in sync even if no new badges (e.g. first load with existing badges)
-        // But we only want to show popup for *newly* acquired ones.
-        // If storedBadges is empty and user has badges, it might be first login on this device.
-        // To avoid spamming on first login, we might want to just sync if it's empty?
-        // Requirement: "For any badge a user gets, I want a pop-up".
-        // If I clear cache, I get popups. That's acceptable for client-side tracking.
-        if (storedBadges.length !== currentBadges.length) {
-          localStorage.setItem("user_badges", JSON.stringify(currentBadges));
-        }
-      }
-    }
-  }, [userData]);
 
   useEffect(() => {
     const totalViews = mySharedChallenges.reduce(
@@ -833,7 +772,7 @@ const Profile: React.FC = () => {
                 <p className="text-xs sm:text-sm text-[#948f90] mt-1 mb-2">
                   {userData.email}
                 </p>
-                <div className="flex flex-wrap gap-2 text-xs sm:text-sm items-center">
+                <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
                   <span className="bg-red-100 text-[#FF3347] px-2 py-1 rounded">
                     {userData.track}
                   </span>
@@ -842,21 +781,6 @@ const Profile: React.FC = () => {
                       {userData.skillLevel}
                     </span>
                   )}
-                  {userData.badges &&
-                    userData.badges.map((badge) => {
-                      const details = BADGE_DETAILS[badge];
-                      if (!details) return null;
-                      return (
-                        <span
-                          key={badge}
-                          className={`${details.bg} ${details.color} px-2 py-1 rounded flex items-center gap-1`}
-                          title={details.description}
-                        >
-                          {details.icon}
-                          {badge}
-                        </span>
-                      );
-                    })}
                 </div>
               </div>
             </div>
@@ -1468,42 +1392,6 @@ const Profile: React.FC = () => {
               className="mt-4 w-full py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
             >
               Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      {/* Badge Congratulation Pop-up */}
-      {showBadgePopup && newBadge && BADGE_DETAILS[newBadge] && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl max-w-sm w-full text-center relative animate-bounce-in">
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-xl pointer-events-none">
-              <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine rotate-45" />
-            </div>
-            <div className="mb-4 flex justify-center">
-              <div
-                className={`w-20 h-20 ${BADGE_DETAILS[newBadge].bg} rounded-full flex items-center justify-center text-4xl ${BADGE_DETAILS[newBadge].color} shadow-lg`}
-              >
-                {BADGE_DETAILS[newBadge].icon}
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-[#2E2E38] mb-2">
-              Congratulations!
-            </h3>
-            <p className="text-[#595b5c] mb-4">
-              You've earned the{" "}
-              <span className={`font-bold ${BADGE_DETAILS[newBadge].color}`}>
-                {newBadge}
-              </span>{" "}
-              badge!
-            </p>
-            <p className="text-sm text-gray-500 mb-6">
-              {BADGE_DETAILS[newBadge].description}
-            </p>
-            <button
-              onClick={() => setShowBadgePopup(false)}
-              className="w-full py-3 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
-              Awesome!
             </button>
           </div>
         </div>
