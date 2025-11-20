@@ -109,7 +109,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
   params,
 }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   // const commentId = searchParams.get("commentId");
   const [sharedChallenge, setSharedChallenge] =
     useState<SharedChallenge | null>(null);
