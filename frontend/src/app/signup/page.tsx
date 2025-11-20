@@ -8,7 +8,6 @@ import { CroppedAreaPixels, getCroppedImg } from "./cropImage";
 import Image from "next/image";
 import Link from "next/link";
 import { API_BASE_URL } from "@/config/api";
-import { Skeleton } from "../components/Skeleton";
 import { useButtonDisable } from "../hooks/useButtonDisable";
 import { Metadata } from "../components/Metadata/Metadata";
 
@@ -101,7 +100,7 @@ const SignupForm: React.FC = () => {
       }
       setUsernameError("");
       return true;
-    } catch (err) {
+    } catch (_err) {
       setUsernameError("Error checking username availability");
       return false;
     }
@@ -203,34 +202,34 @@ const SignupForm: React.FC = () => {
     handleButtonClick(async () => {
       setLoading(true);
       const body = new FormData();
-    body.append("firstName", formData.firstName);
-    body.append("lastName", formData.lastName);
-    body.append("email", formData.email);
-    body.append("password", formData.password);
-    body.append("username", formData.username);
-    if (formData.track) body.append("track", formData.track);
-    if (formData.skillLevel) body.append("skillLevel", formData.skillLevel);
-    if (formData.profilePicture)
-      body.append("profilePicture", formData.profilePicture);
+      body.append("firstName", formData.firstName);
+      body.append("lastName", formData.lastName);
+      body.append("email", formData.email);
+      body.append("password", formData.password);
+      body.append("username", formData.username);
+      if (formData.track) body.append("track", formData.track);
+      if (formData.skillLevel) body.append("skillLevel", formData.skillLevel);
+      if (formData.profilePicture)
+        body.append("profilePicture", formData.profilePicture);
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-        method: "POST",
-        body,
-        credentials: "include",
-      });
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+          method: "POST",
+          body,
+          credentials: "include",
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.message || "Registration failed");
-      } else {
-        console.log("Registered user:", data);
-        window.location.href = "/home";
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong");
+        if (!res.ok) {
+          setError(data.message || "Registration failed");
+        } else {
+          console.log("Registered user:", data);
+          window.location.href = "/home";
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -452,11 +451,10 @@ const SignupForm: React.FC = () => {
                 Select the creative field you want to focus on for the Challenge
               </p>
               <div
-                className={`gap-4 mb-6 ${
-                  tracks.length % 2 === 0
-                    ? "grid grid-cols-1 md:grid-cols-2"
-                    : "grid grid-cols-1"
-                }`}
+                className={`gap-4 mb-6 ${tracks.length % 2 === 0
+                  ? "grid grid-cols-1 md:grid-cols-2"
+                  : "grid grid-cols-1"
+                  }`}
               >
                 {tracks.map((track) => (
                   <button
@@ -467,26 +465,25 @@ const SignupForm: React.FC = () => {
                     style={
                       formData.track === track.name
                         ? {
-                            background:
-                              "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                            backgroundOrigin: "border-box",
-                          }
+                          background:
+                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                          backgroundOrigin: "border-box",
+                        }
                         : {}
                     }
                   >
                     <div className="flex flex-row items-start md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
                       <span
-                        className={`text-xl rounded-full flex items-center justify-center p-2 transition ${
-                          formData.track === track.name
-                            ? "text-black"
-                            : "text-white bg-[#B0B0B8]"
-                        }`}
+                        className={`text-xl rounded-full flex items-center justify-center p-2 transition ${formData.track === track.name
+                          ? "text-black"
+                          : "text-white bg-[#B0B0B8]"
+                          }`}
                         style={
                           formData.track === track.name
                             ? {
-                                background:
-                                  "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                              }
+                              background:
+                                "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                            }
                             : {}
                         }
                       >
@@ -503,10 +500,10 @@ const SignupForm: React.FC = () => {
                           {track.name === "UI/UX Design"
                             ? "User interface and experience design"
                             : track.name === "Graphic Design"
-                            ? "Visual communication and branding"
-                            : track.name === "Frontend Development"
-                            ? "Web development and user interfaces"
-                            : track.description || "Custom track"}
+                              ? "Visual communication and branding"
+                              : track.name === "Frontend Development"
+                                ? "Web development and user interfaces"
+                                : track.description || "Custom track"}
                         </p>
                       </div>
                     </div>
@@ -581,12 +578,12 @@ const SignupForm: React.FC = () => {
                     style={
                       formData.skillLevel === "Beginner"
                         ? {
-                            backgroundImage:
-                              "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                            padding: "1px",
-                            backgroundOrigin: "border-box",
-                            backgroundClip: "padding-box",
-                          }
+                          backgroundImage:
+                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                          padding: "1px",
+                          backgroundOrigin: "border-box",
+                          backgroundClip: "padding-box",
+                        }
                         : {}
                     }
                   >
@@ -617,12 +614,12 @@ const SignupForm: React.FC = () => {
                     style={
                       formData.skillLevel === "Intermediate"
                         ? {
-                            backgroundImage:
-                              "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                            padding: "1px",
-                            backgroundOrigin: "border-box",
-                            backgroundClip: "padding-box",
-                          }
+                          backgroundImage:
+                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                          padding: "1px",
+                          backgroundOrigin: "border-box",
+                          backgroundClip: "padding-box",
+                        }
                         : {}
                     }
                   >
@@ -654,12 +651,12 @@ const SignupForm: React.FC = () => {
                     style={
                       formData.skillLevel === "Advanced"
                         ? {
-                            backgroundImage:
-                              "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                            padding: "1px",
-                            backgroundOrigin: "border-box",
-                            backgroundClip: "padding-box",
-                          }
+                          backgroundImage:
+                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                          padding: "1px",
+                          backgroundOrigin: "border-box",
+                          backgroundClip: "padding-box",
+                        }
                         : {}
                     }
                   >
@@ -816,7 +813,7 @@ const SignupForm: React.FC = () => {
 
   return (
     <>
-      <Metadata 
+      <Metadata
         title="Sign Up"
         description="Create your StreakUp account and start your creative journey"
         keywords="sign up, register, creative challenges, StreakUp account"
