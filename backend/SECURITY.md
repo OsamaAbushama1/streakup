@@ -111,6 +111,7 @@ This document describes the comprehensive anti-scraping protection implemented i
 **Configuration:**
 - **Production:** Only allows requests from `FRONTEND_URL` and `ADMIN_URL`
 - **Development:** Also allows `localhost:3000` and `127.0.0.1:3000`
+- **No Origin:** Allows requests with no origin header (mobile apps, server-to-server)
 - **Credentials:** Enabled for cookie-based authentication
 - **Methods:** GET, POST, PUT, DELETE, OPTIONS
 - **Headers:** Content-Type, Authorization
@@ -118,7 +119,13 @@ This document describes the comprehensive anti-scraping protection implemented i
 **Features:**
 - Environment-based origin filtering
 - Logging of blocked origins
-- Clear error messages
+- Proper rejection without server crashes
+- Mobile app support (no origin header)
+
+**Behavior:**
+- Allowed origins: Request proceeds normally
+- Blocked origins: Request rejected with CORS error (logged but doesn't crash server)
+- No origin: Allowed (common for mobile apps and server-to-server requests)
 
 ## Security Architecture
 
