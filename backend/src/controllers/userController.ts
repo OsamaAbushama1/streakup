@@ -26,7 +26,7 @@ const baseCookieOptions: CookieOptions = {
 
 const cookieOptionsWithDomain: CookieOptions = {
   ...baseCookieOptions,
-  domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+  // domain: isProduction ? process.env.COOKIE_DOMAIN : undefined, // Removed to support Next.js rewrites (HostOnly cookies)
 };
 
 interface AuthRequest extends Request {
