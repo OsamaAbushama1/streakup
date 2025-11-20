@@ -483,8 +483,8 @@ const getRewards = async (req, res) => {
                     // New badge unlock!
                     newlyUnlockedBadges.push(badge.name);
                     // Add to unlockedBadges array
-                    if (!user.unlockedBadges) {
-                        user.unlockedBadges = [];
+                    if (!user.unlockedBadges || user.unlockedBadges.length === 0) {
+                        user.set("unlockedBadges", []);
                     }
                     user.unlockedBadges.push({
                         name: badge.name,
@@ -492,8 +492,8 @@ const getRewards = async (req, res) => {
                         seen: false,
                     });
                     // Add to newBadges for pop-up notification
-                    if (!user.newBadges) {
-                        user.newBadges = [];
+                    if (!user.newBadges || user.newBadges.length === 0) {
+                        user.set("newBadges", []);
                     }
                     if (!user.newBadges.includes(badge.name)) {
                         user.newBadges.push(badge.name);

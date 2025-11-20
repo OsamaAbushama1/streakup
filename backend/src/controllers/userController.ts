@@ -546,6 +546,30 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
         // Check if badge is already in unlockedBadges
         const alreadyUnlocked = user.unlockedBadges?.some(
           (b: any) => b.name === badge.name
+        );
+
+        if (!alreadyUnlocked) {
+          // New badge unlock!
+          newlyUnlockedBadges.push(badge.name);
+
+          // Add to unlockedBadges array
+          if (!user.unlockedBadges || user.unlockedBadges.length === 0) {
+            user.set("unlockedBadges", []);
+          }
+          user.unlockedBadges.push({
+            name: badge.name,
+            unlockedAt: new Date(),
+            seen: false,
+          } as any);
+
+          // Add to newBadges for pop-up notification
+          if (!user.newBadges || user.newBadges.length === 0) {
+            user.set("newBadges", []);
+          }
+          if (!user.newBadges.includes(badge.name)) {
+            user.newBadges.push(badge.name);
+          }
+        }
       }
     }
 
