@@ -67,40 +67,51 @@ const Login: React.FC = () => {
       setLoading(true); // Start loading
       try {
         const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+          credentials: "include",
+        });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Login failed");
-      } else {
-        console.log("Logged in user:", data);
-        // جلب بيانات المستخدم للتحقق من الدور
-        const profileRes = await fetch(
-          `${API_BASE_URL}/api/auth/profile`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-
-        if (profileRes.ok) {
-          const profileData = await profileRes.json();
-          if (profileData.user.role === "Admin") {
-            router.push("/admin");
-          } else {
-            router.push("/home");
-          }
+        let data;
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          data = await res.json();
         } else {
-          setError("Failed to fetch user profile");
+          const text = await res.text();
+          // If it's a 429, it might be plain text
+          if (res.status === 429) {
+            throw new Error("Too many requests. Please wait a few minutes and try again.");
+          }
+          throw new Error(text || "Server error");
         }
-      }
+
+        if (!res.ok) {
+          setError(data?.message || "Login failed");
+        } else {
+          console.log("Logged in user:", data);
+          // جلب بيانات المستخدم للتحقق من الدور
+          const profileRes = await fetch(
+            `${API_BASE_URL}/api/auth/profile`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          if (profileRes.ok) {
+            const profileData = await profileRes.json();
+            if (profileData.user.role === "Admin") {
+              router.push("/admin");
+            } else {
+              router.push("/home");
+            }
+          } else {
+            setError("Failed to fetch user profile");
+          }
+        }
       } catch (err) {
         console.error(err);
         setError("Something went wrong");
@@ -130,77 +141,77 @@ const Login: React.FC = () => {
         <h1 className="text-4xl font-bold text-center text-black mb-4">
           Welcome Back
         </h1>
-      <p className="text-center text-[#2E2E38] mb-6 text-lg">
-        Continue your creative journey and pick up where you left off
-      </p>
+        <p className="text-center text-[#2E2E38] mb-6 text-lg">
+          Continue your creative journey and pick up where you left off
+        </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white space-y-4 w-full max-w-lg p-6 rounded-xl"
-      >
-        <div>
-          <label className="block text-[#2E2E38] text-sm font-bold mb-2">
-            Email Address
-          </label>
-          <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter Your E-mail"
-              className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-              disabled={loading} // Disable input during loading
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block text-[#2E2E38] text-sm font-bold mb-2">
-            Password
-          </label>
-          <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter Your Password"
-              className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-              disabled={loading} // Disable input during loading
-            />
-          </div>
-        </div>
-        <div className="text-right">
-          <Link
-            href="/forget-password"
-            className="text-[#A333FF] text-sm hover:underline"
-          >
-            Forget Password?
-          </Link>
-        </div>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <button
-          type="submit"
-          className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#8E4BA3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading || isButtonDisabled}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white space-y-4 w-full max-w-lg p-6 rounded-xl"
         >
-          {loading || isButtonDisabled ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
-              <span>Processing...</span>
+          <div>
+            <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+              Email Address
+            </label>
+            <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter Your E-mail"
+                className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
+                disabled={loading} // Disable input during loading
+              />
             </div>
-          ) : (
-            "Login →"
-          )}
-        </button>
-      </form>
-      <p className="text-center text-sm text-gray-600 mt-4">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-[#A333FF] hover:underline">
-          Sign up here
-        </Link>
-      </p>
-    </div>
+          </div>
+          <div>
+            <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+              Password
+            </label>
+            <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter Your Password"
+                className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
+                disabled={loading} // Disable input during loading
+              />
+            </div>
+          </div>
+          <div className="text-right">
+            <Link
+              href="/forget-password"
+              className="text-[#A333FF] text-sm hover:underline"
+            >
+              Forget Password?
+            </Link>
+          </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          <button
+            type="submit"
+            className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#8E4BA3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || isButtonDisabled}
+          >
+            {loading || isButtonDisabled ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+                <span>Processing...</span>
+              </div>
+            ) : (
+              "Login →"
+            )}
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-[#A333FF] hover:underline">
+            Sign up here
+          </Link>
+        </p>
+      </div>
     </>
   );
 };
