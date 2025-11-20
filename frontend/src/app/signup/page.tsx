@@ -100,7 +100,7 @@ const SignupForm: React.FC = () => {
       }
       setUsernameError("");
       return true;
-    } catch (_err) {
+    } catch {
       setUsernameError("Error checking username availability");
       return false;
     }
