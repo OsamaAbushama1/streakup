@@ -14,26 +14,37 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const routes_1 = __importDefault(require("./routes"));
 // Config
 const db_1 = __importDefault(require("./config/db"));
+// Security Middleware
+const botDetection_1 = require("./middleware/botDetection");
+const rateLimiter_1 = require("./middleware/rateLimiter");
 dotenv_1.default.config();
 (0, db_1.default)();
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
 // === Middleware ===
 app.use((0, cookie_parser_1.default)());
+// CORS Configuration - Restricted to main domain only
 const allowedOrigins = [
     process.env.FRONTEND_URL?.replace(/\/$/, ""),
     process.env.ADMIN_URL?.replace(/\/$/, ""),
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    // Only allow localhost in development
+    ...(process.env.NODE_ENV === "development"
+        ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+        : []),
 ].filter(Boolean);
 app.use((0, cors_1.default)({
     origin(origin, callback) {
-        if (!origin) {
+        // Allow requests with no origin (mobile apps, Postman in dev, etc.)
+        if (!origin && process.env.NODE_ENV === "development") {
             return callback(null, true);
+        }
+        if (!origin) {
+            return callback(new Error("Origin not allowed by CORS"));
         }
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
+        console.warn(`[CORS BLOCKED] Origin ${origin} not allowed`);
         return callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
     credentials: true,
@@ -43,8 +54,12 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
-// === كل الـ Routes في مكان واحد ===
-app.use("/api", routes_1.default); // كل شيء من هنا
+// === Security Middleware for API Routes ===
+// Apply bot detection and rate limiting to all API routes
+app.use("/api", botDetection_1.detectBot); // Block bots and scrapers
+app.use("/api", rateLimiter_1.strictApiLimiter); // 30 requests per minute limit
+// === All Routes ===
+app.use("/api", routes_1.default);
 // === Health Check ===
 app.get("/", (req, res) => {
     res.json({ message: "Server is running" });

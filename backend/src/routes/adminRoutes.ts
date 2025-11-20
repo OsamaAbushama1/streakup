@@ -51,33 +51,36 @@ const router = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-/* -------------------------------------------------
-   Middleware لكل الـ admin routes (protect + admin)
-   ------------------------------------------------- */
+// ==================== ADMIN ROUTES ====================
+// All routes require authentication (protect) AND admin privileges (restrictToAdmin)
 router.use(protect, restrictToAdmin);
 
-/* ==================== USERS ==================== */
+// ==================== USERS ====================
+// Change admin password
 router.put("/change-password", protect, changePassword);
 
+// User management
 router.get("/users", getAllUsers);
 router.delete("/users/:id", deleteUser);
 router.put("/users/:id", updateUser);
 router.put("/users/:id/ban", banUser);
+
+// Register new admin
 router.post("/register", upload.single("profilePicture"), registerAdmin);
 
-/* ==================== PROJECTS ==================== */
+// ==================== PROJECTS ====================
 router.get("/projects", getAllProjects);
 router.get("/projects/:id", getProjectById);
 router.post("/projects", upload.array("previewImages", 5), createProject);
 router.put("/projects/:id", upload.array("previewImages", 5), updateProject);
 router.delete("/projects/:id", deleteProject);
 
-/* ==================== TRACKS ==================== */
+// ==================== TRACKS ====================
 router.get("/tracks", getTracks);
 router.post("/tracks", upload.single("icon"), addTrack);
 router.delete("/tracks/:trackName", deleteTrack);
 
-/* ==================== CHALLENGES ==================== */
+// ==================== CHALLENGES ====================
 router.get("/challenges", getAllChallenges);
 router.get("/challenges/by-project", getChallengesByProject);
 router.get("/challenges/:id", getChallengeById);
@@ -89,16 +92,17 @@ router.put(
 );
 router.delete("/challenges/:id", deleteChallenge);
 
-/* ==================== COMMENTS ==================== */
+// ==================== COMMENTS ====================
 router.delete("/comments/:id", deleteCommentAdmin);
 
-/* ==================== REPORTS ==================== */
+// ==================== REPORTS ====================
 router.get("/reports", getReports);
 router.put("/reports/:id/resolve", resolveReport);
 
-/* ==================== ACTIVITIES ==================== */
+// ==================== ACTIVITIES ====================
 router.get("/activities", getActivities);
 
-/* ==================== DASHBOARD ==================== */
+// ==================== DASHBOARD ====================
 router.get("/", getDashboardStats); // /api/admin
+
 export default router;

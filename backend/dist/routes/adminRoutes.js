@@ -17,41 +17,43 @@ const router = (0, express_1.Router)();
 // Use memory storage for Cloudinary uploads
 const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage });
-/* -------------------------------------------------
-   Middleware لكل الـ admin routes (protect + admin)
-   ------------------------------------------------- */
+// ==================== ADMIN ROUTES ====================
+// All routes require authentication (protect) AND admin privileges (restrictToAdmin)
 router.use(authMiddleware_1.protect, restrictToAdmin_1.restrictToAdmin);
-/* ==================== USERS ==================== */
+// ==================== USERS ====================
+// Change admin password
 router.put("/change-password", authMiddleware_1.protect, adminController_1.changePassword);
+// User management
 router.get("/users", adminController_1.getAllUsers);
 router.delete("/users/:id", adminController_1.deleteUser);
 router.put("/users/:id", adminController_1.updateUser);
 router.put("/users/:id/ban", adminController_1.banUser);
+// Register new admin
 router.post("/register", upload.single("profilePicture"), adminController_1.registerAdmin);
-/* ==================== PROJECTS ==================== */
+// ==================== PROJECTS ====================
 router.get("/projects", projectController_1.getAllProjects);
 router.get("/projects/:id", projectController_1.getProjectById);
 router.post("/projects", upload.array("previewImages", 5), projectController_1.createProject);
 router.put("/projects/:id", upload.array("previewImages", 5), projectController_1.updateProject);
 router.delete("/projects/:id", projectController_1.deleteProject);
-/* ==================== TRACKS ==================== */
+// ==================== TRACKS ====================
 router.get("/tracks", trackController_1.getTracks);
 router.post("/tracks", upload.single("icon"), trackController_1.addTrack);
 router.delete("/tracks/:trackName", trackController_1.deleteTrack);
-/* ==================== CHALLENGES ==================== */
+// ==================== CHALLENGES ====================
 router.get("/challenges", challengeController_1.getAllChallenges);
 router.get("/challenges/by-project", challengeController_1.getChallengesByProject);
 router.get("/challenges/:id", challengeController_1.getChallengeById);
 router.post("/challenges", upload.array("previewImages", 5), adminController_2.createChallenge);
 router.put("/challenges/:id", upload.array("previewImages", 5), adminController_2.updateChallenge);
 router.delete("/challenges/:id", adminController_2.deleteChallenge);
-/* ==================== COMMENTS ==================== */
+// ==================== COMMENTS ====================
 router.delete("/comments/:id", adminController_1.deleteCommentAdmin);
-/* ==================== REPORTS ==================== */
+// ==================== REPORTS ====================
 router.get("/reports", adminController_1.getReports);
 router.put("/reports/:id/resolve", adminController_1.resolveReport);
-/* ==================== ACTIVITIES ==================== */
+// ==================== ACTIVITIES ====================
 router.get("/activities", adminController_1.getActivities);
-/* ==================== DASHBOARD ==================== */
+// ==================== DASHBOARD ====================
 router.get("/", adminController_1.getDashboardStats); // /api/admin
 exports.default = router;
