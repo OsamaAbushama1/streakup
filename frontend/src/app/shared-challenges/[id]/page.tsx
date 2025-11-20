@@ -15,7 +15,7 @@ import {
   FiLinkedin,
   FiFlag,
 } from "react-icons/fi";
-import { Skeleton, SkeletonCard } from "../../components/Skeleton";
+import { Skeleton } from "../../components/Skeleton";
 import { useButtonDisable } from "../../hooks/useButtonDisable";
 import { Metadata } from "../../components/Metadata/Metadata";
 
@@ -110,7 +110,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const commentId = searchParams.get("commentId");
+  // const commentId = searchParams.get("commentId");
   const [sharedChallenge, setSharedChallenge] =
     useState<SharedChallenge | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -120,7 +120,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasIncrementedView, setHasIncrementedView] = useState(false);
+  // const [hasIncrementedView, setHasIncrementedView] = useState(false);
   const [highlightCommentId, setHighlightCommentId] = useState<string | null>(
     null
   );
@@ -197,12 +197,12 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
           setSharedChallenge((prev) =>
             prev
               ? {
-                  ...prev,
-                  views: viewData.views,
-                }
+                ...prev,
+                views: viewData.views,
+              }
               : prev
           );
-          setHasIncrementedView(true);
+          // setHasIncrementedView(true);
         }
 
         // Fetch like status
@@ -254,7 +254,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
     };
 
     fetchData();
-  }, [params, router, currentUserId]);
+  }, [params, router, currentUserId, backendUrl]);
   // قراءة الـ commentId من localStorage (اللي حطيناه من HomeHeader)
   useEffect(() => {
     const id = localStorage.getItem("scrollToComment");
@@ -306,9 +306,9 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
         setSharedChallenge((prev) =>
           prev
             ? {
-                ...prev,
-                likes: data.likes,
-              }
+              ...prev,
+              likes: data.likes,
+            }
             : prev
         );
       } catch (error) {
@@ -481,7 +481,7 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
 
   return (
     <div className="min-h-screen bg-[#ffffff]">
-      <Metadata 
+      <Metadata
         title={sharedChallenge?.challenge.name || "Shared Challenge"}
         description={sharedChallenge?.description || "View this creative challenge"}
         keywords={`${sharedChallenge?.challenge.category || ''}, shared challenge, creative`}
@@ -569,9 +569,8 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
             <button
               onClick={handleLike}
               disabled={isButtonDisabled}
-              className={`flex items-center gap-2 transition ${
-                isLiked ? "text-red-500" : "text-[#2E2E38] hover:text-red-600"
-              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`flex items-center gap-2 transition ${isLiked ? "text-red-500" : "text-[#2E2E38] hover:text-red-600"
+                } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <FiHeart className={`text-lg ${isLiked ? "fill-red-500" : ""}`} />
               <span>{sharedChallenge.likes}</span>
@@ -663,27 +662,24 @@ const SharedChallengeDetailsPage: React.FC<SharedChallengeDetailsPageProps> = ({
                           <button
                             onClick={() => handleLikeComment(comment._id)}
                             disabled={isButtonDisabled || !!comment.deletedAt}
-                            className={`flex items-center gap-2 transition ${
-                              comment.isLiked
-                                ? "text-red-500"
-                                : "text-[#2E2E38] hover:text-red-600"
-                            } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`flex items-center gap-2 transition ${comment.isLiked
+                              ? "text-red-500"
+                              : "text-[#2E2E38] hover:text-red-600"
+                              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             <FiHeart
-                              className={`text-sm ${
-                                comment.isLiked ? "fill-red-500" : ""
-                              }`}
+                              className={`text-sm ${comment.isLiked ? "fill-red-500" : ""
+                                }`}
                             />
                             <span>Like ({comment.likes})</span>
                           </button>
                           <button
                             onClick={() => handleReportComment(comment._id)}
                             disabled={comment.isReported || !!comment.deletedAt}
-                            className={`transition ${
-                              comment.isReported || !!comment.deletedAt
-                                ? "text-red-500 cursor-not-allowed"
-                                : "text-[#2E2E38] hover:text-red-500"
-                            }`}
+                            className={`transition ${comment.isReported || !!comment.deletedAt
+                              ? "text-red-500 cursor-not-allowed"
+                              : "text-[#2E2E38] hover:text-red-500"
+                              }`}
                           >
                             <FiFlag className="text-sm" />
                           </button>

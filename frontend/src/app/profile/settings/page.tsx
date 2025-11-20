@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { API_BASE_URL } from "@/config/api";
-import { Skeleton, SkeletonCard } from "@/app/components/Skeleton";
+import { Skeleton } from "@/app/components/Skeleton";
 
 const SettingsPage: React.FC = () => {
   // Password change

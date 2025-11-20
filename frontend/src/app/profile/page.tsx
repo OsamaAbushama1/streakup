@@ -850,6 +850,7 @@ const Profile: React.FC = () => {
       </div>
 
       {/* Badge Congratulation Popup */}
+
       {newBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-xl p-8 text-center max-w-md mx-4 animate-bounce-in relative overflow-hidden">
@@ -857,7 +858,7 @@ const Profile: React.FC = () => {
             <FaRocket className="text-6xl text-yellow-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-800 mb-2">Congratulations!</h3>
             <p className="text-gray-600 mb-6">
-              You've earned the <span className="font-bold text-indigo-600">{newBadge}</span> badge!
+              You&apos;ve earned the <span className="font-bold text-indigo-600">{newBadge}</span> badge!
             </p>
             <button
               onClick={closeBadgePopup}
@@ -1411,43 +1412,45 @@ const Profile: React.FC = () => {
       </div>
 
       {/* Payment Popup */}
-      {showPayment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
-              Unlock {selectedRank} Certificate
-            </h3>
-            <p className="text-sm text-[#2E2E38] mb-4">
-              Choose your payment method to unlock the certificate for 50 EGP.
-            </p>
-            <div className="flex flex-col gap-3">
+      {
+        showPayment && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg max-w-md w-full">
+              <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
+                Unlock {selectedRank} Certificate
+              </h3>
+              <p className="text-sm text-[#2E2E38] mb-4">
+                Choose your payment method to unlock the certificate for 50 EGP.
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => handlePayment("instapay")}
+                  className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition"
+                >
+                  Pay with InstaPay
+                </button>
+                <button
+                  onClick={() => handlePayment("vodafone_cash")}
+                  className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition"
+                >
+                  Pay with Vodafone Cash
+                </button>
+              </div>
               <button
-                onClick={() => handlePayment("instapay")}
-                className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition"
+                onClick={() => {
+                  setShowPayment(false);
+                  setSelectedRank("");
+                }}
+                className="mt-4 w-full py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
               >
-                Pay with InstaPay
-              </button>
-              <button
-                onClick={() => handlePayment("vodafone_cash")}
-                className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition"
-              >
-                Pay with Vodafone Cash
+                Cancel
               </button>
             </div>
-            <button
-              onClick={() => {
-                setShowPayment(false);
-                setSelectedRank("");
-              }}
-              className="mt-4 w-full py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
-            >
-              Cancel
-            </button>
           </div>
-        </div>
-      )}
+        )
+      }
       <LandingFooter />
-    </div>
+    </div >
   );
 };
 
