@@ -48,10 +48,7 @@ import {
 
 import {
   getAllRewards,
-  createReward,
-  updateReward,
-  deleteReward,
-  toggleRewardAvailability,
+  toggleRewardLock,
 } from "../controllers/adminRewardController";
 
 const router = Router();
@@ -110,15 +107,11 @@ router.put("/reports/:id/resolve", resolveReport);
 // ==================== ACTIVITIES ====================
 router.get("/activities", getActivities);
 
+// ==================== REWARDS ====================
+router.get("/rewards", getAllRewards);
+router.put("/rewards/:id/lock", toggleRewardLock);
+
 // ==================== DASHBOARD ====================
 router.get("/", getDashboardStats); // /api/admin
-
-// ==================== REWARDS ====================
-// Reward management (admin only)
-router.get("/rewards", getAllRewards);
-router.post("/rewards", createReward);
-router.put("/rewards/:id", updateReward);
-router.delete("/rewards/:id", deleteReward);
-router.put("/rewards/:id/toggle-availability", toggleRewardAvailability);
 
 export default router;

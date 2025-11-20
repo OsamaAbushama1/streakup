@@ -36,6 +36,7 @@ interface User {
   appreciations?: number;
   feedback?: number;
   badges?: string[];
+  newBadges?: string[];
   challenges: string[];
   role: string;
 }
@@ -82,7 +83,7 @@ interface Reward {
     bg: string;
     description: string;
   }[];
-  store: { name: string; points: number; description: string }[];
+  store: { _id: string; name: string; points: number; description: string; isLocked: boolean; icon: string }[];
 }
 type CertificateRank = "Bronze" | "Silver" | "Gold" | "Platinum";
 type UnlockableRank = "Silver" | "Gold" | "Platinum";
@@ -128,6 +129,7 @@ const Profile: React.FC = () => {
     Gold: 0,
     Platinum: 0,
   });
+  const [newBadge, setNewBadge] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -142,9 +144,8 @@ const Profile: React.FC = () => {
     const normalized = path.trim();
     if (!normalized) return fallback;
     if (normalized.startsWith("http")) return normalized;
-    return `${backendUrl}${
-      normalized.startsWith("/") ? normalized : `/${normalized}`
-    }`;
+    return `${backendUrl}${normalized.startsWith("/") ? normalized : `/${normalized}`
+      }`;
   };
   const tabs = [
     "My Challenges",
@@ -263,7 +264,30 @@ const Profile: React.FC = () => {
     };
 
     fetchUserProfile();
+    fetchUserProfile();
   }, [router]);
+
+  useEffect(() => {
+    if (userData?.newBadges && userData.newBadges.length > 0) {
+      setNewBadge(userData.newBadges[0]);
+    }
+  }, [userData]);
+
+  const closeBadgePopup = async () => {
+    setNewBadge(null);
+    try {
+      await fetch(`${backendUrl}/api/auth/ack-badges`, {
+        method: "POST",
+        credentials: "include",
+      });
+      // Update local state to remove new badges
+      if (userData) {
+        setUserData({ ...userData, newBadges: [] });
+      }
+    } catch (err) {
+      console.error("Failed to acknowledge badges", err);
+    }
+  };
 
   useEffect(() => {
     const totalViews = mySharedChallenges.reduce(
@@ -328,26 +352,7 @@ const Profile: React.FC = () => {
                   : "bg-[rgba(255,255,0,0.15)]",
             })
           );
-          const store = [
-            {
-              name: "Highlight Shared Challenge",
-              points: 400,
-              description:
-                "Highlight your shared challenge at the top of the Shared Challenges list for 24 hours.",
-            },
-            {
-              name: "Streak Saver",
-              points: 200,
-              description:
-                "Protect your streak if you miss a day without completing a challenge.",
-            },
-            {
-              name: "Challenge Boost",
-              points: 500,
-              description:
-                "Complete a challenge instantly and earn its points.",
-            },
-          ];
+          const store = data.store;
           setRewards({
             points: data.points,
             badges,
@@ -531,6 +536,14 @@ const Profile: React.FC = () => {
         "Challenge Boost": 500,
       };
 
+      // Check if reward is locked
+      const rewardItem = rewards?.store.find(r => r.name === rewardName);
+      if (rewardItem?.isLocked) {
+        setWarningMessage("This reward is currently locked.");
+        setShowWarningPopup(true);
+        return;
+      }
+
       if ((userData?.points ?? 0) < pointsRequired[rewardName]) {
         setWarningMessage("Insufficient points to redeem this reward.");
         setShowWarningPopup(true);
@@ -572,20 +585,20 @@ const Profile: React.FC = () => {
       setRewards((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-            }
+            ...prev,
+            points: data.points,
+          }
           : prev
       );
       setUserData((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-              ...(rewardName === "Streak Saver" && {
-                streakSavers: data.streakSavers,
-              }),
-            }
+            ...prev,
+            points: data.points,
+            ...(rewardName === "Streak Saver" && {
+              streakSavers: data.streakSavers,
+            }),
+          }
           : prev
       );
       alert(`${rewardName} redeemed successfully!`);
@@ -782,6 +795,13 @@ const Profile: React.FC = () => {
                       {userData.skillLevel}
                     </span>
                   )}
+                  {userData.badges?.map((badge, index) => (
+                    ["Community Helper", "Social Star", "Top Ranker"].includes(badge) && (
+                      <span key={index} className="bg-yellow-100 text-yellow-600 px-2 py-1 rounded flex items-center gap-1">
+                        <FaShieldAlt /> {badge}
+                      </span>
+                    )
+                  ))}
                 </div>
               </div>
             </div>
@@ -827,545 +847,570 @@ const Profile: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 pt-4 gap-2 sm:gap-4">
-          <div className="col-span-1 flex flex-col w-full min-w-[180px] sm:min-w-[200px] md:min-w-[230px] items-center mb-4 md:mb-0">
+      {/* Badge Congratulation Popup */}
+      {newBadge && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl p-8 text-center max-w-md mx-4 animate-bounce-in relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"></div>
+            <FaRocket className="text-6xl text-yellow-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Congratulations!</h3>
+            <p className="text-gray-600 mb-6">
+              You've earned the <span className="font-bold text-indigo-600">{newBadge}</span> badge!
+            </p>
             <button
-              className="w-full py-2 bg-[#A333FF] text-white rounded-lg mb-4 shadow-md hover:bg-[#9225e5] transition text-sm sm:text-base"
-              onClick={() => router.push("/profile/edit")}
+              onClick={closeBadgePopup}
+              className="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 transition-colors"
             >
-              Edit Profile Info
+              Awesome!
             </button>
-            <button
-              className="w-full py-2 bg-white text-[#A333FF] border border-[#A333FF] rounded-lg mb-4 shadow-md hover:bg-[#A333FF] hover:text-white transition text-sm sm:text-base"
-              onClick={() => router.push("/profile/settings")}
-            >
-              Settings
-            </button>
-            <div className="w-full bg-white px-4 sm:px-6 py-4 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col gap-4">
-              <div className="flex justify-between">
-                <p className="text-sm text-black font-semibold">
-                  Challenges Views
-                </p>
-                <p className="text-sm text-[#595b5c]">{challengesViews}</p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-sm text-black font-semibold">
-                  Appreciations
-                </p>
-                <p className="text-sm text-[#595b5c]">{appreciations}</p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-sm text-black font-semibold">Feedbacks</p>
-                <p className="text-sm text-[#595b5c]">{feedbacks}</p>
-              </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 pt-4 gap-2 sm:gap-4">
+        <div className="col-span-1 flex flex-col w-full min-w-[180px] sm:min-w-[200px] md:min-w-[230px] items-center mb-4 md:mb-0">
+          <button
+            className="w-full py-2 bg-[#A333FF] text-white rounded-lg mb-4 shadow-md hover:bg-[#9225e5] transition text-sm sm:text-base"
+            onClick={() => router.push("/profile/edit")}
+          >
+            Edit Profile Info
+          </button>
+          <button
+            className="w-full py-2 bg-white text-[#A333FF] border border-[#A333FF] rounded-lg mb-4 shadow-md hover:bg-[#A333FF] hover:text-white transition text-sm sm:text-base"
+            onClick={() => router.push("/profile/settings")}
+          >
+            Settings
+          </button>
+          <div className="w-full bg-white px-4 sm:px-6 py-4 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col gap-4">
+            <div className="flex justify-between">
+              <p className="text-sm text-black font-semibold">
+                Challenges Views
+              </p>
+              <p className="text-sm text-[#595b5c]">{challengesViews}</p>
+            </div>
+            <div className="flex justify-between">
+              <p className="text-sm text-black font-semibold">
+                Appreciations
+              </p>
+              <p className="text-sm text-[#595b5c]">{appreciations}</p>
+            </div>
+            <div className="flex justify-between">
+              <p className="text-sm text-black font-semibold">Feedbacks</p>
+              <p className="text-sm text-[#595b5c]">{feedbacks}</p>
             </div>
           </div>
+        </div>
 
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col">
-            <div className="flex justify-between bg-[#B0B0B8] p-1 rounded-lg">
-              {tabs.map((tab, index) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 px-2 py-2 font-bold rounded-full transition text-xs sm:text-sm ${
-                    activeTab === tab
-                      ? "bg-[#F5F5F7] text-[#000000] shadow"
-                      : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col">
+          <div className="flex justify-between bg-[#B0B0B8] p-1 rounded-lg">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 px-2 py-2 font-bold rounded-full transition text-xs sm:text-sm ${activeTab === tab
+                  ? "bg-[#F5F5F7] text-[#000000] shadow"
+                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
                   } ${index !== tabs.length - 1 ? "mb-1 sm:mb-0 sm:mr-1" : ""}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-            {activeTab === "My Challenges" && (
-              <div className="pt-4 bg-white">
-                <h3 className="text-base sm:text-lg font-semibold mb-2 text-black">
-                  My Challenges
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
-                  {mySharedChallenges.length === 0 ? (
-                    <p className="text-[#2E2E38] text-sm">
-                      No shared challenges yet.
-                    </p>
-                  ) : (
-                    mySharedChallenges.map((shared, index) => (
-                      <div
-                        key={shared._id}
-                        className="bg-[#FFFFFF] rounded-xl text-white shadow-lg hover:shadow-xl transition-shadow duration-300 p-2 sm:p-3"
-                        onClick={() => handleButtonClick(() => {
-                          handleView(shared.challenge.challengeId, index);
-                          router.push(
-                            `/${userData.username}/${shared.challenge.challengeId}`
-                          );
-                        })}
-                        style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
-                      >
-                        <div className="relative">
-                          <Image
-                            src={getImageUrl(
-                              shared.images &&
-                                shared.images.length > 0 &&
-                                shared.images[0]
-                                ? shared.images[0]
-                                : undefined,
-                              "/imgs/default-challenge.jpg"
-                            )}
-                            alt={
-                              shared.challenge.name || "Shared Challenge Image"
-                            }
-                            width={300}
-                            height={192}
-                            className="h-28 sm:h-36 md:h-40 lg:h-48 rounded-xl mb-3 sm:mb-4 object-cover"
-                          />
-                          <p className="absolute top-2 left-2 text-xs font-semibold text-[#A333FF] bg-[#F4E5FF] bg-opacity-50 px-2 py-1 rounded-xl">
-                            Challenge {String(index + 1).padStart(3, "0")}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="mt-2 text-[#2E2E38] font-bold text-sm">
-                            {shared.challenge.name || "Project Name"}
-                          </p>
-                          <div className="flex justify-between text-xs mt-2 gap-1 sm:gap-2">
-                            <span
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isButtonDisabled) {
-                                  handleButtonClick(() => handleLike(shared._id, index));
-                                }
-                              }}
-                              className={`flex items-center gap-1 cursor-pointer rounded-full px-2 py-1 transition ${
-                                shared.isLiked ? "bg-[#FFE6F1]" : "bg-[#F5F5F7]"
-                              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                            >
-                              {shared.isLiked ? (
-                                <FaHeart className="text-[#FF3366] transition-all duration-200" />
-                              ) : (
-                                <FiHeart className="text-[#2E2E38] transition-all duration-200" />
-                              )}
-                              <span className="text-[#2E2E38]">
-                                {shared.likes}
-                              </span>
-                            </span>
-                            <span className="flex items-center gap-1 text-[#2E2E38] bg-[#F5F5F7] rounded-full px-2 py-1">
-                              <BiComment className="text-[#2E2E38]" />{" "}
-                              {shared.comments}
-                            </span>
-                            <span className="flex items-center gap-1 text-[#2E2E38] bg-[#F5F5F7] rounded-full px-2 py-1">
-                              <FiEye className="text-[#2E2E38]" />{" "}
-                              {shared.views}
-                            </span>
-                          </div>
-                        </div>
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          {activeTab === "My Challenges" && (
+            <div className="pt-4 bg-white">
+              <h3 className="text-base sm:text-lg font-semibold mb-2 text-black">
+                My Challenges
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
+                {mySharedChallenges.length === 0 ? (
+                  <p className="text-[#2E2E38] text-sm">
+                    No shared challenges yet.
+                  </p>
+                ) : (
+                  mySharedChallenges.map((shared, index) => (
+                    <div
+                      key={shared._id}
+                      className="bg-[#FFFFFF] rounded-xl text-white shadow-lg hover:shadow-xl transition-shadow duration-300 p-2 sm:p-3"
+                      onClick={() => handleButtonClick(() => {
+                        handleView(shared.challenge.challengeId, index);
+                        router.push(
+                          `/${userData.username}/${shared.challenge.challengeId}`
+                        );
+                      })}
+                      style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
+                    >
+                      <div className="relative">
+                        <Image
+                          src={getImageUrl(
+                            shared.images &&
+                              shared.images.length > 0 &&
+                              shared.images[0]
+                              ? shared.images[0]
+                              : undefined,
+                            "/imgs/default-challenge.jpg"
+                          )}
+                          alt={
+                            shared.challenge.name || "Shared Challenge Image"
+                          }
+                          width={300}
+                          height={192}
+                          className="h-28 sm:h-36 md:h-40 lg:h-48 rounded-xl mb-3 sm:mb-4 object-cover"
+                        />
+                        <p className="absolute top-2 left-2 text-xs font-semibold text-[#A333FF] bg-[#F4E5FF] bg-opacity-50 px-2 py-1 rounded-xl">
+                          Challenge {String(index + 1).padStart(3, "0")}
+                        </p>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === "Analytics" && (
-              <div className="pt-4 bg-white">
-                <h3 className="text-base sm:text-lg font-semibold mb-2 text-black">
-                  Streak Calendar
-                </h3>
-                <div className="mt-4 p-[16px] sm:px-[14px] sm:py-[20px] lg:px-[16px] lg:py-[25px] bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center">
-                  <div className="flex justify-between items-center w-full overflow-x-auto">
-                    {(analytics?.streakCalendar ?? []).map(
-                      (day, index: number) => (
-                        <div
-                          key={index}
-                          className="flex flex-col items-center mx-1 sm:mx-2"
-                        >
-                          <div
-                            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full ${day.className} flex items-center justify-center`}
+                      <div>
+                        <p className="mt-2 text-[#2E2E38] font-bold text-sm">
+                          {shared.challenge.name || "Project Name"}
+                        </p>
+                        <div className="flex justify-between text-xs mt-2 gap-1 sm:gap-2">
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isButtonDisabled) {
+                                handleButtonClick(() => handleLike(shared._id, index));
+                              }
+                            }}
+                            className={`flex items-center gap-1 cursor-pointer rounded-full px-2 py-1 transition ${shared.isLiked ? "bg-[#FFE6F1]" : "bg-[#F5F5F7]"
+                              } ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
-                            {day.isActive && (
-                              <span className="text-white text-lg sm:text-xl font-bold">
-                                🔥
-                              </span>
+                            {shared.isLiked ? (
+                              <FaHeart className="text-[#FF3366] transition-all duration-200" />
+                            ) : (
+                              <FiHeart className="text-[#2E2E38] transition-all duration-200" />
                             )}
-                          </div>
-                          <span className="text-xs sm:text-sm mt-2 text-black">
-                            {day.number}
+                            <span className="text-[#2E2E38]">
+                              {shared.likes}
+                            </span>
+                          </span>
+                          <span className="flex items-center gap-1 text-[#2E2E38] bg-[#F5F5F7] rounded-full px-2 py-1">
+                            <BiComment className="text-[#2E2E38]" />{" "}
+                            {shared.comments}
+                          </span>
+                          <span className="flex items-center gap-1 text-[#2E2E38] bg-[#F5F5F7] rounded-full px-2 py-1">
+                            <FiEye className="text-[#2E2E38]" />{" "}
+                            {shared.views}
                           </span>
                         </div>
-                      )
-                    )}
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            )}
-
-            {activeTab === "Points & Rewards" && (
-              <div className="pt-4 bg-white">
-                <div className="mt-3 p-[16px] sm:px-[14px] sm:py-[20px] lg:px-[16px] lg:py-[25px] bg-[linear-gradient(135deg,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center">
-                  <h3 className="text-[18px] sm:text-[20px] font-normal mb-2 text-[#2E2E38]">
-                    Your Points Balance
-                  </h3>
-                  <p className="text-[28px] sm:text-[32px] font-bold text-black mb-2">
-                    {userData.points ?? 0}
-                  </p>
-                  <p className="text-[14px] sm:text-[16px] text-[#2E2E38]">
-                    Keep completing challenges to earn more points!
-                  </p>
-                </div>
-              </div>
-            )}
-            {activeTab === "My Certificates" && (
-              <div className="pt-4 bg-white">
-                <h3 className="text-lg font-semibold mb-6">My Certificates</h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {(["Silver", "Gold", "Platinum"] as UnlockableRank[]).map(
-                    (rank, index) => {
-                      const cert = certificates.find(
-                        (c) => c.rank === rank
-                      ) || {
-                        rank,
-                        paid: false,
-                      };
-
-                      const required = rankRequirements[rank];
-                      const currentPoints = userData?.points ?? 0;
-                      const progressValue =
-                        required > 0
-                          ? Math.min((currentPoints / required) * 100, 100)
-                          : 0;
-                      const isUnlocked =
-                        required > 0 && currentPoints >= required;
-                      const isPaid = cert.paid;
-
-                      const currentRankIndex = [
-                        "Silver",
-                        "Gold",
-                        "Platinum",
-                      ].indexOf(
-                        userData?.rank === "Platinum"
-                          ? "Platinum"
-                          : userData?.rank === "Gold"
-                          ? "Gold"
-                          : "Silver"
-                      );
-                      const isCurrentRank = index === currentRankIndex;
-                      const isFutureRank = index > currentRankIndex;
-
-                      return (
-                        <div
-                          key={rank}
-                          className={`relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl ${
-                            isFutureRank ? "opacity-60" : ""
-                          }`}
-                        >
-                          {isFutureRank && (
-                            <div className="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
-                              <FiLock className="text-5xl text-gray-400" />
-                            </div>
-                          )}
-
-                          <div className="flex items-center justify-between mb-4">
-                            <h4 className="text-xl font-bold text-purple-700">
-                              {rank} Certificate
-                            </h4>
-                            {isPaid && (
-                              <FiCheckCircle className="text-green-500 text-3xl" />
-                            )}
-                          </div>
-
-                          {/* البروجرس للرتبة الحالية */}
-                          {isCurrentRank && !isPaid && (
-                            <div className="mb-5">
-                              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                                <span>Points</span>
-                                <span className="font-semibold">
-                                  {currentPoints} / {required}
-                                </span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                <div
-                                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-700"
-                                  style={{ width: `${progressValue}%` }}
-                                />
-                              </div>
-                              <p className="text-xs text-gray-500 mt-2 text-center">
-                                {required - currentPoints} more points needed
-                              </p>
-                            </div>
-                          )}
-
-                          {/* زر الإجراء */}
-                          {isPaid ? (
-                            <button
-                              onClick={() => handleButtonClick(() => downloadCertificate(rank))}
-                              disabled={isButtonDisabled}
-                              className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isButtonDisabled ? "Processing..." : "Download Certificate"}
-                            </button>
-                          ) : isCurrentRank && isUnlocked ? (
-                            <button
-                              onClick={() => handleButtonClick(() => {
-                                setSelectedRank(rank);
-                                setShowPayment(true);
-                              })}
-                              disabled={isButtonDisabled}
-                              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              Unlock for 50 EGP
-                            </button>
-                          ) : null}
-                        </div>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {activeTab === "Analytics" && (
-            <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[0, 1].map((idx) => (
-                <div
-                  key={idx}
-                  className="p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col gap-4"
-                >
-                  {[analytics?.progress1 ?? 0, analytics?.progress2 ?? 0].map(
-                    (progress, subIdx) => (
-                      <div key={subIdx}>
-                        <h4 className="text-sm sm:text-md font-semibold mb-2 text-black">
-                          Progress Tracking
-                        </h4>
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-[#2E2E38] font-medium text-sm">
-                            Challenges Completed
-                          </p>
-                          <p className="text-black font-semibold text-sm">
-                            {progress}/100
-                          </p>
+            <div className="pt-4 bg-white">
+              <h3 className="text-base sm:text-lg font-semibold mb-2 text-black">
+                Streak Calendar
+              </h3>
+              <div className="mt-4 p-[16px] sm:px-[14px] sm:py-[20px] lg:px-[16px] lg:py-[25px] bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center">
+                <div className="flex justify-between items-center w-full overflow-x-auto">
+                  {(analytics?.streakCalendar ?? []).map(
+                    (day, index: number) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center mx-1 sm:mx-2"
+                      >
+                        <div
+                          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full ${day.className} flex items-center justify-center`}
+                        >
+                          {day.isActive && (
+                            <span className="text-white text-lg sm:text-xl font-bold">
+                              🔥
+                            </span>
+                          )}
                         </div>
-                        <div className="w-full bg-[#E2E2E2] rounded-full h-2">
-                          <div
-                            className="bg-[#A333FF] h-2 rounded-full"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
+                        <span className="text-xs sm:text-sm mt-2 text-black">
+                          {day.number}
+                        </span>
                       </div>
                     )
                   )}
                 </div>
-              ))}
+              </div>
             </div>
           )}
 
           {activeTab === "Points & Rewards" && (
-            <div className="col-span-full">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-[#2E2E38]">
-                Badges & Achievements
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-5">
-                {(rewards?.badges ?? []).map((item, index: number) => (
-                  <div
-                    key={index}
-                    className={`p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center relative group ${
-                      !item.isUnlocked ? "opacity-50" : ""
-                    }`}
-                    title={item.description}
-                  >
-                    <div
-                      className={`w-16 h-16 ${item.bg} rounded-full flex items-center justify-center mb-3`}
-                    >
-                      <div className="text-4xl">{item.icon}</div>
-                    </div>
-                    <p className="text-sm font-medium text-[#2E2E38] mb-2">
-                      {item.name}
-                    </p>
-                    {item.isUnlocked ? (
-                      <FiCheckCircle className="text-green-500 text-lg" />
-                    ) : (
-                      <FiLock
-                        className="absolute text-gray-600 text-3xl"
-                        style={{
-                          top: "50%",
-                          left: "50%",
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      />
-                    )}
-                  </div>
-                ))}
-                {(!rewards?.badges || rewards.badges.length === 0) && (
-                  <p className="text-[#2E2E38] text-sm col-span-full">
-                    No badges available yet. Complete challenges to earn badges!
-                  </p>
+            <div className="pt-4 bg-white">
+              <div className="mt-3 p-[16px] sm:px-[14px] sm:py-[20px] lg:px-[16px] lg:py-[25px] bg-[linear-gradient(135deg,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center">
+                <h3 className="text-[18px] sm:text-[20px] font-normal mb-2 text-[#2E2E38]">
+                  Your Points Balance
+                </h3>
+                <p className="text-[28px] sm:text-[32px] font-bold text-black mb-2">
+                  {userData.points ?? 0}
+                </p>
+                <p className="text-[14px] sm:text-[16px] text-[#2E2E38]">
+                  Keep completing challenges to earn more points!
+                </p>
+              </div>
+            </div>
+          )}
+          {activeTab === "My Certificates" && (
+            <div className="pt-4 bg-white">
+              <h3 className="text-lg font-semibold mb-6">My Certificates</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {(["Silver", "Gold", "Platinum"] as UnlockableRank[]).map(
+                  (rank, index) => {
+                    const cert = certificates.find(
+                      (c) => c.rank === rank
+                    ) || {
+                      rank,
+                      paid: false,
+                    };
+
+                    const required = rankRequirements[rank];
+                    const currentPoints = userData?.points ?? 0;
+                    const progressValue =
+                      required > 0
+                        ? Math.min((currentPoints / required) * 100, 100)
+                        : 0;
+                    const isUnlocked =
+                      required > 0 && currentPoints >= required;
+                    const isPaid = cert.paid;
+
+                    const currentRankIndex = [
+                      "Silver",
+                      "Gold",
+                      "Platinum",
+                    ].indexOf(
+                      userData?.rank === "Platinum"
+                        ? "Platinum"
+                        : userData?.rank === "Gold"
+                          ? "Gold"
+                          : "Silver"
+                    );
+                    const isCurrentRank = index === currentRankIndex;
+                    const isFutureRank = index > currentRankIndex;
+
+                    return (
+                      <div
+                        key={rank}
+                        className={`relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl ${isFutureRank ? "opacity-60" : ""
+                          }`}
+                      >
+                        {isFutureRank && (
+                          <div className="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
+                            <FiLock className="text-5xl text-gray-400" />
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xl font-bold text-purple-700">
+                            {rank} Certificate
+                          </h4>
+                          {isPaid && (
+                            <FiCheckCircle className="text-green-500 text-3xl" />
+                          )}
+                        </div>
+
+                        {/* البروجرس للرتبة الحالية */}
+                        {isCurrentRank && !isPaid && (
+                          <div className="mb-5">
+                            <div className="flex justify-between text-sm text-gray-600 mb-2">
+                              <span>Points</span>
+                              <span className="font-semibold">
+                                {currentPoints} / {required}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                              <div
+                                className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-700"
+                                style={{ width: `${progressValue}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 text-center">
+                              {required - currentPoints} more points needed
+                            </p>
+                          </div>
+                        )}
+
+                        {/* زر الإجراء */}
+                        {isPaid ? (
+                          <button
+                            onClick={() => handleButtonClick(() => downloadCertificate(rank))}
+                            disabled={isButtonDisabled}
+                            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isButtonDisabled ? "Processing..." : "Download Certificate"}
+                          </button>
+                        ) : isCurrentRank && isUnlocked ? (
+                          <button
+                            onClick={() => handleButtonClick(() => {
+                              setSelectedRank(rank);
+                              setShowPayment(true);
+                            })}
+                            disabled={isButtonDisabled}
+                            className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Unlock for 50 EGP
+                          </button>
+                        ) : null}
+                      </div>
+                    );
+                  }
                 )}
               </div>
-
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 text-[#2E2E38]">
-                Rewards Store
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {(rewards?.store ?? []).map((reward, idx: number) => {
-                  let icon: ReactNode;
-                  let bg: string;
-
-                  switch (reward.name) {
-                    case "Highlight Shared Challenge":
-                      icon = <FaEye className="text-yellow-500" />;
-                      bg = "bg-[rgba(255,255,0,0.1)]";
-                      break;
-                    case "Streak Saver":
-                      icon = <FaShieldAlt className="text-orange-500" />;
-                      bg = "bg-[rgba(255,165,0,0.1)]";
-                      break;
-                    case "Challenge Boost":
-                      icon = <FaRocket className="text-purple-500" />;
-                      bg = "bg-[rgba(128,0,128,0.1)]";
-                      break;
-                    default:
-                      icon = <BsLightbulb className="text-gray-500" />;
-                      bg = "bg-[rgba(128,128,128,0.1)]";
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      className="p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col justify-between"
-                    >
-                      <div
-                        className={`w-12 h-12 ${bg} rounded-full flex items-center justify-center mb-2 mx-auto`}
-                      >
-                        <div className="text-2xl">{icon}</div>
-                      </div>
-                      <p className="text-sm font-medium text-[#2E2E38] mb-2 text-center">
-                        {reward.name}
-                      </p>
-                      <p className="text-xs text-[#595b5c] mb-2 text-center">
-                        {reward.description}
-                      </p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm font-bold text-[#A333FF]">
-                          {reward.points} points
-                        </span>
-                        <button
-                          className="px-3 py-2 bg-[#A333FF] text-white rounded-lg text-xs hover:bg-[#9225e5] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                          onClick={() => handleButtonClick(() => handleRedeem(reward.name))}
-                          disabled={isButtonDisabled}
-                        >
-                          {isButtonDisabled ? "Processing..." : "Redeem"}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {showHighlightPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white p-6 rounded-lg max-w-md w-full">
-                    <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
-                      Select a Challenge to Highlight
-                    </h3>
-                    <select
-                      className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                      value={selectedChallengeId || ""}
-                      onChange={(e) => setSelectedChallengeId(e.target.value)}
-                    >
-                      <option value="">Select a challenge</option>
-                      {nonHighlightedChallenges.map((challenge) => (
-                        <option key={challenge._id} value={challenge._id}>
-                          {challenge.challenge.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="flex justify-end gap-2">
-                      <button
-                        className="px-4 py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
-                        onClick={() => {
-                          setShowHighlightPopup(false);
-                          setSelectedChallengeId(null);
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
-                        onClick={handleHighlightSubmit}
-                      >
-                        Confirm
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {showBoostPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white p-6 rounded-lg max-w-md w-full">
-                    <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
-                      Select a Challenge to Boost
-                    </h3>
-                    <select
-                      className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                      value={selectedChallengeId || ""}
-                      onChange={(e) => setSelectedChallengeId(e.target.value)}
-                    >
-                      <option value="">Select a challenge</option>
-                      {nonCompletedChallenges.map((challenge) => (
-                        <option key={challenge._id} value={challenge._id}>
-                          {challenge.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="flex justify-end gap-2">
-                      <button
-                        className="px-4 py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
-                        onClick={() => {
-                          setShowBoostPopup(false);
-                          setSelectedChallengeId(null);
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
-                        onClick={handleBoostSubmit}
-                      >
-                        Confirm
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {showWarningPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white p-6 rounded-lg max-w-md w-full">
-                    <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
-                      Warning
-                    </h3>
-                    <p className="text-sm text-[#2E2E38] mb-4">
-                      {warningMessage}
-                    </p>
-                    <div className="flex justify-end">
-                      <button
-                        className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
-                        onClick={() => {
-                          setShowWarningPopup(false);
-                          setWarningMessage(null);
-                        }}
-                      >
-                        OK
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
+
+        {activeTab === "Analytics" && (
+          <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[0, 1].map((idx) => (
+              <div
+                key={idx}
+                className="p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col gap-4"
+              >
+                {[analytics?.progress1 ?? 0, analytics?.progress2 ?? 0].map(
+                  (progress, subIdx) => (
+                    <div key={subIdx}>
+                      <h4 className="text-sm sm:text-md font-semibold mb-2 text-black">
+                        Progress Tracking
+                      </h4>
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-[#2E2E38] font-medium text-sm">
+                          Challenges Completed
+                        </p>
+                        <p className="text-black font-semibold text-sm">
+                          {progress}/100
+                        </p>
+                      </div>
+                      <div className="w-full bg-[#E2E2E2] rounded-full h-2">
+                        <div
+                          className="bg-[#A333FF] h-2 rounded-full"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === "Points & Rewards" && (
+          <div className="col-span-full">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 text-[#2E2E38]">
+              Badges & Achievements
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-5">
+              {(rewards?.badges ?? []).map((item, index: number) => (
+                <div
+                  key={index}
+                  className={`p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center relative group ${!item.isUnlocked ? "opacity-50" : ""
+                    }`}
+                  title={item.description}
+                >
+                  <div
+                    className={`w-16 h-16 ${item.bg} rounded-full flex items-center justify-center mb-3`}
+                  >
+                    <div className="text-4xl">{item.icon}</div>
+                  </div>
+                  <p className="text-sm font-medium text-[#2E2E38] mb-2">
+                    {item.name}
+                  </p>
+                  {item.isUnlocked ? (
+                    <FiCheckCircle className="text-green-500 text-lg" />
+                  ) : (
+                    <FiLock
+                      className="absolute text-gray-600 text-3xl"
+                      style={{
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+              {(!rewards?.badges || rewards.badges.length === 0) && (
+                <p className="text-[#2E2E38] text-sm col-span-full">
+                  No badges available yet. Complete challenges to earn badges!
+                </p>
+              )}
+            </div>
+
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 text-[#2E2E38]">
+              Rewards Store
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {(rewards?.store ?? []).map((reward, idx: number) => {
+                let icon: ReactNode;
+                let bg: string;
+
+                switch (reward.name) {
+                  case "Highlight Shared Challenge":
+                    icon = <FaEye className="text-yellow-500" />;
+                    bg = "bg-[rgba(255,255,0,0.1)]";
+                    break;
+                  case "Streak Saver":
+                    icon = <FaShieldAlt className="text-orange-500" />;
+                    bg = "bg-[rgba(255,165,0,0.1)]";
+                    break;
+                  case "Challenge Boost":
+                    icon = <FaRocket className="text-purple-500" />;
+                    bg = "bg-[rgba(128,0,128,0.1)]";
+                    break;
+                  default:
+                    icon = <BsLightbulb className="text-gray-500" />;
+                    bg = "bg-[rgba(128,128,128,0.1)]";
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col justify-between relative"
+                  >
+                    {reward.isLocked && (
+                      <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10 rounded-lg backdrop-blur-[1px]">
+                        <div className="text-center">
+                          <FiLock className="text-3xl text-gray-500 mx-auto mb-1" />
+                          <span className="text-gray-600 font-bold text-sm">Coming Soon</span>
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className={`w-12 h-12 ${bg} rounded-full flex items-center justify-center mb-2 mx-auto`}
+                    >
+                      <div className="text-2xl">{icon}</div>
+                    </div>
+                    <p className="text-sm font-medium text-[#2E2E38] mb-2 text-center">
+                      {reward.name}
+                    </p>
+                    <p className="text-xs text-[#595b5c] mb-2 text-center">
+                      {reward.description}
+                    </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm font-bold text-[#A333FF]">
+                        {reward.points} points
+                      </span>
+                      <button
+                        className="px-3 py-2 bg-[#A333FF] text-white rounded-lg text-xs hover:bg-[#9225e5] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => handleButtonClick(() => handleRedeem(reward.name))}
+                        disabled={isButtonDisabled}
+                      >
+                        {isButtonDisabled ? "Processing..." : "Redeem"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {showHighlightPopup && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                  <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
+                    Select a Challenge to Highlight
+                  </h3>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                    value={selectedChallengeId || ""}
+                    onChange={(e) => setSelectedChallengeId(e.target.value)}
+                  >
+                    <option value="">Select a challenge</option>
+                    {nonHighlightedChallenges.map((challenge) => (
+                      <option key={challenge._id} value={challenge._id}>
+                        {challenge.challenge.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
+                      onClick={() => {
+                        setShowHighlightPopup(false);
+                        setSelectedChallengeId(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
+                      onClick={handleHighlightSubmit}
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showBoostPopup && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                  <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
+                    Select a Challenge to Boost
+                  </h3>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                    value={selectedChallengeId || ""}
+                    onChange={(e) => setSelectedChallengeId(e.target.value)}
+                  >
+                    <option value="">Select a challenge</option>
+                    {nonCompletedChallenges.map((challenge) => (
+                      <option key={challenge._id} value={challenge._id}>
+                        {challenge.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
+                      onClick={() => {
+                        setShowBoostPopup(false);
+                        setSelectedChallengeId(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
+                      onClick={handleBoostSubmit}
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showWarningPopup && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                  <h3 className="text-lg font-semibold mb-4 text-[#2E2E38]">
+                    Warning
+                  </h3>
+                  <p className="text-sm text-[#2E2E38] mb-4">
+                    {warningMessage}
+                  </p>
+                  <div className="flex justify-end">
+                    <button
+                      className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#9225e5] transition"
+                      onClick={() => {
+                        setShowWarningPopup(false);
+                        setWarningMessage(null);
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {/* بوب أب الدفع */}
+
+      {/* Payment Popup */}
       {showPayment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">

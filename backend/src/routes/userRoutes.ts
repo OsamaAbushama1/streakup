@@ -21,8 +21,7 @@ import {
   unlockCertificate,
   getRankRequirements,
   heartbeat,
-  getBadgeNotifications,
-  markBadgeAsSeen,
+  ackBadges,
 } from "../controllers/userController";
 import multer from "multer";
 import { protect } from "../middleware/authMiddleware";
@@ -97,11 +96,9 @@ router.get("/analytics", authenticateToken, getAnalytics);
 
 // User rewards
 router.get("/rewards", authenticateToken, getRewards);
+router.get("/rewards", authenticateToken, getRewards);
 router.post("/redeem-reward", protect, redeemReward);
-
-// Badge notifications
-router.get("/badge-notifications", protect, getBadgeNotifications);
-router.post("/mark-badge-seen", protect, markBadgeAsSeen);
+router.post("/ack-badges", authenticateToken, ackBadges);
 
 // User certificates
 router.get("/certificate", protect, downloadCertificate);

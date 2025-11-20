@@ -46,6 +46,7 @@ const userSchema = new Schema({
     default: "Bronze",
   },
   badges: [{ type: String }],
+  newBadges: [{ type: String }], // Badges that haven't been shown to the user yet
   challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
   startedChallenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
   completedProjects: { type: Number, default: 0 },
@@ -55,18 +56,6 @@ const userSchema = new Schema({
   emailNotifications: { type: Boolean, default: true },
   streakSavers: { type: Number, default: 0 },
   challengeBoosts: { type: Number, default: 0 },
-
-  // Enhanced badge tracking for pop-ups and display
-  unlockedBadges: [
-    {
-      name: { type: String, required: true },
-      unlockedAt: { type: Date, default: Date.now },
-      seen: { type: Boolean, default: false }, // For pop-up tracking
-    },
-  ],
-
-  // Badges unlocked but not yet shown in pop-up
-  newBadges: [{ type: String }],
 
   // أضف هذا الحقل
   certificates: [
