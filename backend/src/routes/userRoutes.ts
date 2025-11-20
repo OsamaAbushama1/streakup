@@ -24,6 +24,7 @@ import {
 } from "../controllers/userController";
 import multer from "multer";
 import { protect } from "../middleware/authMiddleware";
+import { authLimiter, passwordResetLimiter } from "../middleware/rateLimiter";
 
 import { getAllProjects } from "../controllers/projectController";
 import { getPublicTracks } from "../controllers/trackController";
@@ -39,15 +40,15 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 router.get("/check", protect, checkAuth);
-router.post("/register", upload.single("profilePicture"), registerUser);
+router.post("/register", authLimiter, upload.single("profilePicture"), registerUser);
 router.get("/check-username", checkUsername);
-router.post("/login", loginUser);
+router.post("/login", authLimiter, loginUser);
 router.get("/profile", authenticateToken, getUserProfile);
 router.post("/logout", logoutUser);
 router.post("/heartbeat", protect, heartbeat);
 
-router.post("/forget-password", forgetPassword);
-router.post("/reset-password", resetPassword);
+router.post("/forget-password", passwordResetLimiter, forgetPassword);
+router.post("/reset-password", passwordResetLimiter, resetPassword);
 router.put(
   "/update-profile",
   authenticateToken,

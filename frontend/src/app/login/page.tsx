@@ -77,14 +77,23 @@ const Login: React.FC = () => {
 
         let data;
         const contentType = res.headers.get("content-type");
+        
+        // Handle rate limiting (429) with better error messages
+        if (res.status === 429) {
+          try {
+            data = await res.json();
+            setError(data?.message || "Too many authentication attempts. Please wait 15 minutes before trying again.");
+          } catch {
+            const text = await res.text();
+            setError(text || "Too many authentication attempts. Please wait 15 minutes before trying again.");
+          }
+          return;
+        }
+        
         if (contentType && contentType.indexOf("application/json") !== -1) {
           data = await res.json();
         } else {
           const text = await res.text();
-          // If it's a 429, it might be plain text
-          if (res.status === 429) {
-            throw new Error("Too many requests. Please wait a few minutes and try again.");
-          }
           throw new Error(text || "Server error");
         }
 

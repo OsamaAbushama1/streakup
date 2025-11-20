@@ -25,7 +25,7 @@ const baseCookieOptions = {
 };
 const cookieOptionsWithDomain = {
     ...baseCookieOptions,
-    domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+    // domain: isProduction ? process.env.COOKIE_DOMAIN : undefined, // Removed to support Next.js rewrites (HostOnly cookies)
 };
 const authenticateToken = (req, res, next) => {
     // جرب الـ cookie أولاً
