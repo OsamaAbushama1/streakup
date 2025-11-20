@@ -50,6 +50,9 @@ router.get("/analytics", userController_1.authenticateToken, userController_1.ge
 // User rewards
 router.get("/rewards", userController_1.authenticateToken, userController_1.getRewards);
 router.post("/redeem-reward", authMiddleware_1.protect, userController_1.redeemReward);
+// Badge notifications
+router.get("/badge-notifications", authMiddleware_1.protect, userController_1.getBadgeNotifications);
+router.post("/mark-badge-seen", authMiddleware_1.protect, userController_1.markBadgeAsSeen);
 // User certificates
 router.get("/certificate", authMiddleware_1.protect, userController_1.downloadCertificate);
 router.get("/certificates", userController_1.authenticateToken, userController_1.getUserCertificates);

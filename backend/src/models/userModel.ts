@@ -56,6 +56,18 @@ const userSchema = new Schema({
   streakSavers: { type: Number, default: 0 },
   challengeBoosts: { type: Number, default: 0 },
 
+  // Enhanced badge tracking for pop-ups and display
+  unlockedBadges: [
+    {
+      name: { type: String, required: true },
+      unlockedAt: { type: Date, default: Date.now },
+      seen: { type: Boolean, default: false }, // For pop-up tracking
+    },
+  ],
+
+  // Badges unlocked but not yet shown in pop-up
+  newBadges: [{ type: String }],
+
   // أضف هذا الحقل
   certificates: [
     {

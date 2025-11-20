@@ -46,6 +46,14 @@ import {
   getChallengesByProject,
 } from "../controllers/challengeController";
 
+import {
+  getAllRewards,
+  createReward,
+  updateReward,
+  deleteReward,
+  toggleRewardAvailability,
+} from "../controllers/adminRewardController";
+
 const router = Router();
 // Use memory storage for Cloudinary uploads
 const storage = multer.memoryStorage();
@@ -104,5 +112,13 @@ router.get("/activities", getActivities);
 
 // ==================== DASHBOARD ====================
 router.get("/", getDashboardStats); // /api/admin
+
+// ==================== REWARDS ====================
+// Reward management (admin only)
+router.get("/rewards", getAllRewards);
+router.post("/rewards", createReward);
+router.put("/rewards/:id", updateReward);
+router.delete("/rewards/:id", deleteReward);
+router.put("/rewards/:id/toggle-availability", toggleRewardAvailability);
 
 export default router;

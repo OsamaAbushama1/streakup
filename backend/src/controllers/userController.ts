@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import Comment from "../models/commentModel";
 import Project from "../models/projectModel"; // ← أضف هذا السطر في أعلى الملف
+import Reward from "../models/rewardModel"; // ← New reward model
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import Challenge from "../models/challengeModel";
@@ -489,7 +490,7 @@ export const getAnalytics = async (req: AuthRequest, res: Response) => {
 export const getRewards = async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user?.id).select(
-      "points badges completedChallenges streak rank"
+      "points badges completedChallenges streak rank unlockedBadges newBadges"
     );
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -503,7 +504,8 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
 
     const totalComments = await Comment.countDocuments({ user: user._id });
 
-    const defaultBadges = [
+    // Define badge unlock conditions
+    const badgeDefinitions = [
       {
         name: "First Challenge",
         isUnlocked: (user.completedChallenges || 0) >= 1,
@@ -531,48 +533,64 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
       },
       {
         name: "Top Ranker",
-        isUnlocked: user.points >= 2400,
+        isUnlocked: user.rank === "Platinum", // Fixed: Unlock at Platinum rank
         description: "Reach the highest rank (Platinum)",
       },
     ];
 
-    const badges = user.badges?.length
-      ? user.badges.map((name: string, index: number) => ({
-        name,
-        isUnlocked:
-          index === 0
-            ? (user.completedChallenges || 0) >= 1
-            : index === 1
-              ? (user.streak || 0) >= 7
-              : index === 2
-                ? totalComments >= 20
-                : index === 3
-                  ? totalLikes >= 20
-                  : index === 4
-                    ? (user.streak || 0) >= 30
-                    : index === 5
-                      ? user.points >= 2400
-                      : false,
-        description:
-          defaultBadges[index]?.description || "No description available",
-      }))
-      : defaultBadges;
+    // Check for newly unlocked badges
+    const newlyUnlockedBadges: string[] = [];
 
-    const store = [
-      { name: "Custom Profile Badge", points: 300 },
-      { name: "Extra Challenge Slot", points: 500 },
-      { name: "Highlight Shared Challenge", points: 400 },
-      { name: "Streak Saver", points: 200 },
-      { name: "Rank Booster", points: 700 },
-      { name: "Exclusive Workshop Access", points: 600 },
-    ];
+    for (const badge of badgeDefinitions) {
+      if (badge.isUnlocked) {
+        // Check if badge is already in unlockedBadges
+        const alreadyUnlocked = user.unlockedBadges?.some(
+          (b: any) => b.name === badge.name
+      }
+    }
+
+    // Save if there are new badges
+    if (newlyUnlockedBadges.length > 0) {
+      await user.save();
+    }
+
+    // Prepare badges response with unlock status and timestamps
+    const badges = badgeDefinitions.map((badge) => {
+      const unlockedBadge = user.unlockedBadges?.find(
+        (b: any) => b.name === badge.name
+      );
+
+      return {
+        name: badge.name,
+        description: badge.description,
+        isUnlocked: badge.isUnlocked,
+        unlockedAt: unlockedBadge?.unlockedAt || null,
+        seen: unlockedBadge?.seen || false,
+      };
+    });
+
+    // Fetch rewards from database
+    const rewards = await Reward.find().sort({ createdAt: 1 });
+
+    // Format rewards for response
+    const store = rewards.map((reward) => ({
+      id: reward._id,
+      name: reward.name,
+      description: reward.description,
+      points: reward.points,
+      isAvailable: reward.isAvailable,
+      icon: reward.icon,
+      category: reward.category,
+    }));
 
     res.status(200).json({
       points: user.points || 0,
       badges,
       store,
+      newBadges: user.newBadges || [], // For pop-up notifications
     });
   } catch (error: any) {
+    console.error("Error in getRewards:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -1101,5 +1119,72 @@ export const getRankRequirements = async (req: AuthRequest, res: Response) => {
   } catch (err: any) {
     console.error("[getRankRequirements] Error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+/**
+ * Get badge notifications for pop-ups
+ * Returns list of newly unlocked badges that haven't been shown yet
+ */
+export const getBadgeNotifications = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user?.id).select("newBadges unlockedBadges");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Get full badge details for new badges
+    const badgeNotifications = (user.newBadges || []).map((badgeName) => {
+      const badge = user.unlockedBadges?.find((b: any) => b.name === badgeName);
+      return {
+        name: badgeName,
+        unlockedAt: badge?.unlockedAt || new Date(),
+      };
+    });
+
+    res.status(200).json({
+      badges: badgeNotifications,
+    });
+  } catch (error: any) {
+    console.error("Error in getBadgeNotifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * Mark badge as seen (dismiss pop-up)
+ * Removes badge from newBadges array and marks as seen in unlockedBadges
+ */
+export const markBadgeAsSeen = async (req: AuthRequest, res: Response) => {
+  try {
+    const { badgeName } = req.body;
+
+    if (!badgeName) {
+      return res.status(400).json({ message: "Badge name is required" });
+    }
+
+    const user = await User.findById(req.user?.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Remove from newBadges array
+    if (user.newBadges) {
+      user.newBadges = user.newBadges.filter((name) => name !== badgeName);
+    }
+
+    // Mark as seen in unlockedBadges
+    if (user.unlockedBadges) {
+      const badge = user.unlockedBadges.find((b: any) => b.name === badgeName);
+      if (badge) {
+        badge.seen = true;
+      }
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Badge marked as seen",
+      remainingBadges: user.newBadges?.length || 0,
+    });
+  } catch (error: any) {
+    console.error("Error in markBadgeAsSeen:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
