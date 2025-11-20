@@ -46,11 +46,6 @@ import {
   getChallengesByProject,
 } from "../controllers/challengeController";
 
-import {
-  getAllRewards,
-  toggleRewardLock,
-} from "../controllers/adminRewardController";
-
 const router = Router();
 // Use memory storage for Cloudinary uploads
 const storage = multer.memoryStorage();
@@ -106,10 +101,6 @@ router.put("/reports/:id/resolve", resolveReport);
 
 // ==================== ACTIVITIES ====================
 router.get("/activities", getActivities);
-
-// ==================== REWARDS ====================
-router.get("/rewards", getAllRewards);
-router.put("/rewards/:id/lock", toggleRewardLock);
 
 // ==================== DASHBOARD ====================
 router.get("/", getDashboardStats); // /api/admin

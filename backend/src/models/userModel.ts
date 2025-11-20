@@ -46,7 +46,6 @@ const userSchema = new Schema({
     default: "Bronze",
   },
   badges: [{ type: String }],
-  newBadges: [{ type: String }], // Badges that haven't been shown to the user yet
   challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
   startedChallenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
   completedProjects: { type: Number, default: 0 },

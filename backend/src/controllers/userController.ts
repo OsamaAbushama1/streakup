@@ -9,7 +9,6 @@ import crypto from "crypto";
 import Challenge from "../models/challengeModel";
 import Notification from "../models/notificationModel";
 import SharedChallenge from "../models/sharedChallengeModel";
-import Reward from "../models/rewardModel";
 import mongoose from "mongoose";
 import {
   generateCertificate,
@@ -311,7 +310,6 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
         challengesViews: aggregates.totalViews,
         appreciations: aggregates.totalAppreciations,
         feedback: aggregates.totalFeedback,
-        newBadges: user.newBadges || [],
       },
     });
   } catch (error: any) {
@@ -505,103 +503,72 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
 
     const totalComments = await Comment.countDocuments({ user: user._id });
 
-    const badgeDefinitions = [
+    const defaultBadges = [
       {
         name: "First Challenge",
-        condition: (user.completedChallenges || 0) >= 1,
+        isUnlocked: (user.completedChallenges || 0) >= 1,
         description: "Complete your first challenge",
       },
       {
         name: "7 Day Streak",
-        condition: (user.streak || 0) >= 7,
+        isUnlocked: (user.streak || 0) >= 7,
         description: "Maintain a streak of 7 days",
       },
       {
         name: "Community Helper",
-        condition: totalComments >= 10,
-        description: "Write 10 comments on shared challenges",
+        isUnlocked: totalComments >= 20,
+        description: "Write 20 comments on shared challenges",
       },
       {
         name: "Social Star",
-        condition: totalLikes >= 50,
-        description: "Receive 50 likes on your shared challenges",
+        isUnlocked: totalLikes >= 20,
+        description: "Receive 20 likes on your shared challenges",
       },
       {
         name: "30 Day Streak",
-        condition: (user.streak || 0) >= 30,
+        isUnlocked: (user.streak || 0) >= 30,
         description: "Maintain a streak of 30 days",
       },
       {
         name: "Top Ranker",
-        condition: user.rank === "Platinum",
+        isUnlocked: user.points >= 2400,
         description: "Reach the highest rank (Platinum)",
       },
     ];
 
-    const currentBadges = user.badges || [];
-    const newBadges: string[] = [];
+    const badges = user.badges?.length
+      ? user.badges.map((name: string, index: number) => ({
+        name,
+        isUnlocked:
+          index === 0
+            ? (user.completedChallenges || 0) >= 1
+            : index === 1
+              ? (user.streak || 0) >= 7
+              : index === 2
+                ? totalComments >= 20
+                : index === 3
+                  ? totalLikes >= 20
+                  : index === 4
+                    ? (user.streak || 0) >= 30
+                    : index === 5
+                      ? user.points >= 2400
+                      : false,
+        description:
+          defaultBadges[index]?.description || "No description available",
+      }))
+      : defaultBadges;
 
-    badgeDefinitions.forEach((def) => {
-      if (def.condition && !currentBadges.includes(def.name)) {
-        currentBadges.push(def.name);
-        newBadges.push(def.name);
-      }
-    });
-
-    if (newBadges.length > 0) {
-      user.badges = currentBadges;
-      user.newBadges = [...(user.newBadges || []), ...newBadges];
-      await user.save();
-    }
-
-    const badges = badgeDefinitions.map((def) => ({
-      name: def.name,
-      isUnlocked: currentBadges.includes(def.name),
-      description: def.description,
-    }));
-
-    // Fetch rewards from DB
-    let dbRewards = await Reward.find({});
-
-    // If no rewards exist, seed them (optional, but good for first run)
-    if (dbRewards.length === 0) {
-      const initialRewards = [
-        { name: "Highlight Shared Challenge", points: 400, description: "Highlight your shared challenge at the top of the Shared Challenges list for 24 hours.", isLocked: false, icon: "highlight" },
-        { name: "Streak Saver", points: 200, description: "Protect your streak if you miss a day without completing a challenge.", isLocked: false, icon: "saver" },
-        { name: "Challenge Boost", points: 500, description: "Complete a challenge instantly and earn its points.", isLocked: false, icon: "boost" },
-      ];
-      dbRewards = await Reward.insertMany(initialRewards);
-    }
-
-    const store = dbRewards.map(r => ({
-      _id: r._id,
-      name: r.name,
-      points: r.points,
-      description: r.description,
-      isLocked: r.isLocked,
-      icon: r.icon
-    }));
+    const store = [
+      { name: "Highlight Shared Challenge", points: 400 },
+      { name: "Streak Saver", points: 200 },
+      { name: "Challenge Boost", points: 700 },
+    ];
 
     res.status(200).json({
       points: user.points || 0,
       badges,
       store,
     });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-export const ackBadges = async (req: AuthRequest, res: Response) => {
-  try {
-    const user = await User.findById(req.user?.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    user.newBadges = [];
-    await user.save();
-
-    res.status(200).json({ message: "Badges acknowledged" });
   } catch (error: any) {
     res.status(500).json({ message: "Server error" });
   }

@@ -8,6 +8,7 @@ import { CroppedAreaPixels, getCroppedImg } from "./cropImage";
 import Image from "next/image";
 import Link from "next/link";
 import { API_BASE_URL } from "@/config/api";
+import { Skeleton } from "../components/Skeleton";
 import { useButtonDisable } from "../hooks/useButtonDisable";
 import { Metadata } from "../components/Metadata/Metadata";
 
@@ -100,7 +101,7 @@ const SignupForm: React.FC = () => {
       }
       setUsernameError("");
       return true;
-    } catch {
+    } catch (err) {
       setUsernameError("Error checking username availability");
       return false;
     }
@@ -452,8 +453,8 @@ const SignupForm: React.FC = () => {
               </p>
               <div
                 className={`gap-4 mb-6 ${tracks.length % 2 === 0
-                  ? "grid grid-cols-1 md:grid-cols-2"
-                  : "grid grid-cols-1"
+                    ? "grid grid-cols-1 md:grid-cols-2"
+                    : "grid grid-cols-1"
                   }`}
               >
                 {tracks.map((track) => (
@@ -475,8 +476,8 @@ const SignupForm: React.FC = () => {
                     <div className="flex flex-row items-start md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
                       <span
                         className={`text-xl rounded-full flex items-center justify-center p-2 transition ${formData.track === track.name
-                          ? "text-black"
-                          : "text-white bg-[#B0B0B8]"
+                            ? "text-black"
+                            : "text-white bg-[#B0B0B8]"
                           }`}
                         style={
                           formData.track === track.name

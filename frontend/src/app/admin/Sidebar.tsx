@@ -13,7 +13,6 @@ import {
   FiChevronRight,
   FiHome,
   FiLogOut,
-  FiGift,
 } from "react-icons/fi";
 import Image from "next/image";
 
@@ -135,18 +134,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             >
               <FiActivity size={20} />
               {isOpen && "Activity"}
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/rewards"
-              className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/rewards"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
-                }`}
-            >
-              <FiGift size={20} />
-              {isOpen && "Rewards"}
             </Link>
           </li>
           <li>

@@ -5,7 +5,7 @@ import { FiArrowLeft, FiShare2, FiUpload, FiTrash2 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { API_BASE_URL } from "@/config/api";
-import { Skeleton } from "../../components/Skeleton";
+import { Skeleton, SkeletonCard } from "../../components/Skeleton";
 
 interface Challenge {
   _id: string;
@@ -69,7 +69,7 @@ const ShareChallengePage: React.FC<ShareChallengePageProps> = ({ params }) => {
     };
 
     fetchChallenge();
-  }, [id, router, backendUrl]);
+  }, [id, router]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -301,8 +301,8 @@ const ShareChallengePage: React.FC<ShareChallengePageProps> = ({ params }) => {
             onClick={handleShare}
             disabled={isSubmitting} // تعطيل الزر
             className={`px-6 py-2 bg-[#A333FF] text-white rounded-lg transition flex items-center text-lg ${isSubmitting
-              ? "opacity-60 cursor-not-allowed"
-              : "hover:bg-[#9225e5]"
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-[#9225e5]"
               }`}
           >
             {isSubmitting ? (
