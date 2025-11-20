@@ -86,12 +86,15 @@ const HomeHeader: React.FC = () => {
           setUser(data.user);
         } else {
           setError(data.message || "Failed to fetch user profile");
-          router.push("/login");
+          // Only redirect if explicitly unauthorized
+          if (res.status === 401 || res.status === 403) {
+            router.push("/login");
+          }
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        setError("Error fetching user profile");
-        router.push("/login");
+        setError("Error fetching user profile. Please try refreshing.");
+        // Do NOT redirect on network/server errors to avoid loops
       } finally {
         setLoading(false);
       }
