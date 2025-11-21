@@ -14,6 +14,7 @@ interface UserData {
     feedback?: number;
     appreciations?: number;
     points?: number;
+    rank?: string;
 }
 
 export default function BadgePopupManager() {
@@ -84,8 +85,7 @@ export default function BadgePopupManager() {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[9999]">
-            <div className="bg-white p-6 rounded-2xl max-w-sm md:max-w-lg w-full text-center relative shadow-2xl  mx-4 md:mx-0">
-
+            <div className="bg-white p-6 rounded-2xl max-w-sm md:max-w-lg w-full text-center relative shadow-2xl mx-4 md:mx-0">
                 {/* Close Button */}
                 <button
                     onClick={() => setShowPopup(false)}

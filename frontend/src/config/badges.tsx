@@ -20,6 +20,7 @@ export interface BadgeDef {
         feedback?: number;
         appreciations?: number;
         points?: number;
+        rank?: string;
     }) => boolean;
     showInBanner: boolean; // Whether to display in profile banner
 }
@@ -82,7 +83,7 @@ export const ALL_BADGES: BadgeDef[] = [
         color: "text-purple-500",
         bgColor: "bg-purple-100",
         description: "Reach the highest rank (Platinum)",
-        check: (user) => (user.points || 0) >= 2400,
+        check: (user) => user.rank === "Platinum",
         showInBanner: true, // ⭐ Show in banner
     },
 ];
@@ -97,6 +98,7 @@ export const getEarnedBadges = (userData: {
     feedback?: number;
     appreciations?: number;
     points?: number;
+    rank?: string;
 }) => ALL_BADGES.filter((badge) => badge.check(userData));
 
 // Helper to get earned banner badges for a user
@@ -106,4 +108,5 @@ export const getEarnedBannerBadges = (userData: {
     feedback?: number;
     appreciations?: number;
     points?: number;
+    rank?: string;
 }) => ALL_BADGES.filter((badge) => badge.showInBanner && badge.check(userData));
