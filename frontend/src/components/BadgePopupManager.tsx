@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FiX } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ALL_BADGES, BadgeDef } from "@/config/badges";
 import { API_BASE_URL } from "@/config/api";
 
@@ -17,6 +18,7 @@ interface UserData {
 export default function BadgePopupManager() {
     const [showPopup, setShowPopup] = useState(false);
     const [currentBadge, setCurrentBadge] = useState<BadgeDef | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const checkForNewBadges = async () => {
@@ -72,37 +74,43 @@ export default function BadgePopupManager() {
         return () => clearInterval(interval);
     }, []);
 
+    const handleViewBadges = () => {
+        setShowPopup(false);
+        router.push("/profile");
+    };
+
     if (!showPopup || !currentBadge) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-            <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center relative shadow-2xl transform transition-all scale-100 animate-fadeIn">
-                <button
-                    onClick={() => setShowPopup(false)}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-                >
-                    <FiX size={24} />
-                </button>
-
-                <div
-                    className={`mx-auto w-24 h-24 ${currentBadge.bgColor} ${currentBadge.color} rounded-full flex items-center justify-center text-5xl mb-4 shadow-lg`}
-                >
-                    {currentBadge.icon}
+        <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+            <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center relative shadow-2xl">
+                {/* Badge Image */}
+                <div className="mb-6">
+                    <Image
+                        src="/imgs/badge.png"
+                        alt="Badge"
+                        width={120}
+                        height={120}
+                        className="mx-auto"
+                    />
                 </div>
 
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    🎉 Congratulations! 🎉
+                {/* Title */}
+                <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                    You&apos;ve earned a new badge!
                 </h3>
-                <p className="text-lg font-semibold text-purple-600 mb-2">
-                    {currentBadge.name}
-                </p>
-                <p className="text-gray-600 mb-6">{currentBadge.description}</p>
 
+                {/* Description */}
+                <p className="text-gray-600 mb-6">
+                    Your badge appears in your profile achievements.
+                </p>
+
+                {/* View My Badges Button */}
                 <button
-                    onClick={() => setShowPopup(false)}
+                    onClick={handleViewBadges}
                     className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
                 >
-                    Awesome! 🚀
+                    View My Badges
                 </button>
             </div>
         </div>
