@@ -84,7 +84,8 @@ export default function BadgePopupManager() {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[9999]">
-            <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center relative shadow-2xl">
+            <div className="bg-white p-6 rounded-2xl max-w-sm md:max-w-lg w-full text-center relative shadow-2xl  mx-4 md:mx-0">
+
                 {/* Close Button */}
                 <button
                     onClick={() => setShowPopup(false)}
