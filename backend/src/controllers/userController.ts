@@ -531,7 +531,7 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
       },
       {
         name: "Top Ranker",
-        isUnlocked: user.points >= 2400,
+        isUnlocked: user.rank === "Platinum",
         description: "Reach the highest rank (Platinum)",
       },
     ];
@@ -551,7 +551,7 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
                   : index === 4
                     ? (user.streak || 0) >= 30
                     : index === 5
-                      ? user.points >= 2400
+                      ? user.rank === "Platinum"
                       : false,
         description:
           defaultBadges[index]?.description || "No description available",

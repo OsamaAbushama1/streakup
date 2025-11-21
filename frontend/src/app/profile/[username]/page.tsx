@@ -680,7 +680,7 @@ const PublicProfilePage: React.FC = () => {
                         className={`${badge.bgColor} ${badge.color} px-2 py-1 rounded flex items-center gap-1`}
                       >
                         {badge.icon}
-                        {badge.name} {badge.level}
+                        {badge.name}
                       </span>
                     )
                   )}

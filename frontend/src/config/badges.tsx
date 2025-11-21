@@ -9,7 +9,6 @@ import {
 
 export interface BadgeDef {
     name: string;
-    level: string;
     icon: ReactNode;
     color: string;
     bgColor: string;
@@ -28,7 +27,6 @@ export interface BadgeDef {
 export const ALL_BADGES: BadgeDef[] = [
     {
         name: "First Challenge",
-        level: "Level 1",
         icon: <FaRocket />,
         color: "text-green-500",
         bgColor: "bg-green-100",
@@ -38,7 +36,6 @@ export const ALL_BADGES: BadgeDef[] = [
     },
     {
         name: "7 Day Streak",
-        level: "Level 1",
         icon: <FaFireAlt />,
         color: "text-orange-500",
         bgColor: "bg-orange-100",
@@ -48,7 +45,6 @@ export const ALL_BADGES: BadgeDef[] = [
     },
     {
         name: "Community Helper",
-        level: "Level 1",
         icon: <FaHandsHelping />,
         color: "text-blue-500",
         bgColor: "bg-blue-100",
@@ -58,7 +54,6 @@ export const ALL_BADGES: BadgeDef[] = [
     },
     {
         name: "Social Star",
-        level: "Level 1",
         icon: <FaStar />,
         color: "text-yellow-500",
         bgColor: "bg-yellow-100",
@@ -68,7 +63,6 @@ export const ALL_BADGES: BadgeDef[] = [
     },
     {
         name: "30 Day Streak",
-        level: "Level 1",
         icon: <FaFireAlt />,
         color: "text-red-500",
         bgColor: "bg-red-100",
@@ -78,7 +72,6 @@ export const ALL_BADGES: BadgeDef[] = [
     },
     {
         name: "Top Ranker",
-        level: "Level 1",
         icon: <FaTrophy />,
         color: "text-purple-500",
         bgColor: "bg-purple-100",
