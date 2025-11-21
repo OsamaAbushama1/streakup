@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, ReactNode } from "react";
 import { API_BASE_URL } from "@/config/api";
-import { FiCheckCircle, FiEye, FiHeart, FiLock, FiX } from "react-icons/fi";
+import { FiCheckCircle, FiEye, FiHeart, FiLock } from "react-icons/fi";
 import { BiComment } from "react-icons/bi";
 import {
   FaEye,
@@ -9,9 +9,6 @@ import {
   FaHeart,
   FaRocket,
   FaShieldAlt,
-  FaTrophy,
-  FaHandsHelping,
-  FaStar,
 } from "react-icons/fa";
 import Image from "next/image";
 import { BsLightbulb } from "react-icons/bs";
@@ -20,6 +17,7 @@ import HomeHeader from "../components/Home/HomeHeader";
 import LandingFooter from "../components/Landing/LandingFooter";
 import { Skeleton, SkeletonCard } from "../components/Skeleton";
 import { useButtonDisable } from "../hooks/useButtonDisable";
+import { getEarnedBannerBadges } from "@/config/badges";
 
 interface User {
   _id: string;
@@ -95,41 +93,6 @@ interface Certificate {
   paid: boolean;
 }
 
-interface BadgeDef {
-  name: string;
-  level: string;
-  icon: ReactNode;
-  color: string;
-  bgColor: string;
-  check: (user: User) => boolean;
-}
-
-const BADGES_CONFIG: BadgeDef[] = [
-  {
-    name: "Community Helper",
-    level: "Level 1",
-    icon: <FaHandsHelping />,
-    color: "text-blue-500",
-    bgColor: "bg-blue-100",
-    check: (user) => (user.feedback || 0) >= 20,
-  },
-  {
-    name: "Social Star",
-    level: "Level 1",
-    icon: <FaStar />,
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-100",
-    check: (user) => (user.appreciations || 0) >= 20,
-  },
-  {
-    name: "Top Ranker",
-    level: "Level 1",
-    icon: <FaTrophy />,
-    color: "text-purple-500",
-    bgColor: "bg-purple-100",
-    check: (user) => (user.points || 0) >= 2400,
-  },
-];
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>("My Challenges");
@@ -167,9 +130,6 @@ const Profile: React.FC = () => {
     Gold: 0,
     Platinum: 0,
   });
-
-  const [showBadgePopup, setShowBadgePopup] = useState(false);
-  const [newBadge, setNewBadge] = useState<BadgeDef | null>(null);
 
   const router = useRouter();
 
@@ -240,24 +200,6 @@ const Profile: React.FC = () => {
       alert("Payment failed. Try again.");
     }
   };
-
-  useEffect(() => {
-    if (userData) {
-      const earnedBadges = BADGES_CONFIG.filter((badge) => badge.check(userData));
-
-      const seenBadges = JSON.parse(localStorage.getItem("seenBadges") || "[]");
-
-      for (const badge of earnedBadges) {
-        if (!seenBadges.includes(badge.name)) {
-          setNewBadge(badge);
-          setShowBadgePopup(true);
-          const updatedSeen = [...seenBadges, badge.name];
-          localStorage.setItem("seenBadges", JSON.stringify(updatedSeen));
-          break; // Show one at a time
-        }
-      }
-    }
-  }, [userData]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -841,7 +783,7 @@ const Profile: React.FC = () => {
                       {userData.skillLevel}
                     </span>
                   )}
-                  {BADGES_CONFIG.filter((badge) => badge.check(userData)).map(
+                  {getEarnedBannerBadges(userData).map(
                     (badge) => (
                       <span
                         key={badge.name}
@@ -1463,35 +1405,6 @@ const Profile: React.FC = () => {
               className="mt-4 w-full py-2 bg-gray-300 text-[#2E2E38] rounded-lg hover:bg-gray-400 transition"
             >
               Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      {/* Badge Popup */}
-      {showBadgePopup && newBadge && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center relative shadow-2xl transform transition-all scale-100">
-            <button
-              onClick={() => setShowBadgePopup(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <FiX size={24} />
-            </button>
-
-            <div className={`mx-auto w-20 h-20 ${newBadge.bgColor} ${newBadge.color} rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner`}>
-              {newBadge.icon}
-            </div>
-
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Congratulations!</h3>
-            <p className="text-gray-600 mb-6">
-              You&apos;ve unlocked the <span className="font-bold text-black">{newBadge.name}</span> badge!
-            </p>
-
-            <button
-              onClick={() => setShowBadgePopup(false)}
-              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-            >
-              Awesome!
             </button>
           </div>
         </div>

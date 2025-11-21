@@ -16,6 +16,7 @@ import HomeHeader from "@/app/components/Home/HomeHeader";
 import { API_BASE_URL } from "@/config/api";
 import { Skeleton, SkeletonCard } from "@/app/components/Skeleton";
 import LandingFooter from "@/app/components/Landing/LandingFooter";
+import { getEarnedBannerBadges } from "@/config/badges";
 
 interface User {
   _id: string;
@@ -459,20 +460,20 @@ const PublicProfilePage: React.FC = () => {
       setRewards((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-            }
+            ...prev,
+            points: data.points,
+          }
           : prev
       );
       setUserData((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-              ...(rewardName === "Streak Saver" && {
-                streakSavers: data.streakSavers,
-              }),
-            }
+            ...prev,
+            points: data.points,
+            ...(rewardName === "Streak Saver" && {
+              streakSavers: data.streakSavers,
+            }),
+          }
           : prev
       );
       alert(`${rewardName} redeemed successfully!`);
@@ -510,17 +511,17 @@ const PublicProfilePage: React.FC = () => {
       setRewards((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-            }
+            ...prev,
+            points: data.points,
+          }
           : prev
       );
       setUserData((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-            }
+            ...prev,
+            points: data.points,
+          }
           : prev
       );
       setMySharedChallenges((prev) =>
@@ -569,28 +570,28 @@ const PublicProfilePage: React.FC = () => {
       setRewards((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-            }
+            ...prev,
+            points: data.points,
+          }
           : prev
       );
       setUserData((prev) =>
         prev
           ? {
-              ...prev,
-              points: data.points,
-              challenges: [...(prev.challenges || []), selectedChallengeId],
-              completedChallenges: (prev.completedChallenges || 0) + 1,
-              streak: (prev.streak || 0) + 1,
-              rank:
-                (prev.completedChallenges || 0) + 1 >= 30
-                  ? "Platinum"
-                  : (prev.completedChallenges || 0) + 1 >= 20
+            ...prev,
+            points: data.points,
+            challenges: [...(prev.challenges || []), selectedChallengeId],
+            completedChallenges: (prev.completedChallenges || 0) + 1,
+            streak: (prev.streak || 0) + 1,
+            rank:
+              (prev.completedChallenges || 0) + 1 >= 30
+                ? "Platinum"
+                : (prev.completedChallenges || 0) + 1 >= 20
                   ? "Gold"
                   : (prev.completedChallenges || 0) + 1 >= 10
-                  ? "Silver"
-                  : "Bronze",
-            }
+                    ? "Silver"
+                    : "Bronze",
+          }
           : prev
       );
       setNonCompletedChallenges((prev) =>
@@ -671,6 +672,17 @@ const PublicProfilePage: React.FC = () => {
                     <span className="bg-blue-100 text-[#33CFFF] px-2 py-1 rounded">
                       {userData.skillLevel}
                     </span>
+                  )}
+                  {getEarnedBannerBadges(userData).map(
+                    (badge) => (
+                      <span
+                        key={badge.name}
+                        className={`${badge.bgColor} ${badge.color} px-2 py-1 rounded flex items-center gap-1`}
+                      >
+                        {badge.icon}
+                        {badge.name} {badge.level}
+                      </span>
+                    )
                   )}
                 </div>
               </div>
@@ -755,9 +767,8 @@ const PublicProfilePage: React.FC = () => {
           )}
 
           <div
-            className={`col-span-1 ${
-              isOwnProfile ? "md:col-span-2 lg:col-span-3" : "md:col-span-3"
-            } flex flex-col`}
+            className={`col-span-1 ${isOwnProfile ? "md:col-span-2 lg:col-span-3" : "md:col-span-3"
+              } flex flex-col`}
           >
             {isOwnProfile && (
               <div className="flex justify-between bg-[#B0B0B8] p-1 rounded-lg">
@@ -765,13 +776,11 @@ const PublicProfilePage: React.FC = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 px-2 py-2 font-bold rounded-full transition text-xs sm:text-sm ${
-                      activeTab === tab
-                        ? "bg-[#F5F5F7] text-[#000000] shadow"
-                        : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
-                    } ${
-                      index !== tabs.length - 1 ? "mb-1 sm:mb-0 sm:mr-1" : ""
-                    }`}
+                    className={`flex-1 px-2 py-2 font-bold rounded-full transition text-xs sm:text-sm ${activeTab === tab
+                      ? "bg-[#F5F5F7] text-[#000000] shadow"
+                      : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                      } ${index !== tabs.length - 1 ? "mb-1 sm:mb-0 sm:mr-1" : ""
+                      }`}
                   >
                     {tab}
                   </button>
@@ -817,12 +826,12 @@ const PublicProfilePage: React.FC = () => {
                           <Image
                             src={
                               shared.images &&
-                              shared.images.length > 0 &&
-                              shared.images[0] &&
-                              shared.images[0].trim()
+                                shared.images.length > 0 &&
+                                shared.images[0] &&
+                                shared.images[0].trim()
                                 ? `${backendUrl}/${shared.images[0]
-                                    .trim()
-                                    .replace(/^\/+/, "")}`
+                                  .trim()
+                                  .replace(/^\/+/, "")}`
                                 : "/imgs/default-challenge.jpg"
                             }
                             alt={
@@ -855,9 +864,8 @@ const PublicProfilePage: React.FC = () => {
                                   );
                                 }
                               }}
-                              className={`flex items-center gap-1 cursor-pointer rounded-full px-2 py-1 transition ${
-                                shared.isLiked ? "bg-[#FFE6F1]" : "bg-[#F5F5F7]"
-                              }`}
+                              className={`flex items-center gap-1 cursor-pointer rounded-full px-2 py-1 transition ${shared.isLiked ? "bg-[#FFE6F1]" : "bg-[#F5F5F7]"
+                                }`}
                             >
                               {shared.isLiked ? (
                                 <FaHeart className="text-[#FF3366] transition-all duration-200" />
@@ -971,9 +979,8 @@ const PublicProfilePage: React.FC = () => {
                   {(rewards?.badges ?? []).map((item, index: number) => (
                     <div
                       key={index}
-                      className={`p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center relative group ${
-                        !item.isUnlocked ? "opacity-50" : ""
-                      }`}
+                      className={`p-4 bg-white rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center text-center relative group ${!item.isUnlocked ? "opacity-50" : ""
+                        }`}
                       title={item.description}
                     >
                       <div
