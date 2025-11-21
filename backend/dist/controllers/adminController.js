@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerAdmin = exports.getDashboardStats = exports.changePassword = exports.getActivities = exports.banUser = exports.deleteCommentAdmin = exports.resolveReport = exports.getReports = exports.updateUser = exports.deleteUser = exports.getUserById = exports.getAllUsers = exports.deleteChallenge = exports.updateChallenge = exports.createChallenge = void 0;
+exports.updateRewardSettings = exports.getRewardSettings = exports.registerAdmin = exports.getDashboardStats = exports.changePassword = exports.getActivities = exports.banUser = exports.deleteCommentAdmin = exports.resolveReport = exports.getReports = exports.updateUser = exports.deleteUser = exports.getUserById = exports.getAllUsers = exports.deleteChallenge = exports.updateChallenge = exports.createChallenge = void 0;
 const userModel_1 = __importDefault(require("../models/userModel"));
 const commentModel_1 = __importDefault(require("../models/commentModel"));
 const challengeModel_1 = __importDefault(require("../models/challengeModel"));
@@ -12,6 +12,7 @@ const trackModel_1 = __importDefault(require("../models/trackModel"));
 const projectModel_1 = __importDefault(require("../models/projectModel"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const cloudinary_1 = require("../utils/cloudinary");
+const systemSettingModel_1 = __importDefault(require("../models/systemSettingModel"));
 const FIXED_TRACKS = ["UI/UX Design", "Graphic Design", "Frontend Development"];
 const isValidTrack = async (trackName) => {
     if (FIXED_TRACKS.includes(trackName))
@@ -808,3 +809,35 @@ const registerAdmin = async (req, res) => {
     }
 };
 exports.registerAdmin = registerAdmin;
+const getRewardSettings = async (req, res) => {
+    try {
+        const setting = await systemSettingModel_1.default.findOne({ key: "activeRewards" });
+        res.status(200).json({ activeRewards: setting ? setting.value : [] });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+exports.getRewardSettings = getRewardSettings;
+const updateRewardSettings = async (req, res) => {
+    try {
+        const { activeRewards } = req.body; // Array of active rewards or empty array to lock all
+        // Validate activeRewards is an array
+        if (!Array.isArray(activeRewards)) {
+            return res.status(400).json({ message: "activeRewards must be an array" });
+        }
+        // Validate each reward name
+        const validRewards = ["Highlight Shared Challenge", "Streak Saver", "Challenge Boost"];
+        for (const reward of activeRewards) {
+            if (!validRewards.includes(reward)) {
+                return res.status(400).json({ message: `Invalid reward name: ${reward}` });
+            }
+        }
+        await systemSettingModel_1.default.findOneAndUpdate({ key: "activeRewards" }, { value: activeRewards }, { upsert: true, new: true });
+        res.status(200).json({ message: "Reward settings updated", activeRewards });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+exports.updateRewardSettings = updateRewardSettings;

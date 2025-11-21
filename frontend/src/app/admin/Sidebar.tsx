@@ -13,6 +13,7 @@ import {
   FiChevronRight,
   FiHome,
   FiLogOut,
+  FiGift,
 } from "react-icons/fi";
 import Image from "next/image";
 
@@ -80,8 +81,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Link
               href="/admin"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiHome size={20} />
@@ -92,8 +93,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Link
               href="/admin/challenges"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/challenges"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiClipboard size={20} />
@@ -104,8 +105,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Link
               href="/admin/users"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/users"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiUsers size={20} />
@@ -116,8 +117,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Link
               href="/admin/reports"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/reports"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiFileText size={20} />
@@ -128,8 +129,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Link
               href="/admin/activity"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/activity"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiActivity size={20} />
@@ -138,10 +139,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           </li>
           <li>
             <Link
+              href="/admin/rewards"
+              className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/rewards"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                }`}
+            >
+              <FiGift size={20} />
+              {isOpen && "Rewards"}
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/admin/settings"
               className={`flex items-center gap-2 p-2 rounded-lg text-sm ${pathname === "/admin/settings"
-                  ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
-                  : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
+                ? "bg-[#F4E5FF] text-[#A333FF] font-bold"
+                : "text-[#939398] hover:bg-[#F4E5FF] hover:text-[#A333FF]"
                 }`}
             >
               <FiSettings size={20} />
@@ -154,8 +167,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <button
           onClick={handleLogout}
           className={`flex items-center gap-2 p-2 rounded-lg text-sm w-full text-left ${pathname === "/logout"
-              ? "bg-[#A333FF] text-[#F4E5FF] font-bold"
-              : "text-[#F4E5FF] hover:bg-[#8022cd] hover:text-[#F4E5FF] bg-[#A333FF]"
+            ? "bg-[#A333FF] text-[#F4E5FF] font-bold"
+            : "text-[#F4E5FF] hover:bg-[#8022cd] hover:text-[#F4E5FF] bg-[#A333FF]"
             }`}
           suppressHydrationWarning
         >

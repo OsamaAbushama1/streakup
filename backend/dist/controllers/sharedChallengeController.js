@@ -85,19 +85,24 @@ const getSharedChallenges = async (req, res) => {
         const pageNum = Math.max(1, parseInt(page, 10));
         const limitNum = Math.max(1, parseInt(limit, 10));
         const skip = (pageNum - 1) * limitNum;
-        if (tab === "trending") {
-            return res.json({
-                sharedChallenges: [],
-                total: 0,
-                totalPages: 0,
-                currentPage: pageNum,
-            });
-        }
+        let query = {};
         let sortOption = { createdAt: -1 };
         if (tab === "trending") {
-            sortOption = { likes: -1, views: -1 };
+            query = {
+                $or: [
+                    {
+                        highlighted: true,
+                        $or: [
+                            { highlightExpiresAt: { $gt: new Date() } },
+                            { highlightExpiresAt: { $exists: false } } // Backward compatibility
+                        ]
+                    },
+                    { likes: { $gte: 30 }, views: { $gte: 30 } },
+                ],
+            };
+            sortOption = { highlighted: -1, likes: -1, views: -1 };
         }
-        const sharedChallenges = await sharedChallengeModel_1.default.find()
+        const sharedChallenges = await sharedChallengeModel_1.default.find(query)
             .populate({
             path: "challenge",
             select: "name category views likes challengeId duration points",
@@ -110,7 +115,7 @@ const getSharedChallenges = async (req, res) => {
             .sort(sortOption)
             .skip(skip)
             .limit(Number(limit));
-        const totalChallenges = await sharedChallengeModel_1.default.countDocuments();
+        const totalChallenges = await sharedChallengeModel_1.default.countDocuments(query);
         const totalPages = Math.ceil(totalChallenges / limitNum);
         res.status(200).json({
             sharedChallenges,
@@ -158,7 +163,7 @@ const getMyNonHighlightedSharedChallenges = async (req, res) => {
     try {
         const sharedChallenges = await sharedChallengeModel_1.default.find({
             user: req.user?.id,
-            highlighted: false,
+            $or: [{ highlighted: false }, { highlighted: { $exists: false } }],
         })
             .populate({
             path: "challenge",

@@ -16,6 +16,7 @@ const sharedChallengeModel_1 = __importDefault(require("../models/sharedChalleng
 const mongoose_1 = __importDefault(require("mongoose"));
 const generateCertificate_1 = require("../utils/generateCertificate");
 const cloudinary_1 = require("../utils/cloudinary");
+const systemSettingModel_1 = __importDefault(require("../models/systemSettingModel"));
 const isProduction = process.env.NODE_ENV === "production";
 const baseCookieOptions = {
     httpOnly: true,
@@ -405,9 +406,27 @@ const updateProfile = async (req, res) => {
 exports.updateProfile = updateProfile;
 const getAnalytics = async (req, res) => {
     try {
-        const user = await userModel_1.default.findById(req.user?.id).select("streak completedChallenges");
+        const user = await userModel_1.default.findById(req.user?.id).select("streak completedChallenges profileViews challenges");
         if (!user)
             return res.status(404).json({ message: "User not found" });
+        // Get total likes from all shared challenges
+        const sharedChallenges = await sharedChallengeModel_1.default.find({
+            user: user._id,
+        }).select("likes");
+        const totalLikes = sharedChallenges.reduce((sum, challenge) => sum + (challenge.likes || 0), 0);
+        // Get total number of challenges available in user's track
+        const totalChallengesInTrack = await challengeModel_1.default.countDocuments({
+            category: user.track,
+        });
+        // Calculate challenges completed percentage
+        const completedChallenges = user.completedChallenges || 0;
+        const challengesCompletedPercentage = totalChallengesInTrack > 0
+            ? Math.min((completedChallenges / totalChallengesInTrack) * 100, 100)
+            : 0;
+        // Calculate consistency rate (profile views as a percentage, capped at 100)
+        // This represents engagement/visibility - you can adjust the formula as needed
+        const profileViews = user.profileViews || 0;
+        const consistencyRate = Math.min(profileViews, 100); // Simple percentage capped at 100
         const streak = user.streak || 0;
         const calendarDays = 7;
         const activeDayIndex = streak % calendarDays;
@@ -420,8 +439,12 @@ const getAnalytics = async (req, res) => {
         }));
         res.status(200).json({
             streakCalendar,
-            progress1: user.streak * 5,
-            progress2: user.completedChallenges * 10,
+            totalLikes,
+            profileViews: user.profileViews || 0,
+            completedChallenges,
+            totalChallengesInTrack,
+            challengesCompletedPercentage: Math.round(challengesCompletedPercentage),
+            consistencyRate: Math.round(consistencyRate),
         });
     }
     catch (error) {
@@ -467,7 +490,7 @@ const getRewards = async (req, res) => {
             },
             {
                 name: "Top Ranker",
-                isUnlocked: user.points >= 2400,
+                isUnlocked: user.rank === "Platinum",
                 description: "Reach the highest rank (Platinum)",
             },
         ];
@@ -485,7 +508,7 @@ const getRewards = async (req, res) => {
                                 : index === 4
                                     ? (user.streak || 0) >= 30
                                     : index === 5
-                                        ? user.points >= 2400
+                                        ? user.rank === "Platinum"
                                         : false,
                 description: defaultBadges[index]?.description || "No description available",
             }))
@@ -495,10 +518,13 @@ const getRewards = async (req, res) => {
             { name: "Streak Saver", points: 200 },
             { name: "Challenge Boost", points: 700 },
         ];
+        const activeRewardsSetting = await systemSettingModel_1.default.findOne({ key: "activeRewards" });
+        const activeRewards = activeRewardsSetting ? activeRewardsSetting.value : [];
         res.status(200).json({
             points: user.points || 0,
             badges,
             store,
+            activeRewards,
         });
     }
     catch (error) {
@@ -685,6 +711,11 @@ const redeemReward = async (req, res) => {
             return res
                 .status(403)
                 .json({ message: "You are banned from redeeming rewards" });
+        }
+        const activeRewardsSetting = await systemSettingModel_1.default.findOne({ key: "activeRewards" });
+        const activeRewards = activeRewardsSetting ? activeRewardsSetting.value : [];
+        if (!Array.isArray(activeRewards) || !activeRewards.includes(rewardName)) {
+            return res.status(403).json({ message: "This reward is currently locked" });
         }
         let pointsRequired;
         switch (rewardName) {

@@ -8,6 +8,7 @@ import Project from "../models/projectModel";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { uploadToCloudinary, uploadMultipleToCloudinary } from "../utils/cloudinary";
+import SystemSetting from "../models/systemSettingModel";
 
 interface PopulatedUser {
   _id: mongoose.Types.ObjectId;
@@ -19,8 +20,8 @@ interface PopulatedUser {
 interface AuthRequest extends Request {
   user?: { id: string; role?: string };
   files?:
-    | Express.Multer.File[]
-    | { [fieldname: string]: Express.Multer.File[] };
+  | Express.Multer.File[]
+  | { [fieldname: string]: Express.Multer.File[] };
 }
 
 const FIXED_TRACKS = ["UI/UX Design", "Graphic Design", "Frontend Development"];
@@ -800,6 +801,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: "Invalid month provided" });
     }
 
+
     if (isNaN(yearForTop)) {
       return res.status(400).json({ message: "Invalid year provided" });
     }
@@ -938,6 +940,44 @@ export const registerAdmin = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error in registerAdmin:", error.stack);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getRewardSettings = async (req: AuthRequest, res: Response) => {
+  try {
+    const setting = await SystemSetting.findOne({ key: "activeRewards" });
+    res.status(200).json({ activeRewards: setting ? setting.value : [] });
+  } catch (error: any) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const updateRewardSettings = async (req: AuthRequest, res: Response) => {
+  try {
+    const { activeRewards } = req.body; // Array of active rewards or empty array to lock all
+
+    // Validate activeRewards is an array
+    if (!Array.isArray(activeRewards)) {
+      return res.status(400).json({ message: "activeRewards must be an array" });
+    }
+
+    // Validate each reward name
+    const validRewards = ["Highlight Shared Challenge", "Streak Saver", "Challenge Boost"];
+    for (const reward of activeRewards) {
+      if (!validRewards.includes(reward)) {
+        return res.status(400).json({ message: `Invalid reward name: ${reward}` });
+      }
+    }
+
+    await SystemSetting.findOneAndUpdate(
+      { key: "activeRewards" },
+      { value: activeRewards },
+      { upsert: true, new: true }
+    );
+
+    res.status(200).json({ message: "Reward settings updated", activeRewards });
+  } catch (error: any) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

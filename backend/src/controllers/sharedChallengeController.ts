@@ -9,8 +9,8 @@ import mongoose, { Types } from "mongoose";
 interface AuthRequest extends Request {
   user?: { id: string };
   files?:
-    | Express.Multer.File[]
-    | { [fieldname: string]: Express.Multer.File[] };
+  | Express.Multer.File[]
+  | { [fieldname: string]: Express.Multer.File[] };
 }
 
 export const getSharedChallengeById = async (
@@ -101,21 +101,26 @@ export const getSharedChallenges = async (req: AuthRequest, res: Response) => {
     const limitNum = Math.max(1, parseInt(limit as string, 10));
     const skip = (pageNum - 1) * limitNum;
 
-    if (tab === "trending") {
-      return res.json({
-        sharedChallenges: [],
-        total: 0,
-        totalPages: 0,
-        currentPage: pageNum,
-      });
-    }
-
+    let query: any = {};
     let sortOption: { [key: string]: any } = { createdAt: -1 };
+
     if (tab === "trending") {
-      sortOption = { likes: -1, views: -1 };
+      query = {
+        $or: [
+          {
+            highlighted: true,
+            $or: [
+              { highlightExpiresAt: { $gt: new Date() } },
+              { highlightExpiresAt: { $exists: false } } // Backward compatibility
+            ]
+          },
+          { likes: { $gte: 30 }, views: { $gte: 30 } },
+        ],
+      };
+      sortOption = { highlighted: -1, likes: -1, views: -1 };
     }
 
-    const sharedChallenges = await SharedChallenge.find()
+    const sharedChallenges = await SharedChallenge.find(query)
       .populate({
         path: "challenge",
         select: "name category views likes challengeId duration points",
@@ -129,7 +134,7 @@ export const getSharedChallenges = async (req: AuthRequest, res: Response) => {
       .skip(skip)
       .limit(Number(limit));
 
-    const totalChallenges = await SharedChallenge.countDocuments();
+    const totalChallenges = await SharedChallenge.countDocuments(query);
     const totalPages = Math.ceil(totalChallenges / limitNum);
 
     res.status(200).json({
@@ -184,9 +189,10 @@ export const getMyNonHighlightedSharedChallenges = async (
   res: Response
 ) => {
   try {
+
     const sharedChallenges = await SharedChallenge.find({
       user: req.user?.id,
-      highlighted: false,
+      $or: [{ highlighted: false }, { highlighted: { $exists: false } }],
     })
       .populate({
         path: "challenge",
@@ -197,6 +203,8 @@ export const getMyNonHighlightedSharedChallenges = async (
         select: "firstName lastName profilePicture",
       })
       .sort({ createdAt: -1 });
+
+
 
     const sharedWithComments = await Promise.all(
       sharedChallenges.map(async (shared) => {

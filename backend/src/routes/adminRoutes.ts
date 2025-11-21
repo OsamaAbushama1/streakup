@@ -16,6 +16,8 @@ import {
   registerAdmin,
   resolveReport,
   updateUser,
+  getRewardSettings,
+  updateRewardSettings,
 } from "../controllers/adminController";
 
 import {
@@ -98,6 +100,10 @@ router.delete("/comments/:id", deleteCommentAdmin);
 // ==================== REPORTS ====================
 router.get("/reports", getReports);
 router.put("/reports/:id/resolve", resolveReport);
+
+// ==================== REWARDS ====================
+router.get("/rewards/settings", getRewardSettings);
+router.put("/rewards/settings", updateRewardSettings);
 
 // ==================== ACTIVITIES ====================
 router.get("/activities", getActivities);

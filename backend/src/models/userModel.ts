@@ -55,6 +55,7 @@ const userSchema = new Schema({
   emailNotifications: { type: Boolean, default: true },
   streakSavers: { type: Number, default: 0 },
   challengeBoosts: { type: Number, default: 0 },
+  profileViews: { type: Number, default: 0 },
 
   // أضف هذا الحقل
   certificates: [

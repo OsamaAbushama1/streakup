@@ -52,6 +52,9 @@ router.delete("/comments/:id", adminController_1.deleteCommentAdmin);
 // ==================== REPORTS ====================
 router.get("/reports", adminController_1.getReports);
 router.put("/reports/:id/resolve", adminController_1.resolveReport);
+// ==================== REWARDS ====================
+router.get("/rewards/settings", adminController_1.getRewardSettings);
+router.put("/rewards/settings", adminController_1.updateRewardSettings);
 // ==================== ACTIVITIES ====================
 router.get("/activities", adminController_1.getActivities);
 // ==================== DASHBOARD ====================

@@ -3,135 +3,77 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toggleRewardAvailability = exports.deleteReward = exports.updateReward = exports.createReward = exports.getAllRewards = void 0;
-const rewardModel_1 = __importDefault(require("../models/rewardModel"));
-/**
- * Get all rewards (admin only)
- */
-const getAllRewards = async (req, res) => {
+exports.toggleRewardAvailability = exports.getRewardSettings = void 0;
+const userModel_1 = __importDefault(require("../models/userModel"));
+const rewardSettingsModel_1 = __importDefault(require("../models/rewardSettingsModel"));
+const mongoose_1 = __importDefault(require("mongoose"));
+// Get reward settings
+const getRewardSettings = async (req, res) => {
     try {
-        const rewards = await rewardModel_1.default.find().sort({ createdAt: -1 });
-        res.status(200).json({
-            rewards,
-            total: rewards.length,
-        });
-    }
-    catch (error) {
-        console.error("Error in getAllRewards:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-};
-exports.getAllRewards = getAllRewards;
-/**
- * Create new reward (admin only)
- */
-const createReward = async (req, res) => {
-    try {
-        const { name, description, points, isAvailable, icon, category } = req.body;
-        // Validation
-        if (!name || !description || !points) {
-            return res.status(400).json({
-                message: "Name, description, and points are required",
+        const user = await userModel_1.default.findById(req.user?.id);
+        if (!user || user.role !== "Admin") {
+            return res.status(403).json({ message: "Access denied" });
+        }
+        let settings = await rewardSettingsModel_1.default.findOne();
+        // Create default settings if none exist
+        if (!settings) {
+            settings = await rewardSettingsModel_1.default.create({
+                highlightSharedChallenge: false,
+                streakSaver: false,
+                challengeBoost: false,
             });
         }
-        // Check if reward with same name already exists
-        const existingReward = await rewardModel_1.default.findOne({ name });
-        if (existingReward) {
-            return res.status(400).json({
-                message: "Reward with this name already exists",
-            });
-        }
-        const reward = await rewardModel_1.default.create({
-            name,
-            description,
-            points,
-            isAvailable: isAvailable || false,
-            icon: icon || "🎁",
-            category: category || "utility",
-        });
-        res.status(201).json({
-            message: "Reward created successfully",
-            reward,
-        });
+        res.status(200).json({ settings });
     }
     catch (error) {
-        console.error("Error in createReward:", error);
+        console.error("Error in getRewardSettings:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
-exports.createReward = createReward;
-/**
- * Update reward (admin only)
- */
-const updateReward = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, description, points, isAvailable, icon, category } = req.body;
-        const reward = await rewardModel_1.default.findById(id);
-        if (!reward) {
-            return res.status(404).json({ message: "Reward not found" });
-        }
-        // Update fields
-        if (name !== undefined)
-            reward.name = name;
-        if (description !== undefined)
-            reward.description = description;
-        if (points !== undefined)
-            reward.points = points;
-        if (isAvailable !== undefined)
-            reward.isAvailable = isAvailable;
-        if (icon !== undefined)
-            reward.icon = icon;
-        if (category !== undefined)
-            reward.category = category;
-        await reward.save();
-        res.status(200).json({
-            message: "Reward updated successfully",
-            reward,
-        });
-    }
-    catch (error) {
-        console.error("Error in updateReward:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-};
-exports.updateReward = updateReward;
-/**
- * Delete reward (admin only)
- */
-const deleteReward = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const reward = await rewardModel_1.default.findById(id);
-        if (!reward) {
-            return res.status(404).json({ message: "Reward not found" });
-        }
-        await reward.deleteOne();
-        res.status(200).json({
-            message: "Reward deleted successfully",
-        });
-    }
-    catch (error) {
-        console.error("Error in deleteReward:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-};
-exports.deleteReward = deleteReward;
-/**
- * Toggle reward availability (admin only)
- */
+exports.getRewardSettings = getRewardSettings;
+// Toggle reward availability
 const toggleRewardAvailability = async (req, res) => {
     try {
-        const { id } = req.params;
-        const reward = await rewardModel_1.default.findById(id);
-        if (!reward) {
-            return res.status(404).json({ message: "Reward not found" });
+        const user = await userModel_1.default.findById(req.user?.id);
+        if (!user || user.role !== "Admin") {
+            return res.status(403).json({ message: "Access denied" });
         }
-        reward.isAvailable = !reward.isAvailable;
-        await reward.save();
+        const { rewardName, isAvailable } = req.body;
+        if (!rewardName || typeof isAvailable !== "boolean") {
+            return res.status(400).json({ message: "Invalid request data" });
+        }
+        const validRewards = [
+            "highlightSharedChallenge",
+            "streakSaver",
+            "challengeBoost",
+        ];
+        if (!validRewards.includes(rewardName)) {
+            return res.status(400).json({ message: "Invalid reward name" });
+        }
+        let settings = await rewardSettingsModel_1.default.findOne();
+        if (!settings) {
+            settings = await rewardSettingsModel_1.default.create({
+                highlightSharedChallenge: false,
+                streakSaver: false,
+                challengeBoost: false,
+            });
+        }
+        // Update the specific reward field
+        if (rewardName === "highlightSharedChallenge") {
+            settings.highlightSharedChallenge = isAvailable;
+        }
+        else if (rewardName === "streakSaver") {
+            settings.streakSaver = isAvailable;
+        }
+        else if (rewardName === "challengeBoost") {
+            settings.challengeBoost = isAvailable;
+        }
+        settings.lastUpdatedBy = new mongoose_1.default.Types.ObjectId(req.user?.id);
+        settings.lastUpdatedAt = new Date();
+        await settings.save();
         res.status(200).json({
-            message: `Reward ${reward.isAvailable ? "enabled" : "disabled"} successfully`,
-            reward,
+            message: `Reward ${isAvailable ? "enabled" : "disabled"} successfully`,
+            settings,
         });
     }
     catch (error) {

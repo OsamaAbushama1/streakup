@@ -6,16 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.passwordResetLimiter = exports.authLimiter = exports.apiLimiter = exports.strictApiLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 /**
- * Strict API Rate Limiter - 30 requests per minute
+ * Strict API Rate Limiter - 300 requests per minute
  * Applied to all API endpoints to prevent scraping and abuse
  */
 exports.strictApiLimiter = (0, express_rate_limit_1.default)({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 30, // Limit each IP to 30 requests per minute
+    max: 300, // Limit each IP to 300 requests per minute
     message: {
         success: false,
         error: "RATE_LIMIT_EXCEEDED",
-        message: "Too many requests from this IP address. You have exceeded the limit of 30 requests per minute.",
+        message: "Too many requests from this IP address. You have exceeded the limit of 300 requests per minute.",
         hint: "Please wait a moment before trying again.",
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
