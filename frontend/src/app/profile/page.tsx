@@ -9,6 +9,9 @@ import {
   FaHeart,
   FaRocket,
   FaShieldAlt,
+  FaTrophy,
+  FaHandsHelping,
+  FaStar,
 } from "react-icons/fa";
 import Image from "next/image";
 import { BsLightbulb } from "react-icons/bs";
@@ -311,23 +314,50 @@ const Profile: React.FC = () => {
           const data = await response.json();
           const badges = data.badges.map(
             (
-              badge: { name: string; isUnlocked: boolean; description: string },
-              index: number
-            ) => ({
-              name: badge.name,
-              isUnlocked: badge.isUnlocked,
-              description: badge.description,
-              icon:
-                index % 2 === 0 ? (
-                  <BsLightbulb className="text-red-500" />
-                ) : (
-                  <FaFireAlt className="text-yellow-500" />
-                ),
-              bg:
-                index % 2 === 0
-                  ? "bg-[rgba(255,0,0,0.1)]"
-                  : "bg-[rgba(255,255,0,0.15)]",
-            })
+              badge: { name: string; isUnlocked: boolean; description: string }
+            ) => {
+              // Map each badge to its specific icon and color
+              let icon: ReactNode;
+              let bg: string;
+
+              switch (badge.name) {
+                case "First Challenge":
+                  icon = <FaRocket className="text-green-500" />;
+                  bg = "bg-green-100";
+                  break;
+                case "7 Day Streak":
+                  icon = <FaFireAlt className="text-orange-500" />;
+                  bg = "bg-orange-100";
+                  break;
+                case "Community Helper":
+                  icon = <FaHandsHelping className="text-blue-500" />;
+                  bg = "bg-blue-100";
+                  break;
+                case "Social Star":
+                  icon = <FaStar className="text-yellow-500" />;
+                  bg = "bg-yellow-100";
+                  break;
+                case "30 Day Streak":
+                  icon = <FaFireAlt className="text-red-500" />;
+                  bg = "bg-red-100";
+                  break;
+                case "Top Ranker":
+                  icon = <FaTrophy className="text-purple-500" />;
+                  bg = "bg-purple-100";
+                  break;
+                default:
+                  icon = <FaRocket className="text-gray-500" />;
+                  bg = "bg-gray-100";
+              }
+
+              return {
+                name: badge.name,
+                isUnlocked: badge.isUnlocked,
+                description: badge.description,
+                icon,
+                bg,
+              };
+            }
           );
           const store = [
             {
