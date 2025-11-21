@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { FiX } from "react-icons/fi";
 import { ALL_BADGES, BadgeDef } from "@/config/badges";
 import { API_BASE_URL } from "@/config/api";
 
@@ -84,6 +85,14 @@ export default function BadgePopupManager() {
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[9999]">
             <div className="bg-white p-8 rounded-2xl max-w-sm w-full text-center relative shadow-2xl">
+                {/* Close Button */}
+                <button
+                    onClick={() => setShowPopup(false)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+                >
+                    <FiX size={24} />
+                </button>
+
                 {/* Badge Image */}
                 <div className="mb-6">
                     <Image
