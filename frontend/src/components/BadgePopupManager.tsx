@@ -84,7 +84,7 @@ export default function BadgePopupManager() {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[9999]">
-            <div className="bg-white p-6 rounded-2xl max-w-sm md:max-w-lg w-full text-center relative shadow-2xl  mx-4 md:mx-0">
+            <div className="p-6 rounded-2xl max-w-sm md:max-w-lg w-full text-center relative shadow-2xl  mx-4 md:mx-0 bg-[linear-gradient(135deg,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] text-white">
 
                 {/* Close Button */}
                 <button
@@ -123,6 +123,6 @@ export default function BadgePopupManager() {
                     View My Badges
                 </button>
             </div>
-        </div>
+        </div >
     );
 }

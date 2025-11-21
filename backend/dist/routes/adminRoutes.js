@@ -13,7 +13,6 @@ const projectController_1 = require("../controllers/projectController");
 const trackController_1 = require("../controllers/trackController");
 const adminController_2 = require("../controllers/adminController");
 const challengeController_1 = require("../controllers/challengeController");
-const adminRewardController_1 = require("../controllers/adminRewardController");
 const router = (0, express_1.Router)();
 // Use memory storage for Cloudinary uploads
 const storage = multer_1.default.memoryStorage();
@@ -57,11 +56,4 @@ router.put("/reports/:id/resolve", adminController_1.resolveReport);
 router.get("/activities", adminController_1.getActivities);
 // ==================== DASHBOARD ====================
 router.get("/", adminController_1.getDashboardStats); // /api/admin
-// ==================== REWARDS ====================
-// Reward management (admin only)
-router.get("/rewards", adminRewardController_1.getAllRewards);
-router.post("/rewards", adminRewardController_1.createReward);
-router.put("/rewards/:id", adminRewardController_1.updateReward);
-router.delete("/rewards/:id", adminRewardController_1.deleteReward);
-router.put("/rewards/:id/toggle-availability", adminRewardController_1.toggleRewardAvailability);
 exports.default = router;
