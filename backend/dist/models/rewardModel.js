@@ -35,45 +35,11 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const rewardSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    points: {
-        type: Number,
-        required: true,
-        min: 0,
-    },
-    isAvailable: {
-        type: Boolean,
-        default: false, // Coming Soon by default
-    },
-    icon: {
-        type: String,
-        default: "🎁",
-    },
-    category: {
-        type: String,
-        enum: ["boost", "cosmetic", "utility", "special"],
-        default: "utility",
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
-// Update timestamp on save
-rewardSchema.pre("save", function (next) {
-    this.updatedAt = new Date();
-    next();
-});
-exports.default = mongoose_1.default.model("Reward", rewardSchema);
+    name: { type: String, required: true, unique: true },
+    description: { type: String, required: true },
+    points: { type: Number, required: true },
+    icon: { type: String },
+    isAvailable: { type: Boolean, default: false },
+    isSystem: { type: Boolean, default: false },
+}, { timestamps: true });
+exports.default = mongoose_1.default.model('Reward', rewardSchema);

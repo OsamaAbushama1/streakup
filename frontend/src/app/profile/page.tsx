@@ -91,7 +91,7 @@ interface Reward {
     bg: string;
     description: string;
   }[];
-  store: { name: string; points: number; description: string }[];
+  store: { name: string; points: number; description: string; isAvailable?: boolean }[];
   activeRewards: string[];
 }
 type CertificateRank = "Bronze" | "Silver" | "Gold" | "Platinum";
@@ -365,30 +365,10 @@ const Profile: React.FC = () => {
               };
             }
           );
-          const store = [
-            {
-              name: "Highlight Shared Challenge",
-              points: 400,
-              description:
-                "Highlight your shared challenge at the top of the Shared Challenges list for 24 hours.",
-            },
-            {
-              name: "Streak Saver",
-              points: 200,
-              description:
-                "Protect your streak if you miss a day without completing a challenge.",
-            },
-            {
-              name: "Challenge Boost",
-              points: 500,
-              description:
-                "Complete a challenge instantly and earn its points.",
-            },
-          ];
           setRewards({
             points: data.points,
             badges,
-            store,
+            store: data.store || [],
             activeRewards: data.activeRewards || [],
           });
         } catch (err: unknown) {
@@ -1332,7 +1312,8 @@ const Profile: React.FC = () => {
 
               <div className="relative">
                 {/* Global Lock Overlay if everything is locked */}
-                {(!rewards?.activeRewards || rewards.activeRewards.length === 0) && (
+                {/* Global Lock Overlay if store is empty */}
+                {(!rewards?.store || rewards.store.length === 0) && (
                   <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300">
                     <div className="bg-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
                       <FiLock className="text-gray-500" />
@@ -1341,7 +1322,7 @@ const Profile: React.FC = () => {
                   </div>
                 )}
 
-                <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 ${(!rewards?.activeRewards || rewards.activeRewards.length === 0) ? "opacity-50 pointer-events-none" : ""}`}>
+                <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 ${(!rewards?.store || rewards.store.length === 0) ? "opacity-50 pointer-events-none" : ""}`}>
                   {(rewards?.store ?? []).map((reward, idx: number) => {
                     let icon: ReactNode;
                     let bg: string;
@@ -1364,7 +1345,7 @@ const Profile: React.FC = () => {
                         bg = "bg-[rgba(128,128,128,0.1)]";
                     }
 
-                    const isLocked = !rewards?.activeRewards?.includes(reward.name);
+                    const isLocked = reward.isAvailable === false;
 
                     return (
                       <div

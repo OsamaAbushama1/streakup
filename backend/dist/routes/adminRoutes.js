@@ -53,8 +53,14 @@ router.delete("/comments/:id", adminController_1.deleteCommentAdmin);
 router.get("/reports", adminController_1.getReports);
 router.put("/reports/:id/resolve", adminController_1.resolveReport);
 // ==================== REWARDS ====================
-router.get("/rewards/settings", adminController_1.getRewardSettings);
-router.put("/rewards/settings", adminController_1.updateRewardSettings);
+// ==================== REWARDS ====================
+// router.get("/rewards/settings", getRewardSettings); // Deprecated
+// router.put("/rewards/settings", updateRewardSettings); // Deprecated
+const rewardController_1 = require("../controllers/rewardController");
+router.get("/rewards", rewardController_1.getAllRewardsAdmin);
+router.post("/rewards", rewardController_1.createReward);
+router.put("/rewards/:id", rewardController_1.updateReward);
+router.delete("/rewards/:id", rewardController_1.deleteReward);
 // ==================== ACTIVITIES ====================
 router.get("/activities", adminController_1.getActivities);
 // ==================== DASHBOARD ====================

@@ -16,6 +16,8 @@ import {
 } from "../utils/generateCertificate";
 import { uploadToCloudinary } from "../utils/cloudinary";
 import SystemSetting from "../models/systemSettingModel";
+import Reward from "../models/rewardModel";
+import { syncSystemRewards } from "./rewardController";
 
 const isProduction = process.env.NODE_ENV === "production";
 const baseCookieOptions: CookieOptions = {
@@ -583,25 +585,41 @@ export const getRewards = async (req: AuthRequest, res: Response) => {
                     : index === 5
                       ? user.rank === "Platinum"
                       : false,
-        description:
-          defaultBadges[index]?.description || "No description available",
+        description: defaultBadges[index]?.description || "No description available",
       }))
       : defaultBadges;
 
-    const store = [
-      { name: "Highlight Shared Challenge", points: 400 },
-      { name: "Streak Saver", points: 200 },
-      { name: "Challenge Boost", points: 700 },
-    ];
+    // Fetch rewards from DB
+    let dbRewards = await Reward.find().sort({ createdAt: -1 });
 
-    const activeRewardsSetting = await SystemSetting.findOne({ key: "activeRewards" });
-    const activeRewards = activeRewardsSetting ? activeRewardsSetting.value : [];
+    // If no rewards found, try to sync system rewards and fetch again
+    if (dbRewards.length === 0) {
+      await syncSystemRewards();
+      dbRewards = await Reward.find().sort({ createdAt: -1 });
+    }
+
+    let store = dbRewards.map(r => ({
+      name: r.name,
+      points: r.points,
+      description: r.description,
+      isAvailable: r.isAvailable,
+      icon: r.icon
+    }));
+
+    if (store.length === 0) {
+      // Fallback if DB is still empty (shouldn't happen)
+      store = [
+        { name: "Highlight Shared Challenge", points: 400, description: "Highlight your shared challenge at the top of the Shared Challenges list for 24 hours.", isAvailable: true },
+        { name: "Streak Saver", points: 200, description: "Protect your streak if you miss a day without completing a challenge.", isAvailable: true },
+        { name: "Challenge Boost", points: 500, description: "Complete a challenge instantly and earn its points.", isAvailable: true },
+      ] as any;
+    }
 
     res.status(200).json({
       points: user.points || 0,
       badges,
       store,
-      activeRewards,
+      // activeRewards is deprecated, frontend should use isAvailable from store items
     });
   } catch (error: any) {
     res.status(500).json({ message: "Server error" });
@@ -827,17 +845,26 @@ export const redeemReward = async (req: AuthRequest, res: Response) => {
         .json({ message: "You are banned from redeeming rewards" });
     }
 
-    const activeRewardsSetting = await SystemSetting.findOne({ key: "activeRewards" });
-    const activeRewards = activeRewardsSetting ? activeRewardsSetting.value : [];
+    // Check reward in DB
+    const reward = await Reward.findOne({ name: rewardName });
 
-    if (!Array.isArray(activeRewards) || !activeRewards.includes(rewardName)) {
-      return res.status(403).json({ message: "This reward is currently locked" });
+    if (!reward) {
+      // Fallback for legacy/hardcoded if not in DB yet
+      const validLegacy = ["Highlight Shared Challenge", "Streak Saver", "Challenge Boost"];
+      if (!validLegacy.includes(rewardName)) {
+        return res.status(404).json({ message: "Reward not found" });
+      }
+      // If it is legacy but not in DB, assume it's available (or check SystemSetting if you want strict compat)
+    } else {
+      if (!reward.isAvailable) {
+        return res.status(403).json({ message: "This reward is currently locked" });
+      }
     }
 
     let pointsRequired: number;
     switch (rewardName) {
       case "Highlight Shared Challenge":
-        pointsRequired = 400;
+        pointsRequired = reward ? reward.points : 400;
         if (!challengeId) {
           return res.status(400).json({ message: "Challenge ID is required" });
         }
@@ -864,7 +891,7 @@ export const redeemReward = async (req: AuthRequest, res: Response) => {
         break;
 
       case "Streak Saver":
-        pointsRequired = 200;
+        pointsRequired = reward ? reward.points : 200;
         if (user.points < pointsRequired) {
           return res.status(400).json({ message: "Insufficient points" });
         }
@@ -886,7 +913,7 @@ export const redeemReward = async (req: AuthRequest, res: Response) => {
         break;
 
       case "Challenge Boost":
-        pointsRequired = 500;
+        pointsRequired = reward ? reward.points : 500;
         if (!challengeId) {
           return res.status(400).json({ message: "Challenge ID is required" });
         }
@@ -977,6 +1004,20 @@ export const redeemReward = async (req: AuthRequest, res: Response) => {
         break;
 
       default:
+        // Generic reward handling
+        if (reward) {
+          if (user.points < reward.points) {
+            return res.status(400).json({ message: "Insufficient points" });
+          }
+          user.points -= reward.points;
+          // Here we could add logic to record the claim
+          await user.save();
+          return res.status(200).json({
+            message: `${rewardName} redeemed successfully`,
+            points: user.points,
+            streakSavers: user.streakSavers,
+          });
+        }
         return res.status(400).json({ message: "Invalid reward" });
     }
 
