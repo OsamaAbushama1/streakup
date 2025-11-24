@@ -26,7 +26,7 @@ const GamifiedLearning: React.FC = () => {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-[60vh] bg-[#FFFFFF] px-4 sm:px-6 md:px-12 lg:px-8 py-12 sm:py-16">
+    <section className="relative flex flex-col items-center justify-center min-h-[60vh] bg-[#FFFFFF] px-4 sm:px-6 md:px-12 lg:px-8 py-6 sm:py-8">
       <div className="container mx-auto xl:max-w-7xl text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { motion } from "framer-motion";
 
 const LandingHeader: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,9 +60,19 @@ const LandingHeader: React.FC = () => {
   };
 
   return (
-    <header className="py-4 absolute top-4 sm:top-6 left-0 right-0 z-10">
+    <motion.header
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="py-4 absolute top-4 sm:top-6 left-0 right-0 z-10"
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl flex justify-between items-center">
-        <div className="flex items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex items-center"
+        >
           <Link href="/" className="block">
             <Image
               src="/imgs/logo.png"
@@ -79,41 +90,62 @@ const LandingHeader: React.FC = () => {
       "
             />
           </Link>
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           {isAuthenticated ? (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               className="px-3 py-1.5 sm:px-5 sm:py-3 text-sm sm:text-base bg-white/50 text-purple-600 rounded-full font-medium shadow hover:bg-white/80 transition"
             >
               Logout
-            </button>
+            </motion.button>
           ) : (
             <>
+              {/* Sign Up Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.4 }}
+                className="inline-block"
+              >
+                <Link
+                  href="/signup"
+                  className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base bg-[#8981FA] text-white rounded-full font-semibold shadow-lg hover:bg-[#9330e4] transition whitespace-nowrap mr-2 inline-block"
+                >
+                  Sign Up
+                </Link>
+              </motion.div>
               {/* Login Button */}
-              <Link
-                href="/signup"
-                className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base bg-[#A333FF] text-white rounded-full font-semibold shadow-lg hover:bg-[#9330e4] transition whitespace-nowrap mr-2"
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 }}
+                className="inline-block"
               >
-                Sign Up
-              </Link>
-              <Link
-                href="/login"
-                className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-[#ffffff] border border-white/70 rounded-full font-semibold 
-                   bg-white/10 backdrop-blur-sm
-                   shadow-md 
-                   hover:bg-white/20 hover:shadow-lg  
-                   transition-all duration-300 whitespace-nowrap"
-              >
-                Login
-              </Link>
+                <Link
+                  href="/login"
+                  className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-[#ffffff] border border-white/70 rounded-full font-semibold 
+                     bg-white/10 backdrop-blur-sm
+                     shadow-md 
+                     hover:bg-white/20 hover:shadow-lg  
+                     transition-all duration-300 whitespace-nowrap inline-block"
+                >
+                  Login
+                </Link>
+              </motion.div>
             </>
 
           )}
-        </div>
+        </motion.div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 

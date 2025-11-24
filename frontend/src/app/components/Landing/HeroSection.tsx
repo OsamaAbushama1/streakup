@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => {
   };
   return (
     <section
-      className="relative flex flex-col items-center justify-center text-center h-[90vh] overflow-hidden"
+      className="relative flex flex-col items-center justify-center text-center h-[100vh] overflow-hidden"
     >
       <video
         autoPlay
@@ -52,8 +52,8 @@ const HeroSection: React.FC = () => {
           }}
           className="mb-6"
         >
-          <span className="inline-flex items-center gap-2 rounded-full text-white font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
-            <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8">
+          <span className="inline-flex items-center gap-2 rounded-full text-white font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base mt-8">
+            <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 ">
               <Image
                 src="/imgs/Star.png"
                 alt="star icon"
@@ -71,9 +71,9 @@ const HeroSection: React.FC = () => {
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
           }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-8xl font-bold text-white mt-4 mb-4 sm:mb-6"
         >
-          Level Up Your Creative Skills
+          Level Up Your<br />Creative Skills
         </motion.h1>
 
         <motion.p
@@ -96,7 +96,7 @@ const HeroSection: React.FC = () => {
         >
           <Link
             href="/challenge-center"
-            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#000000] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
+            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#ffffff] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
           >
             Start the Challenge for Free
           </Link>
@@ -107,17 +107,17 @@ const HeroSection: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="absolute bottom-8 flex flex-col items-center gap-2"
+        className="absolute bottom-4 flex flex-col items-center "
         onClick={handleScroll}
       >
-        <div className="w-6 h-10 sm:w-7 sm:h-12 border-2 border-black rounded-full flex items-start justify-center">
-          <div className="w-1.5 h-3 sm:h-4 bg-black rounded-full mt-2 animate-bounce"></div>
+        <div className="w-6 h-10 sm:w-7 sm:h-12 border-2 border-white rounded-full flex items-start justify-center">
+          <div className="w-1.5 h-3 sm:h-4 bg-white rounded-full mt-2 animate-bounce"></div>
         </div>
-        <span className="text-base sm:text-lg text-black mt-2">
+        <span className="text-base sm:text-lg text-white mt-2">
           Scroll down
         </span>
 
-        <span className="animate-bounce text-3xl sm:text-4xl text-black">
+        <span className="animate-bounce text-3xl sm:text-4xl text-white">
           ↓
         </span>
       </motion.button>

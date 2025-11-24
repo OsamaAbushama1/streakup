@@ -19,9 +19,9 @@ const AboutMe: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#8B7FF7] mb-3">
             The Story of StreakUp
           </h1>
-          <h2 className="text-xl sm:text-xl md:text-2xl font-bold text-[#A8A8A8]">
+          <p className="text-[#A8A8A8] text-sm sm:text-lg md:text-lg leading-relaxed mb-10">
             Streaks, Feedback, and More
-          </h2>
+          </p>
         </motion.div>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16 w-full">
@@ -59,9 +59,9 @@ const AboutMe: React.FC = () => {
             <Image
               src="/imgs/aboutMe.png"
               alt="About StreakUp"
-              width={350}
-              height={350}
-              className="w-64 h-64 sm:w-80 sm:h-80 md:w-[350px] md:h-[350px] object-contain"
+              width={320}
+              height={320}
+              className="w-64 h-64 sm:w-80 sm:h-80 md:w-[320px] md:h-[320px] object-contain"
             />
           </motion.div>
         </div>

@@ -276,19 +276,19 @@ const SignupForm: React.FC = () => {
     switch (step) {
       case 1:
         return (
-          <div className="flex flex-col items-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-center text-black mb-4">
+          <div className="bg-white flex rounded-xl flex-col items-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-center text-[#8B7FF7] mb-4">
               Join to the Streak Up Community
             </h1>
-            <p className="text-center text-[#2E2E38] mb-6 text-lg">
+            <p className="text-center text-[#8A8A8A] mb-6 text-lg">
               Start your Challenge journey to creative excellence
             </p>
             <div className="flex items-center justify-center mb-6">
               <span className="flex items-center gap-4">
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="w-8 h-8 bg-[#8B7FF7] rounded-full flex items-center justify-center text-white font-bold">
                   1
                 </span>
-                <span className="border-b-2 border-[#A333FF] w-15"></span>
+                <span className="border-b-2 border-[#8B7FF7] w-15"></span>
                 <span className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500">
                   2
                 </span>
@@ -300,111 +300,101 @@ const SignupForm: React.FC = () => {
             </div>
             <form
               onSubmit={handleSubmit}
-              className="bg-white space-y-4 w-full max-w-lg p-6 rounded-xl"
+              className="space-y-4 w-full"
             >
-              <h3 className="text-base sm:text-lg font-semibold text-[#000000] mb-4">
+              <h3 className="text-lg sm:text-2xl font-bold text-center text-[#000000] mb-4">
                 Basic Information
               </h3>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+                  <label className="block text-gray-700 text-sm font-semibold mb-2">
                     First Name
                   </label>
-                  <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      placeholder="Enter Your First Name"
-                      className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-                      disabled={loading}
-                      suppressHydrationWarning
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[#2E2E38] text-sm font-bold mb-2">
-                    Last Name
-                  </label>
-                  <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      placeholder="Enter Your Last Name"
-                      className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-                      disabled={loading}
-                      suppressHydrationWarning
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label className="block text-[#2E2E38] text-sm font-bold mb-2">
-                  Username
-                </label>
-                <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
                   <input
                     type="text"
-                    name="username"
-                    value={formData.username}
+                    name="firstName"
+                    value={formData.firstName}
                     onChange={handleChange}
-                    placeholder="Enter Your Username"
-                    className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
+                    placeholder="Enter Your First Name"
+                    className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
                     disabled={loading}
                     suppressHydrationWarning
                   />
                 </div>
+                <div className="flex-1">
+                  <label className="block text-gray-700 text-sm font-semibold mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Enter Your Last Name"
+                    className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                    disabled={loading}
+                    suppressHydrationWarning
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-semibold mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Enter Your Username"
+                  className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                  disabled={loading}
+                  suppressHydrationWarning
+                />
                 {usernameError && (
                   <p className="text-red-500 text-sm mt-1">{usernameError}</p>
                 )}
               </div>
               <div>
-                <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+                <label className="block text-gray-700 text-sm font-semibold mb-2">
                   Email Address
                 </label>
-                <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter Your E-mail"
-                    className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-                    disabled={loading}
-                    suppressHydrationWarning
-                  />
-                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter Your E-mail"
+                  className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                  disabled={loading}
+                  suppressHydrationWarning
+                />
               </div>
               <div>
-                <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+                <label className="block text-gray-700 text-sm font-semibold mb-2">
                   Password
                 </label>
-                <div className="p-[2px] rounded-lg bg-[#B0B0B8] focus-within:bg-[linear-gradient(to_right,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] transition">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter Your Password"
-                    className="w-full px-3 py-2 rounded-lg focus:outline-none bg-white text-black placeholder-[#525050]"
-                    disabled={loading}
-                    suppressHydrationWarning
-                  />
-                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter Your Password"
+                  className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                  disabled={loading}
+                  suppressHydrationWarning
+                />
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <button
                 type="submit"
-                className="w-full bg-[#A333FF] text-white py-3 rounded-lg hover:bg-[#540099] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#8981FA] text-white py-3 rounded-3xl hover:bg-[#766ee9] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 suppressHydrationWarning
                 disabled={loading || isButtonDisabled || !!usernameError}
               >
                 {loading || isButtonDisabled ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-3xl animate-spin"></div>
                     <span>Processing...</span>
                   </div>
                 ) : (
@@ -431,20 +421,20 @@ const SignupForm: React.FC = () => {
             </p>
             <div className="flex items-center justify-center mb-6">
               <span className="flex items-center gap-4">
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="w-8 h-8 bg-[#8981FA] rounded-full flex items-center justify-center text-white font-bold">
                   1
                 </span>
-                <span className="border-b-2 border-[#A333FF] w-15"></span>
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="border-b-2 border-[#8981FA] w-15"></span>
+                <span className="w-8 h-8 bg-[#8981FA] rounded-full flex items-center justify-center text-white font-bold">
                   2
                 </span>
-                <span className="border-b-2 border-[#A333FF] w-15"></span>
+                <span className="border-b-2 border-[#8981FA] w-15"></span>
                 <span className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500">
                   3
                 </span>
               </span>
             </div>
-            <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6">
+            <div className="w-full">
               <h2 className="text-xl font-bold text-left text-black mb-4">
                 Choose Your Track
               </h2>
@@ -509,7 +499,7 @@ const SignupForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-4 py-2 bg-white text-[#A333FF] border-2 border-[#A333FF] rounded-lg hover:bg-[#A333FF] hover:text-white"
+                  className="px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
                   disabled={loading}
                   suppressHydrationWarning
                 >
@@ -518,13 +508,13 @@ const SignupForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleButtonClick(() => handleContinue())}
-                  className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#540099] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   suppressHydrationWarning
                   disabled={loading || isButtonDisabled || !formData.track}
                 >
                   {loading || isButtonDisabled ? (
                     <div className="flex items-center space-x-2">
-                      <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-4 border-t-transparent border-white rounded-3xl animate-spin"></div>
                       <span>Processing...</span>
                     </div>
                   ) : (
@@ -546,20 +536,20 @@ const SignupForm: React.FC = () => {
             </p>
             <div className="flex items-center justify-center mb-6">
               <span className="flex items-center gap-4">
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="w-8 h-8 bg-[#8981FA] rounded-full flex items-center justify-center text-white font-bold">
                   1
                 </span>
-                <span className="border-b-2 border-[#A333FF] w-15"></span>
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="border-b-2 border-[#8981FA] w-15"></span>
+                <span className="w-8 h-8 bg-[#8981FA] rounded-full flex items-center justify-center text-white font-bold">
                   2
                 </span>
-                <span className="border-b-2 border-[#A333FF] w-15"></span>
-                <span className="w-8 h-8 bg-[#A333FF] rounded-full flex items-center justify-center text-white font-bold">
+                <span className="border-b-2 border-[#8981FA] w-15"></span>
+                <span className="w-8 h-8 bg-[#8981FA] rounded-full flex items-center justify-center text-white font-bold">
                   3
                 </span>
               </span>
             </div>
-            <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6">
+            <div className="w-full">
               <h2 className="text-xl font-bold text-left text-[#000000] mb-4">
                 What&apos;s your current skill level?
               </h2>
@@ -584,7 +574,9 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Beginner
                         </span>
-
+                        <span className="text-xs text-[#6d6f72]">
+                          Just starting out or learning basics
+                        </span>
                       </div>
                       <div>
                         <input
@@ -618,7 +610,9 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Intermediate
                         </span>
-
+                        <span className="text-xs text-[#6d6f72]">
+                          Some experience, looking to improve
+                        </span>
                       </div>
                       <div>
                         <input
@@ -653,7 +647,9 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Advanced
                         </span>
-
+                        <span className="text-xs text-[#6d6f72]">
+                          Experienced, seeking new challenges
+                        </span>
                       </div>
                       <div>
                         <input
@@ -688,7 +684,7 @@ const SignupForm: React.FC = () => {
                         <FiUser className="text-2xl text-[#F5F5F7]" />
                       </span>
                     )}
-                    <label className="cursor-pointer text-[#A333FF] hover:underline border font-semibold border-gray-300 rounded-lg p-2 flex items-center">
+                    <label className="cursor-pointer text-[#8981FA] hover:underline border font-semibold border-gray-300 rounded-lg p-2 flex items-center">
                       <input
                         type="file"
                         accept="image/*"
@@ -709,7 +705,7 @@ const SignupForm: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="px-4 py-2 bg-white text-[#A333FF] border-2 border-[#A333FF] rounded-lg hover:bg-[#A333FF] hover:text-white"
+                    className="px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
                     disabled={loading}
                     suppressHydrationWarning
                   >
@@ -717,7 +713,7 @@ const SignupForm: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#A333FF] text-white rounded-lg hover:bg-[#540099] flex items-center justify-center"
+                    className="px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center"
                     disabled={loading}
                     suppressHydrationWarning
                   >
@@ -804,8 +800,15 @@ const SignupForm: React.FC = () => {
         description="Create your StreakUp account and start your creative journey"
         keywords="sign up, register, creative challenges, StreakUp account"
       />
-      <section className="min-h-screen bg-[#F4E5FF] flex items-center justify-center p-4 pt-8 md:pt-4">
-        {renderStep()}
+      <section className="min-h-screen bg-[#F4E5FF] flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 lg:p-16 
+                        w-full mx-auto 
+                        scale-100 
+                        animate-in fade-in duration-500">
+            {renderStep()}
+          </div>
+        </div>
       </section>
     </>
   );
