@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import LandingHeader from "./LandingHeader";
 
+import { motion } from "framer-motion";
+
 const HeroSection: React.FC = () => {
   const handleScroll = () => {
     const nextSection = document.getElementById("next-section");
@@ -29,12 +31,31 @@ const HeroSection: React.FC = () => {
       </video>
       <LandingHeader />
 
-      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center -mt-[70px]">
-        <div className="mb-6">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1,
+            },
+          },
+        }}
+        className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center -mt-[70px]"
+      >
+        <motion.div
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
+          }}
+          className="mb-6"
+        >
           <span className="inline-flex items-center gap-2 rounded-full text-white font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
             <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8">
               <Image
-                src="/imgs/star.png"
+                src="/imgs/Star.png"
                 alt="star icon"
                 width={24}
                 height={24}
@@ -43,27 +64,49 @@ const HeroSection: React.FC = () => {
             </span>
             Challenges that Build Skills
           </span>
-        </div>
+        </motion.div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6">
+        <motion.h1
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
+          }}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6"
+        >
           Level Up Your Creative Skills
-        </h1>
+        </motion.h1>
 
-        <p className="text-[#ffffff] max-w-md sm:max-w-lg md:max-w-2xl mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
+        <motion.p
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
+          }}
+          className="text-[#ffffff] max-w-md sm:max-w-lg md:max-w-2xl mb-6 sm:mb-8 text-sm sm:text-base md:text-lg"
+        >
           Join to challenges for designers, developers, and Graphic Designers.
           Build your portfolio, earn points, and grow with a vibrant creative
           community.
-        </p>
+        </motion.p>
 
-        <Link
-          href="/challenge-center"
-          className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#000000] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
+        <motion.div
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
+          }}
         >
-          Start the Challenge for Free
-        </Link>
-      </div>
+          <Link
+            href="/challenge-center"
+            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#000000] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
+          >
+            Start the Challenge for Free
+          </Link>
+        </motion.div>
+      </motion.div>
 
-      <button
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
         className="absolute bottom-8 flex flex-col items-center gap-2"
         onClick={handleScroll}
       >
@@ -77,7 +120,7 @@ const HeroSection: React.FC = () => {
         <span className="animate-bounce text-3xl sm:text-4xl text-black">
           ↓
         </span>
-      </button>
+      </motion.button>
     </section>
   );
 };

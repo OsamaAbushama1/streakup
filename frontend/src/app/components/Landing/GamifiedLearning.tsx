@@ -3,28 +3,59 @@
 import React from "react";
 import Image from "next/image";
 
-const GamifiedLearning: React.FC = () => {
-  return (
-    <section className="relative flex flex-col items-center justify-center min-h-[60vh] bg-[#F4E5FF] px-4 sm:px-6 md:px-12 lg:px-8 py-12 sm:py-16">
-      <div className="container mx-auto xl:max-w-7xl text-center">
-        <h2 className="text-3xl sm:text-3xl md:text-4xl font-extrabold text-[#000000] mb-4">
-          Gamified Learning Experience
-        </h2>
-        <p className="text-[#2E2E38] text-sm sm:text-lg md:text-lg leading-relaxed mb-10">
-          Boost your creativity through the challenges, streaks, and badges
-        </p>
+import { motion } from "framer-motion";
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-          <div className="bg-white/80 rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
+const GamifiedLearning: React.FC = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
+
+  return (
+    <section className="relative flex flex-col items-center justify-center min-h-[60vh] bg-[#FFFFFF] px-4 sm:px-6 md:px-12 lg:px-8 py-12 sm:py-16">
+      <div className="container mx-auto xl:max-w-7xl text-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#8981FA] mb-4">
+            Gamified Learning Experience
+          </h2>
+          <p className="text-[#A8A8A8] text-sm sm:text-lg md:text-lg leading-relaxed mb-10">
+            Boost your creativity through the challenges, streaks, and badges
+          </p>
+        </motion.div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
+        >
+          <motion.div variants={itemVariants} className="bg-[#F0F0FF] rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
             <div
-              className="flex-shrink-0 w-[60px] h-[60px] rounded-full flex items-center justify-center"
-              style={{
-                background:
-                  "linear-gradient(135deg, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-              }}
+              className="flex-shrink-0 w-[60px] h-[60px] rounded-xl flex items-center justify-center bg-[#ffffff]"
+
             >
               <Image
-                src="/imgs/streak.png"
+                src="/imgs/Fire.png"
                 alt="Streak System Icon"
                 width={32}
                 height={32}
@@ -40,18 +71,15 @@ const GamifiedLearning: React.FC = () => {
                 multiply your points.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white/80 rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
+          <motion.div variants={itemVariants} className="bg-[#F0F0FF] rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
             <div
-              className="flex-shrink-0 w-[60px] h-[60px] rounded-full flex items-center justify-center"
-              style={{
-                background:
-                  "linear-gradient(135deg, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-              }}
+              className="flex-shrink-0 w-[60px] h-[60px] rounded-xl flex items-center justify-center bg-[#ffffff]"
+
             >
               <Image
-                src="/imgs/star-neaticons.png"
+                src="/imgs/Star.png"
                 alt="Points & Rewards Icon"
                 width={32}
                 height={32}
@@ -67,18 +95,15 @@ const GamifiedLearning: React.FC = () => {
                 mentorship and course discounts.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white/80 rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
+          <motion.div variants={itemVariants} className="bg-[#F0F0FF] rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
             <div
-              className="flex-shrink-0 w-[60px] h-[60px] rounded-full flex items-center justify-center"
-              style={{
-                background:
-                  "linear-gradient(135deg, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-              }}
+              className="flex-shrink-0 w-[60px] h-[60px] rounded-xl flex items-center justify-center bg-[#ffffff]"
+
             >
               <Image
-                src="/imgs/email.png"
+                src="/imgs/Rhombus.png"
                 alt="Certified Achievement Icon"
                 width={32}
                 height={32}
@@ -94,18 +119,15 @@ const GamifiedLearning: React.FC = () => {
                 skills.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white/80 rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
+          <motion.div variants={itemVariants} className="bg-[#F0F0FF] rounded-lg p-6 shadow-lg hover:shadow-xl transition flex flex-col sm:flex-row items-center sm:items-center gap-4">
             <div
-              className="flex-shrink-0 w-[60px] h-[60px] rounded-full flex items-center justify-center"
-              style={{
-                background:
-                  "linear-gradient(135deg, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-              }}
+              className="flex-shrink-0 w-[60px] h-[60px] rounded-xl flex items-center justify-center bg-[#ffffff]"
+
             >
               <Image
-                src="/imgs/users.png"
+                src="/imgs/Face-Laugh.png"
                 alt="Community Feedback Icon"
                 width={32}
                 height={32}
@@ -121,8 +143,8 @@ const GamifiedLearning: React.FC = () => {
                 creatives to help you improve your work.
               </p>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
