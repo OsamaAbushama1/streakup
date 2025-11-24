@@ -17,8 +17,6 @@ export const getPublicTracks = async (req: Request, res: Response) => {
       tracks: tracks.map((track) => ({
         name: track.name,
         icon: track.icon || null,
-        description: track.description || null,
-        // points: track.points || 0,  ← احذف هذا
       })),
     });
   } catch (error: any) {
@@ -37,8 +35,6 @@ export const getTracks = async (req: AuthRequest, res: Response) => {
       tracks: tracks.map((track) => ({
         name: track.name,
         icon: track.icon || null,
-        description: track.description || null,
-        // points: track.points || 0,  ← احذف هذا
       })),
     });
   } catch (error: any) {
@@ -53,7 +49,7 @@ export const addTrack = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    const { name, description } = req.body; // أضف description
+    const { name } = req.body;
     const iconFile = req.file;
 
     if (!name || !name.trim()) {
@@ -77,7 +73,6 @@ export const addTrack = async (req: AuthRequest, res: Response) => {
 
     const track = await Track.create({
       name: name.trim(),
-      description: description?.trim() || null,
       icon: iconPath,
     });
 
@@ -86,7 +81,6 @@ export const addTrack = async (req: AuthRequest, res: Response) => {
       track: {
         name: track.name,
         icon: track.icon || null,
-        description: track.description || null,
       },
     });
   } catch (error: any) {

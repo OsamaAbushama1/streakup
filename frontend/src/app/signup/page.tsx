@@ -453,8 +453,8 @@ const SignupForm: React.FC = () => {
               </p>
               <div
                 className={`gap-4 mb-6 ${tracks.length % 2 === 0
-                    ? "grid grid-cols-1 md:grid-cols-2"
-                    : "grid grid-cols-1"
+                  ? "grid grid-cols-1 md:grid-cols-2"
+                  : "grid grid-cols-1"
                   }`}
               >
                 {tracks.map((track) => (
@@ -473,11 +473,11 @@ const SignupForm: React.FC = () => {
                         : {}
                     }
                   >
-                    <div className="flex flex-row items-start md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
+                    <div className="flex flex-row items-center md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
                       <span
                         className={`text-xl rounded-full flex items-center justify-center p-2 transition ${formData.track === track.name
-                            ? "text-black"
-                            : "text-white bg-[#B0B0B8]"
+                          ? "text-black"
+                          : "text-white bg-[#B0B0B8]"
                           }`}
                         style={
                           formData.track === track.name
@@ -496,15 +496,6 @@ const SignupForm: React.FC = () => {
                       <div className="text-left">
                         <p className="text-sm font-medium text-black">
                           {track.name}
-                        </p>
-                        <p className="text-xs text-[#3c3c3e]">
-                          {track.name === "UI/UX Design"
-                            ? "User interface and experience design"
-                            : track.name === "Graphic Design"
-                              ? "Visual communication and branding"
-                              : track.name === "Frontend Development"
-                                ? "Web development and user interfaces"
-                                : track.description || "Custom track"}
                         </p>
                       </div>
                     </div>
@@ -593,9 +584,7 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Beginner
                         </span>
-                        <span className="text-[#3c3c3e] text-sm">
-                          Just starting out or learning basics
-                        </span>
+
                       </div>
                       <div>
                         <input
@@ -629,9 +618,7 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Intermediate
                         </span>
-                        <span className="text-[#3c3c3e] text-sm">
-                          Some experience, looking to improve
-                        </span>
+
                       </div>
                       <div>
                         <input
@@ -666,9 +653,7 @@ const SignupForm: React.FC = () => {
                         <span className="text-sm font-medium text-black">
                           Advanced
                         </span>
-                        <span className="text-[#3c3c3e] text-sm">
-                          Experienced, seeking new challenges
-                        </span>
+
                       </div>
                       <div>
                         <input

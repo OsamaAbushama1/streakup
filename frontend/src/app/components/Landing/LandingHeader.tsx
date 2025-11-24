@@ -61,15 +61,15 @@ const LandingHeader: React.FC = () => {
   return (
     <header className="py-4 absolute top-4 sm:top-6 left-0 right-0 z-10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-7xl flex justify-between items-center">
-      <div className="flex items-center">
-      <Link href="/" className="block">
-    <Image
-      src="/imgs/logo.png"
-      alt="Logo"
-      width={70}
-      height={70}
-      priority
-      className="
+        <div className="flex items-center">
+          <Link href="/" className="block">
+            <Image
+              src="/imgs/logo.png"
+              alt="Logo"
+              width={70}
+              height={70}
+              priority
+              className="
         object-contain
         w-11 h-11
         sm:w-12 sm:h-12
@@ -77,12 +77,12 @@ const LandingHeader: React.FC = () => {
         lg:w-[55px] lg:h-[55px]
         cursor-pointer
       "
-    />
-  </Link>
-</div>
+            />
+          </Link>
+        </div>
 
         <div>
-          { isAuthenticated ? (
+          {isAuthenticated ? (
             <button
               onClick={handleLogout}
               className="px-3 py-1.5 sm:px-5 sm:py-3 text-sm sm:text-base bg-white/50 text-purple-600 rounded-full font-medium shadow hover:bg-white/80 transition"
@@ -91,25 +91,25 @@ const LandingHeader: React.FC = () => {
             </button>
           ) : (
             <>
-            {/* Login Button */}
-            <Link
-              href="/signup"
-              className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base bg-[#A333FF] text-white rounded-full font-semibold shadow-lg hover:bg-[#9330e4] transition whitespace-nowrap mr-2"
-            >
-              Sign Up
-            </Link>
-            <Link
-              href="/login"
-              className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-[#A333FF] border border-white/70 rounded-full font-semibold 
+              {/* Login Button */}
+              <Link
+                href="/signup"
+                className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base bg-[#A333FF] text-white rounded-full font-semibold shadow-lg hover:bg-[#9330e4] transition whitespace-nowrap mr-2"
+              >
+                Sign Up
+              </Link>
+              <Link
+                href="/login"
+                className="px-5 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-[#ffffff] border border-white/70 rounded-full font-semibold 
                    bg-white/10 backdrop-blur-sm
                    shadow-md 
                    hover:bg-white/20 hover:shadow-lg  
                    transition-all duration-300 whitespace-nowrap"
-            >
-              Login
-            </Link>          
-          </>
-            
+              >
+                Login
+              </Link>
+            </>
+
           )}
         </div>
       </div>

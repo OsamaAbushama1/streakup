@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
         pathname.startsWith('/forget-password') ||
         pathname.startsWith('/reset-password') ||
         pathname.startsWith('/imgs') ||
+        pathname.startsWith('/vid') ||
         pathname.startsWith('/public')
 
     // If the user is not logged in and tries to access a protected route
