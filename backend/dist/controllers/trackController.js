@@ -17,8 +17,6 @@ const getPublicTracks = async (req, res) => {
             tracks: tracks.map((track) => ({
                 name: track.name,
                 icon: track.icon || null,
-                description: track.description || null,
-                // points: track.points || 0,  ← احذف هذا
             })),
         });
     }
@@ -38,8 +36,6 @@ const getTracks = async (req, res) => {
             tracks: tracks.map((track) => ({
                 name: track.name,
                 icon: track.icon || null,
-                description: track.description || null,
-                // points: track.points || 0,  ← احذف هذا
             })),
         });
     }
@@ -54,7 +50,7 @@ const addTrack = async (req, res) => {
         if (req.user?.role !== "Admin" && req.user?.role !== "SuperAdmin") {
             return res.status(403).json({ message: "Access denied" });
         }
-        const { name, description } = req.body; // أضف description
+        const { name } = req.body;
         const iconFile = req.file;
         if (!name || !name.trim()) {
             return res.status(400).json({ message: "Track name is required" });
@@ -75,7 +71,6 @@ const addTrack = async (req, res) => {
         }
         const track = await trackModel_1.default.create({
             name: name.trim(),
-            description: description?.trim() || null,
             icon: iconPath,
         });
         res.status(201).json({
@@ -83,7 +78,6 @@ const addTrack = async (req, res) => {
             track: {
                 name: track.name,
                 icon: track.icon || null,
-                description: track.description || null,
             },
         });
     }

@@ -128,7 +128,7 @@ export const getSharedChallenges = async (req: AuthRequest, res: Response) => {
       })
       .populate({
         path: "user",
-        select: "firstName lastName profilePicture username",
+        select: "firstName lastName profilePicture username track",
       })
       .sort(sortOption)
       .skip(skip)

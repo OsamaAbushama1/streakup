@@ -110,7 +110,7 @@ const getSharedChallenges = async (req, res) => {
         })
             .populate({
             path: "user",
-            select: "firstName lastName profilePicture username",
+            select: "firstName lastName profilePicture username track",
         })
             .sort(sortOption)
             .skip(skip)

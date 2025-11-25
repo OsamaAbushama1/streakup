@@ -35,8 +35,9 @@ interface SharedChallenge {
     _id: string;
     firstName: string;
     lastName: string;
-    username: string; // موجود
+    username: string;
     profilePicture?: string;
+    track?: string;
   };
   highlighted: boolean;
   views: number;
@@ -281,21 +282,19 @@ export default function HomePage() {
           <div className="flex bg-[#B0B0B8] p-1 rounded-full">
             <button
               onClick={() => setActiveTab("recent")}
-              className={`px-2 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition mr-1 text-sm sm:text-base ${
-                activeTab === "recent"
-                  ? "bg-[#F5F5F7] text-[#000000] shadow"
-                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
-              }`}
+              className={`px-2 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition mr-1 text-sm sm:text-base ${activeTab === "recent"
+                ? "bg-[#F5F5F7] text-[#000000] shadow"
+                : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                }`}
             >
               Recent
             </button>
             <button
               onClick={() => setActiveTab("trending")}
-              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition text-sm sm:text-base ${
-                activeTab === "trending"
-                  ? "bg-[#F5F5F7] text-[#000000] shadow"
-                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
-              }`}
+              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition text-sm sm:text-base ${activeTab === "trending"
+                ? "bg-[#F5F5F7] text-[#000000] shadow"
+                : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                }`}
             >
               Trending
             </button>
@@ -329,7 +328,7 @@ export default function HomePage() {
               return (
                 <div
                   key={sharedChallenge._id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer select-none"
+                  className="group relative bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer select-none transition-all duration-300  hover:shadow-2xl border border-white/20"
                   onClick={() => handleButtonClick(() => {
                     if (!challengeId) {
                       alert(
@@ -349,79 +348,102 @@ export default function HomePage() {
                     if (isValidNewRoute) {
                       router.push(`/${username}/${challengeId}`);
                     } else {
-                      // fallback آمن
                       console.warn(
-                        `Username missing for ${
-                          sharedChallenge.user?.firstName || "user"
+                        `Username missing for ${sharedChallenge.user?.firstName || "user"
                         } – using old route`
                       );
                       router.push(fallbackRoute);
                     }
                   })}
-                  style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
+                  style={{
+                    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+                    opacity: isButtonDisabled ? 0.6 : 1,
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+                    boxShadow: '0 8px 32px 0 rgba(137, 129, 250, 0.1)',
+                  }}
                 >
-                  <Image
-                    src={
-                      sharedChallenge.images[0]
-                        ? getImageUrl(sharedChallenge.images[0])
-                        : "/imgs/projectImage.png"
-                    }
-                    alt={sharedChallenge.challenge.name}
-                    width={400}
-                    height={250}
-                    className="w-full h-auto object-contain bg-gray-50"
-                    onError={(e) => {
-                      e.currentTarget.src = "/imgs/projectImage.png";
-                    }}
-                  />
-                  <div className="p-4">
-                    <p className="text-[#2E2E38] text-sm sm:text-base mb-2 truncate">
-                      {sharedChallenge.challenge.project
-                        ? sharedChallenge.challenge.project.name
-                        : "No Project"}
-                    </p>
-                    <h3
-                      className={`text-base sm:text-lg md:text-xl font-semibold mb-3 line-clamp-2 ${
-                        activeTab === "trending"
-                          ? "text-[#A333FF]"
-                          : "text-[#2E2E38]"
-                      }`}
-                    >
-                      {activeTab === "trending" && "Hot "}
-                      {sharedChallenge.challenge.name}
-                      {sharedChallenge.highlighted && (
-                        <span className="ml-2 text-yellow-500 font-bold text-xs">
-                          [Highlighted]
-                        </span>
-                      )}
-                    </h3>
+                  {/* Gradient Border Effect */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#8981FA]/20 via-[#A333FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Image
-                        src={getImageUrl(sharedChallenge.user?.profilePicture)}
-                        alt="Profile"
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-white shadow"
-                        onError={(e) =>
-                          (e.currentTarget.src = "/imgs/default-profile.jpg")
-                        }
-                      />
-                      <div>
-                        <p className="text-sm sm:text-base font-medium text-gray-700 truncate">
+                  {/* User Info Section - At the top */}
+                  <div className="relative p-4 pb-3 bg-gradient-to-r from-white/50 to-transparent backdrop-blur-md">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#8981FA] to-[#A333FF] rounded-full  opacity-50"></div>
+                        <Image
+                          src={getImageUrl(sharedChallenge.user?.profilePicture)}
+                          alt="Profile"
+                          width={48}
+                          height={48}
+                          className="relative w-12 h-12 rounded-full object-cover border-2 border-white "
+                          onError={(e) =>
+                            (e.currentTarget.src = "/imgs/default-profile.jpg")
+                          }
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-bold text-gray-900 truncate bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
                           {sharedChallenge.user?.firstName || "Unknown"}{" "}
                           {sharedChallenge.user?.lastName || "User"}
                         </p>
-                        {username ? (
-                          <p className="text-xs text-gray-500">@{username}</p>
-                        ) : (
-                          <p className="text-xs text-red-500">
-                            username missing
-                          </p>
-                        )}
+                        <p className="text-sm font-medium text-[#8981FA] truncate">
+                          {sharedChallenge.user?.track || "No Track"}
+                        </p>
                       </div>
                     </div>
                   </div>
+
+                  {/* Challenge Image with Overlay */}
+                  <div className="relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                    <Image
+                      src={
+                        sharedChallenge.images[0]
+                          ? getImageUrl(sharedChallenge.images[0])
+                          : "/imgs/projectImage.png"
+                      }
+                      alt={sharedChallenge.challenge.name}
+                      width={400}
+                      height={250}
+                      className="w-full h-auto object-cover bg-gradient-to-br from-gray-50 to-gray-100 transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = "/imgs/projectImage.png";
+                      }}
+                    />
+                  </div>
+
+                  {/* Challenge Info Section */}
+                  <div className="relative p-4 pt-3 bg-white/60 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-1 w-8 bg-gradient-to-r from-[#8981FA] to-[#A333FF] rounded-full"></div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide truncate">
+                        {sharedChallenge.challenge.project
+                          ? sharedChallenge.challenge.project.name
+                          : "No Project"}
+                      </p>
+                    </div>
+                    <h3
+                      className={`text-base sm:text-lg font-bold line-clamp-2 transition-colors duration-200 ${activeTab === "trending"
+                        ? "text-transparent bg-clip-text bg-gradient-to-r from-[#A333FF] to-[#8981FA]"
+                        : "text-gray-900 group-hover:text-[#8981FA]"
+                        }`}
+                    >
+                      {activeTab === "trending" && (
+                        <span className="inline-flex items-center gap-1 mr-1">
+                          <span className="text-orange-500">🔥</span>
+                        </span>
+                      )}
+                      {sharedChallenge.challenge.name}
+                      {sharedChallenge.highlighted && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                          ⭐ Featured
+                        </span>
+                      )}
+                    </h3>
+                  </div>
+
+                  {/* Bottom Gradient Accent */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8981FA] via-[#A333FF] to-[#8981FA] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               );
             })}
@@ -438,104 +460,237 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* === Top Creators of the Week === */}
+        {/* === Top Creators & Learn from the Pros Side by Side === */}
         <div className="mt-16 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 xl:max-w-7xl mx-auto">
-            <div className="mb-8 text-center sm:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#000000] mb-2">
-                Top Creators of the Week
-              </h2>
-              <p className="text-sm sm:text-base text-[#909097]">
-                Celebrate the most consistent and creative users this week
-              </p>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:max-w-7xl mx-auto">
+            {/* === Top Creators of the Week === */}
+            <div className="bg-white rounded-2xl shadow-2xl p-6 lg:col-span-1">
+              <div className="mb-8 text-center sm:text-left">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#8981FA] text-center mb-2">
+                  Top Creators of the Week
+                </h2>
+                <p className="text-sm sm:text-base text-[#909097] text-center">
+                  Celebrate the most consistent and creative users this week
+                </p>
+              </div>
 
-            {loadingCreators ? (
-              <div className="space-y-5">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 bg-gray-50 rounded-xl p-4">
-                    <Skeleton variant="avatar" width={72} height={72} className="flex-shrink-0" />
-                    <div className="flex-1 w-full">
-                      <Skeleton variant="text" width="60%" height={24} className="mb-2" />
-                      <Skeleton variant="text" width="40%" height={16} className="mb-4" />
-                      <div className="flex gap-5">
-                        <Skeleton variant="rectangular" width={80} height={40} />
-                        <Skeleton variant="rectangular" width={80} height={40} />
+              {loadingCreators ? (
+                <div className="space-y-5">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-gray-50 rounded-xl p-4">
+                      <Skeleton variant="avatar" width={64} height={64} className="flex-shrink-0" />
+                      <div className="flex-1 w-full text-center sm:text-left">
+                        <Skeleton variant="text" width="50%" height={24} className="mb-2 mx-auto sm:mx-0" />
+                        <Skeleton variant="text" width="30%" height={16} className="mb-3 mx-auto sm:mx-0" />
+                        <Skeleton variant="rectangular" width={100} height={36} className="mx-auto sm:mx-0" />
                       </div>
                     </div>
-                    <Skeleton variant="rectangular" width={120} height={36} className="w-full sm:w-auto" />
-                  </div>
-                ))}
-              </div>
-            ) : topCreators.length === 0 ? (
-              <p className="text-center text-[#2E2E38] py-8">
-                No creators found this week.
-              </p>
-            ) : (
-              <div className="space-y-5">
-                {topCreators.map((creator) => (
-                  <div
-                    key={creator._id}
-                    className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 bg-gray-50 transition-all duration-200 rounded-xl p-4 relative"
-                  >
-                    <div className="flex flex-1 items-center gap-3 sm:gap-4 mt-8 sm:mt-0 w-full ml-12 sm:ml-0">
+                  ))}
+                </div>
+              ) : topCreators.length === 0 ? (
+                <p className="text-center text-[#2E2E38] py-8">
+                  No creators found this week.
+                </p>
+              ) : (
+                <div className="space-y-5">
+                  {topCreators.map((creator) => (
+                    <div
+                      key={creator._id}
+                      className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F4E5FF] hover:bg-gray-100 transition-all duration-200 rounded-xl p-4"
+                    >
                       <div className="flex-shrink-0">
                         <Image
                           src={getImageUrl(creator.profilePicture)}
                           alt={`${creator.firstName} ${creator.lastName}`}
-                          width={72}
-                          height={72}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-4 border-white shadow-md"
+                          width={64}
+                          height={64}
+                          className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md"
                         />
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 text-center sm:text-left">
                         <h3 className="text-base sm:text-lg font-bold text-black truncate">
                           {creator.firstName} {creator.lastName}
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-600 font-medium truncate">
+                        <p className="text-xs sm:text-sm text-gray-600 font-medium truncate mb-3">
                           {creator.track}
                         </p>
 
-                        <div className="flex gap-5 mt-1 text-xs">
-                          <div className="text-center">
-                            <div className="font-bold text-yellow-500 flex items-center gap-1 justify-center">
-                              <IoFlame />
-                              {creator.streak}
-                            </div>
-                            <div className="text-[#2E2E38]">Day streak</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-bold text-[#A333FF] flex items-center gap-1">
-                              <IoStar />
-                              {creator.points}
-                            </div>
-                            <div className="text-[#2E2E38]">points</div>
-                          </div>
-                        </div>
+                        <button
+                          onClick={() => handleButtonClick(() => {
+                            const username =
+                              creator.username ||
+                              `${creator.firstName}-${creator.lastName}`
+                                .toLowerCase()
+                                .replace(/\s+/g, "-");
+                            router.push(`/profile/${username}`);
+                          })}
+                          disabled={isButtonDisabled}
+                          className="w-full sm:w-auto px-5 py-2 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isButtonDisabled ? "Loading..." : "View Profile"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* === Learn from the Pros === */}
+            <div className="bg-white rounded-2xl shadow-2xl p-6 lg:col-span-2">
+              {/* Header */}
+              <div className="text-center mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#8981FA] to-[#A333FF] bg-clip-text text-transparent mb-3">
+                  Learn from the Pros
+                </h2>
+                <p className="text-[#909097] text-sm sm:text-base max-w-2xl mx-auto">
+                  Join mentorship sessions or explore premium courses to level up faster
+                </p>
+              </div>
+
+              {/* Points Banner */}
+              <div className="mb-4 bg-[#F6C953] rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#FFF0C9] backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
+                    <IoStar className="w-6 h-6 text-[#F6C953]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Use Your Points!</h3>
+                    <p className="text-[#ffffff] text-sm">Redeem points for mentorship sessions or premium courses</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mentor Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Mentor Card 1 */}
+                <div className="bg-[#F4E5FF] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Profile Picture */}
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#8981FA] to-[#A333FF] rounded-full blur-md opacity-50"></div>
+                      <div className="relative w-20 h-20 bg-white rounded-full p-1">
+                        <Image
+                          src="/imgs/default-profile.jpg"
+                          alt="Jessica Martinez"
+                          width={80}
+                          height={80}
+                          className="w-full h-full rounded-full object-cover"
+                        />
                       </div>
                     </div>
 
-                    <div className="w-full sm:w-auto mt-3 sm:mt-0">
-                      <button
-                        onClick={() => handleButtonClick(() => {
-                          const username =
-                            creator.username ||
-                            `${creator.firstName}-${creator.lastName}`
-                              .toLowerCase()
-                              .replace(/\s+/g, "-");
-                          router.push(`/profile/${username}`);
-                        })}
-                        disabled={isButtonDisabled}
-                        className="w-full sm:w-auto px-5 py-2 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isButtonDisabled ? "Loading..." : "View Profile"}
-                      </button>
+                    {/* Name */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">Jessica Martinez</h3>
+
+                    {/* Expertise */}
+                    <p className="text-sm text-gray-600 mb-6">UI/UX Design & Product Strategy</p>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-center gap-8 mb-6 w-full">
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-[#8981FA]">30</p>
+                        <p className="text-xs text-gray-600">Minute</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-pink-500">400</p>
+                        <p className="text-xs text-gray-600">Point</p>
+                      </div>
                     </div>
+
+                    {/* Redeem Button */}
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                      Redeem
+                    </button>
                   </div>
-                ))}
+                </div>
+
+                {/* Mentor Card 2 */}
+                <div className="bg-[#F4E5FF] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Profile Picture */}
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#8981FA] to-[#A333FF] rounded-full blur-md opacity-50"></div>
+                      <div className="relative w-20 h-20 bg-white rounded-full p-1">
+                        <Image
+                          src="/imgs/default-profile.jpg"
+                          alt="Jessica Martinez"
+                          width={80}
+                          height={80}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">Jessica Martinez</h3>
+
+                    {/* Expertise */}
+                    <p className="text-sm text-gray-600 mb-6">UI/UX Design & Product Strategy</p>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-center gap-8 mb-6 w-full">
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-[#8981FA]">40</p>
+                        <p className="text-xs text-gray-600">Minute</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-pink-500">300</p>
+                        <p className="text-xs text-gray-600">Point</p>
+                      </div>
+                    </div>
+
+                    {/* Redeem Button */}
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                      Redeem
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mentor Card 3 */}
+                <div className="bg-[#F4E5FF] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Profile Picture */}
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#8981FA] to-[#A333FF] rounded-full blur-md opacity-50"></div>
+                      <div className="relative w-20 h-20 bg-white rounded-full p-1">
+                        <Image
+                          src="/imgs/default-profile.jpg"
+                          alt="Jessica Martinez"
+                          width={80}
+                          height={80}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">Jessica Martinez</h3>
+
+                    {/* Expertise */}
+                    <p className="text-sm text-gray-600 mb-6">UI/UX Design & Product Strategy</p>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-center gap-8 mb-6 w-full">
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-[#8981FA]">60</p>
+                        <p className="text-xs text-gray-600">Minute</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-pink-500">500</p>
+                        <p className="text-xs text-gray-600">Point</p>
+                      </div>
+                    </div>
+
+                    {/* Redeem Button */}
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                      Redeem
+                    </button>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -543,7 +698,7 @@ export default function HomePage() {
         <div className="mt-16 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 xl:max-w-7xl mx-auto">
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#000000]">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#8981FA]">
                 Pick Up Where You Left Off
               </h2>
               {nextChallenge?.duration !== undefined && (
@@ -567,7 +722,7 @@ export default function HomePage() {
               )}
             </div>
 
-            <p className="text-sm sm:text-base text-[#2E2E38] max-w-2xl mb-6">
+            <p className="text-sm sm:text-base text-[#909097] max-w-2xl mb-6">
               Your next challenge awaits — keep your streak alive!
             </p>
 
