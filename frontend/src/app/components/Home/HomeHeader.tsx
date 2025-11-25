@@ -6,8 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
-import { Skeleton } from "../Skeleton";
 import { useButtonDisable } from "../../hooks/useButtonDisable";
+import { Skeleton } from "../Skeleton";
 
 interface Notification {
   _id: string;
@@ -24,11 +24,10 @@ interface Notification {
   username: string | null;
   challenge: { name: string };
   read: boolean;
-  commentId?: string | null; // جديد
+  commentId?: string | null;
   commentPreview?: string | null;
 }
 
-// دالة لتحويل التاريخ إلى نص ذكي
 const formatTimeAgo = (dateString: string): string => {
   const now = new Date();
   const past = new Date(dateString);
@@ -71,7 +70,6 @@ const HomeHeader: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
-  // جلب بيانات المستخدم
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -86,7 +84,6 @@ const HomeHeader: React.FC = () => {
           setUser(data.user);
         } else {
           setError(data.message || "Failed to fetch user profile");
-          // Only redirect if explicitly unauthorized
           if (res.status === 401 || res.status === 403) {
             router.push("/login");
           }
@@ -94,7 +91,6 @@ const HomeHeader: React.FC = () => {
       } catch (error) {
         console.error("Error fetching user profile:", error);
         setError("Error fetching user profile. Please try refreshing.");
-        // Do NOT redirect on network/server errors to avoid loops
       } finally {
         setLoading(false);
       }
@@ -103,7 +99,6 @@ const HomeHeader: React.FC = () => {
     fetchUserProfile();
   }, [router]);
 
-  // جلب الإشعارات
   useEffect(() => {
     if (!user) return;
 
@@ -122,7 +117,7 @@ const HomeHeader: React.FC = () => {
               ...n,
               challengeLinkId: n.challengeLinkId || null,
               challenge: { name: n.challenge?.name || "Unknown Challenge" },
-              commentId: n.commentId || null, // جديد
+              commentId: n.commentId || null,
               commentPreview: n.comment?.content
                 ? n.comment.content.length > 30
                   ? n.comment.content.trim().substring(0, 30) + "..."
@@ -143,7 +138,6 @@ const HomeHeader: React.FC = () => {
     return () => clearInterval(interval);
   }, [user]);
 
-  // إغلاق القوائم عند الكليك خارجها
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -165,7 +159,6 @@ const HomeHeader: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // فتح/إغلاق الإشعارات + تحديث حالة القراءة
   const handleNotificationsClick = async () => {
     setIsNotificationsDropdownOpen(!isNotificationsDropdownOpen);
     setIsProfileDropdownOpen(false);
@@ -201,21 +194,17 @@ const HomeHeader: React.FC = () => {
       });
 
       if (res.ok) {
-        // Clear any client-side state
         setUser(null);
         setIsMenuOpen(false);
         setIsProfileDropdownOpen(false);
         setIsNotificationsDropdownOpen(false);
-        // Force navigation and clear cache
         window.location.href = "/login";
       } else {
         console.error("Logout failed:", res.statusText);
-        // Still try to navigate even if request fails
         window.location.href = "/login";
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      // Navigate to login even on error
       window.location.href = "/login";
     }
   };
@@ -230,7 +219,6 @@ const HomeHeader: React.FC = () => {
 
       let finalUsername = username;
 
-      // لو مفيش username → نجيبه من الـ API
       if (!finalUsername) {
         try {
           const res = await fetch(
@@ -251,7 +239,6 @@ const HomeHeader: React.FC = () => {
         return;
       }
 
-      // احفظ commentId في localStorage
       if (commentId) {
         localStorage.setItem("scrollToComment", commentId);
       } else {
@@ -273,8 +260,7 @@ const HomeHeader: React.FC = () => {
   return (
     <header className="bg-white p-4 border-b border-gray-300">
       <div className="container mx-auto xl:max-w-7xl flex justify-between items-center">
-        {/* Logo */}
-        {/* Logo - يكبر + يودي للهوم لما تضغط عليه */}
+        {/* Logo - Far Left */}
         <Link href="/home" className="flex items-center">
           <Image
             src="/imgs/logo.png"
@@ -282,29 +268,168 @@ const HomeHeader: React.FC = () => {
             width={70}
             height={70}
             priority
-            className="
-      w-12 h-12
-      sm:w-12 sm:h-12
-      md:w-[45px] md:h-[45px]
-      lg:w-[55px] lg:h-[55px]
-      object-contain
-      cursor-pointer
-    "
+            className="w-12 h-12 sm:w-12 sm:h-12 md:w-[45px] md:h-[45px] lg:w-[55px] lg:h-[55px] object-contain cursor-pointer"
           />
         </Link>
 
-        {/* Search + Icons */}
+        {/* Center to Right - All Elements */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search Challenge, Creative..."
-              defaultValue=""  // الحل السحري
-              className="px-8 py-2 w-40 sm:w-60 md:w-80 border-none rounded-lg focus:outline-none bg-[#F5F5F7] placeholder-[#B0B0B8] text-sm sm:text-base text-black"
-              suppressHydrationWarning // احتياط إضافي (اختياري لكن مفيد جدًا)
-            />
-            <FiSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#B0B0B8] text-lg sm:text-xl cursor-pointer" />
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <Link
+              href="/home"
+              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+            >
+              Home
+            </Link>
+            <Link
+              href="/community-feed"
+              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+            >
+              Community
+            </Link>
+            <Link
+              href="/challenge-center"
+              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+            >
+              Challenge Center
+            </Link>
+          </div>
+
+          {/* Notifications Icon */}
+          <div className="hidden sm:block relative">
+            <div className="relative">
+              <FiBell
+                className="text-[#000000] text-xl cursor-pointer"
+                onClick={handleNotificationsClick}
+              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </div>
+
+            {isNotificationsDropdownOpen && (
+              <div
+                ref={notificationsDropdownRef}
+                className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 max-h-[320px] overflow-y-auto"
+              >
+                {notifications.length === 0 ? (
+                  <p className="text-gray-500 text-sm text-center py-4">
+                    No notifications yet
+                  </p>
+                ) : (
+                  notifications.map((notif) => (
+                    <div
+                      key={notif._id}
+                      className={`p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50 transition ${!notif.read ? "bg-blue-50" : ""
+                        }`}
+                      onClick={() => goToSharedChallenge(
+                        notif.username,
+                        notif.challengeLinkId,
+                        notif.commentId
+                      )}
+                      style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src={
+                            notif.sender.profilePicture
+                              ? notif.sender.profilePicture.startsWith("http")
+                                ? notif.sender.profilePicture
+                                : `${API_BASE_URL}/${notif.sender.profilePicture}`
+                              : "/imgs/default-profile.jpg"
+                          }
+                          alt="Sender"
+                          width={36}
+                          height={36}
+                          className="rounded-full flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            <span className="font-semibold">
+                              {notif.sender.firstName} {notif.sender.lastName}
+                            </span>{" "}
+                            {notif.type === "like" && notif.commentId
+                              ? "liked your comment"
+                              : notif.type === "like"
+                                ? "liked your challenge"
+                                : "commented on your challenge"}
+                          </p>
+                          {notif.commentPreview && (
+                            <p className="text-xs text-gray-700 truncate mt-1 italic">
+                              {notif.commentPreview}
+                            </p>
+                          )}
+                          {notif.challenge?.name && !notif.commentId && (
+                            <p className="text-xs text-blue-600 truncate mt-1">
+                              {notif.challenge.name}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatTimeAgo(notif.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* User Profile with Dropdown */}
+          <div className="hidden sm:block relative">
+            {loading ? (
+              <Skeleton variant="avatar" width={36} height={36} />
+            ) : (
+              <>
+                <div className="flex items-center space-x-2 cursor-pointer" onClick={handleProfileClick}>
+                  <Image
+                    src={
+                      user?.profilePicture
+                        ? user.profilePicture.startsWith("http")
+                          ? user.profilePicture
+                          : `${API_BASE_URL}/${user.profilePicture}`
+                        : "/imgs/default-profile.jpg"
+                    }
+                    alt="Profile"
+                    width={36}
+                    height={36}
+                    className="rounded-full"
+                  />
+                  <span className="text-[#000000] font-medium text-sm hidden md:block">
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                </div>
+
+                {isProfileDropdownOpen && (
+                  <div
+                    ref={profileDropdownRef}
+                    className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50"
+                  >
+                    <Link href="/profile">
+                      <div className="p-3 hover:bg-gray-100 cursor-pointer text-black text-sm">
+                        Profile
+                      </div>
+                    </Link>
+                    <div
+                      className={`p-3 hover:bg-gray-100 cursor-pointer text-black text-sm border-t ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                      onClick={() => handleButtonClick(() => handleLogout())}
+                      style={{ pointerEvents: isButtonDisabled ? 'none' : 'auto' }}
+                    >
+                      {isButtonDisabled ? "Logging out..." : "Logout"}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Search Icon */}
+          <div className="hidden sm:block">
+            <FiSearch className="text-[#B0B0B8] text-xl cursor-pointer" />
           </div>
 
           {/* Mobile Menu */}
@@ -316,14 +441,28 @@ const HomeHeader: React.FC = () => {
             {isMenuOpen && (
               <div className="absolute -right-6 mt-6 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                 <Link
+                  href="/home"
+                  className="p-2 flex items-center hover:bg-gray-100"
+                >
+                  <span className="text-[#000000] font-medium">Home</span>
+                </Link>
+
+                <Link
+                  href="/community-feed"
+                  className="p-2 flex items-center hover:bg-gray-100"
+                >
+                  <span className="text-[#000000] font-medium">Community</span>
+                </Link>
+
+                <Link
                   href="/challenge-center"
-                  className="p-2 flex items-center"
+                  className="p-2 flex items-center hover:bg-gray-100"
                 >
                   <BsLightbulb className="text-[#000000] text-xl mr-2" />
                   <span className="text-[#000000] font-medium">Challenge</span>
                 </Link>
 
-                <div className="p-2 flex items-center relative">
+                <div className="p-2 flex items-center relative hover:bg-gray-100">
                   <div className="relative">
                     <FiBell
                       className="text-[#000000] text-xl mr-2 cursor-pointer"
@@ -343,7 +482,7 @@ const HomeHeader: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-2 flex items-center relative">
+                <div className="p-2 flex items-center relative hover:bg-gray-100">
                   {loading ? (
                     <Skeleton variant="avatar" width={24} height={24} />
                   ) : (
@@ -371,146 +510,13 @@ const HomeHeader: React.FC = () => {
                     </>
                   )}
                 </div>
+
+                <div className="p-2 flex items-center hover:bg-gray-100">
+                  <FiSearch className="text-[#B0B0B8] text-xl mr-2" />
+                  <span className="text-[#000000] font-medium">Search</span>
+                </div>
               </div>
             )}
-          </div>
-
-          {/* Desktop Icons */}
-          <div className="hidden sm:flex items-center space-x-3">
-            <Link
-              href="/challenge-center"
-              className="flex items-center space-x-1 bg-white text-[#000000] font-medium text-sm px-3 py-2 rounded-lg transition duration-200"
-            >
-              <BsLightbulb className="text-[#000000] text-xl" />
-              <span>Challenge</span>
-            </Link>
-
-            {/* Notifications */}
-            <div className="relative">
-              <div className="relative">
-                <FiBell
-                  className="text-[#000000] text-xl cursor-pointer"
-                  onClick={handleNotificationsClick}
-                />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </div>
-
-              {isNotificationsDropdownOpen && (
-                <div
-                  ref={notificationsDropdownRef}
-                  className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 max-h-[320px] overflow-y-auto"
-                >
-                  {notifications.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-4">
-                      No notifications yet
-                    </p>
-                  ) : (
-                    notifications.map((notif) => (
-                      <div
-                        key={notif._id}
-                        className={`p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50 transition ${!notif.read ? "bg-blue-50" : ""
-                          }`}
-                        onClick={() => goToSharedChallenge(
-                          notif.username,
-                          notif.challengeLinkId,
-                          notif.commentId
-                        )}
-                        style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
-                      >
-                        <div className="flex items-start gap-3">
-                          <Image
-                            src={
-                              notif.sender.profilePicture
-                                ? notif.sender.profilePicture.startsWith("http")
-                                  ? notif.sender.profilePicture
-                                  : `${API_BASE_URL}/${notif.sender.profilePicture}`
-                                : "/imgs/default-profile.jpg"
-                            }
-                            alt="Sender"
-                            width={36}
-                            height={36}
-                            className="rounded-full flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              <span className="font-semibold">
-                                {notif.sender.firstName} {notif.sender.lastName}
-                              </span>{" "}
-                              {notif.type === "like" && notif.commentId
-                                ? "liked your comment"
-                                : notif.type === "like"
-                                  ? "liked your challenge"
-                                  : "commented on your challenge"}
-                            </p>
-                            {notif.commentPreview && (
-                              <p className="text-xs text-gray-700 truncate mt-1 italic">
-                                {notif.commentPreview}
-                              </p>
-                            )}
-                            {notif.challenge?.name && !notif.commentId && (
-                              <p className="text-xs text-blue-600 truncate mt-1">
-                                {notif.challenge.name}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500 mt-1">
-                              {formatTimeAgo(notif.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Profile */}
-            <div className="relative">
-              {loading ? (
-                <Skeleton variant="avatar" width={36} height={36} />
-              ) : (
-                <>
-                  <Image
-                    src={
-                      user?.profilePicture
-                        ? user.profilePicture.startsWith("http")
-                          ? user.profilePicture
-                          : `${API_BASE_URL}/${user.profilePicture}`
-                        : "/imgs/default-profile.jpg"
-                    }
-                    alt="Profile"
-                    width={36}
-                    height={36}
-                    className="rounded-full cursor-pointer"
-                    onClick={handleProfileClick}
-                  />
-
-                  {isProfileDropdownOpen && (
-                    <div
-                      ref={profileDropdownRef}
-                      className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50"
-                    >
-                      <Link href="/profile">
-                        <div className="p-3 hover:bg-gray-100 cursor-pointer text-black text-sm">
-                          Profile
-                        </div>
-                      </Link>
-                      <div
-                        className={`p-3 hover:bg-gray-100 cursor-pointer text-black text-sm border-t ${isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                        onClick={() => handleButtonClick(() => handleLogout())}
-                        style={{ pointerEvents: isButtonDisabled ? 'none' : 'auto' }}
-                      >
-                        {isButtonDisabled ? "Logging out..." : "Logout"}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
           </div>
         </div>
       </div>

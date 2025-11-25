@@ -240,9 +240,9 @@ export default function HomePage() {
 
       {/* === Welcome Section === */}
       <div className="text-center px-3">
-        <div className="container rounded-lg mx-auto mt-10 mb-5 py-5 px-6 xl:max-w-7xl bg-[linear-gradient(135deg,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] flex flex-col items-center justify-center text-white">
+        <div className="container rounded-lg mx-auto mt-10 mb-5 py-5 px-6 xl:max-w-7xl bg-[url('/imgs/banner.jpg')] bg-cover bg-center flex flex-col items-center justify-center text-white">
           <div className="mb-6">
-            <span className="inline-flex items-center gap-2 rounded-full text-[#A333FF] font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
+            <span className="inline-flex items-center gap-2 rounded-full text-[#ffffff] font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
               <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8">
                 <Image
                   src="/imgs/star.png"
@@ -251,22 +251,22 @@ export default function HomePage() {
                   height={24}
                   className="w-4 h-4 sm:w-6 sm:h-6 md:w-4 md:h-4"
                 />
-              </span>
+              </span >
               Today&apos;s Inspiration
             </span>
           </div>
 
-          <h1 className="text-[#000000] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-center px-2">
+          <h1 className="text-[#FFFFFF] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-center px-2">
             Welcome Back, {firstName}!
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg max-w-2xl text-[#2E2E38] mb-6 sm:mb-8 px-4 text-center">
+          <p className="text-sm sm:text-base md:text-lg max-w-2xl text-[#FFFFFF] mb-6 sm:mb-8 px-4 text-center">
             Ready to continue your streak? Check out today&apos;s challenge!
           </p>
 
           <Link
             href="/challenge-center"
-            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#A333FF] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
+            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#ffffff] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base"
           >
             Go to Challenge Center
           </Link>
@@ -276,7 +276,7 @@ export default function HomePage() {
       {/* === Community Feed === */}
       <main className="container mx-auto pb-6 pt-0 px-0 xl:max-w-7xl">
         <div className="flex sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 px-3">
-          <h2 className="mt-[6px] text-xl sm:text-3xl font-bold text-[#000000]">
+          <h2 className="mt-[6px] text-xl sm:text-3xl font-bold text-[#8981FA]">
             Community Feed
           </h2>
           <div className="flex bg-[#B0B0B8] p-1 rounded-full">
@@ -386,7 +386,7 @@ export default function HomePage() {
                           {sharedChallenge.user?.firstName || "Unknown"}{" "}
                           {sharedChallenge.user?.lastName || "User"}
                         </p>
-                        <p className="text-sm font-medium text-[#8981FA] truncate">
+                        <p className="text-sm font-medium text-[#828282] truncate">
                           {sharedChallenge.user?.track || "No Track"}
                         </p>
                       </div>
@@ -394,8 +394,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Challenge Image with Overlay */}
-                  <div className="relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                  <div className="relative overflow-hidden rounded-lg px-4">
                     <Image
                       src={
                         sharedChallenge.images[0]
@@ -405,7 +404,7 @@ export default function HomePage() {
                       alt={sharedChallenge.challenge.name}
                       width={400}
                       height={250}
-                      className="w-full h-auto object-cover bg-gradient-to-br from-gray-50 to-gray-100 transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-auto object-cover transition-transform duration-300 rounded-lg "
                       onError={(e) => {
                         e.currentTarget.src = "/imgs/projectImage.png";
                       }}
@@ -415,17 +414,16 @@ export default function HomePage() {
                   {/* Challenge Info Section */}
                   <div className="relative p-4 pt-3 bg-white/60 backdrop-blur-sm">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="h-1 w-8 bg-gradient-to-r from-[#8981FA] to-[#A333FF] rounded-full"></div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide truncate">
+                      <p className="text-base font-semibold text-[#000000] uppercase tracking-wide truncate">
                         {sharedChallenge.challenge.project
                           ? sharedChallenge.challenge.project.name
                           : "No Project"}
                       </p>
                     </div>
                     <h3
-                      className={`text-base sm:text-lg font-bold line-clamp-2 transition-colors duration-200 ${activeTab === "trending"
+                      className={`text-sm sm:text-base font-bold line-clamp-2 transition-colors duration-200 ${activeTab === "trending"
                         ? "text-transparent bg-clip-text bg-gradient-to-r from-[#A333FF] to-[#8981FA]"
-                        : "text-gray-900 group-hover:text-[#8981FA]"
+                        : "text-[#828282] group-hover:text-[#8981FA]"
                         }`}
                     >
                       {activeTab === "trending" && (
@@ -461,7 +459,7 @@ export default function HomePage() {
         </div>
 
         {/* === Top Creators & Learn from the Pros Side by Side === */}
-        <div className="mt-16 px-4">
+        <div className="mt-8 px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:max-w-7xl mx-auto">
             {/* === Top Creators of the Week === */}
             <div className="bg-white rounded-2xl shadow-2xl p-6 lg:col-span-1">
@@ -526,7 +524,7 @@ export default function HomePage() {
                             router.push(`/profile/${username}`);
                           })}
                           disabled={isButtonDisabled}
-                          className="w-full sm:w-auto px-5 py-2 bg-[#A333FF] text-white rounded-lg font-medium hover:bg-[#9225e5] transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full sm:w-auto px-5 py-2 bg-[#ffffff] text-[#8981FA] rounded-3xl font-medium hover:bg-[#f5f5f5] transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isButtonDisabled ? "Loading..." : "View Profile"}
                         </button>
@@ -590,17 +588,17 @@ export default function HomePage() {
                     {/* Stats */}
                     <div className="flex items-center justify-center gap-8 mb-6 w-full">
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-[#8981FA]">30</p>
+                        <p className="text-3xl font-medium text-[#8981FA]">30</p>
                         <p className="text-xs text-gray-600">Minute</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-pink-500">400</p>
+                        <p className="text-3xl font-medium text-pink-500">400</p>
                         <p className="text-xs text-gray-600">Point</p>
                       </div>
                     </div>
 
                     {/* Redeem Button */}
-                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-3xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
                       Redeem
                     </button>
                   </div>

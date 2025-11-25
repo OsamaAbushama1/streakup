@@ -162,11 +162,11 @@ const Login: React.FC = () => {
         {/* Right Side - Login Form Card */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
           <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-3">
+            <div className="text-center mb-4">
+              <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-[#8B7FF7]">
                 Welcome Back
               </h1>
-              <p className="text-gray-600 text-base sm:text-lg">
+              <p className="text-[#8A8A8A] text-base sm:text-lg">
                 Continue your creative journey and pick up where you left off
               </p>
             </div>
@@ -179,40 +179,36 @@ const Login: React.FC = () => {
                 <label className="block text-gray-700 text-sm font-semibold mb-2">
                   Email Address
                 </label>
-                <div className="p-[2px] rounded-lg bg-gray-300 focus-within:bg-[linear-gradient(to_right,#8981FA,#A333FF)] transition">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter Your E-mail"
-                    className="w-full px-4 py-3 rounded-lg focus:outline-none bg-white text-black placeholder-gray-400"
-                    disabled={loading}
-                  />
-                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter Your E-mail"
+                  className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                  disabled={loading}
+                />
               </div>
 
               <div>
                 <label className="block text-gray-700 text-sm font-semibold mb-2">
                   Password
                 </label>
-                <div className="p-[2px] rounded-lg bg-gray-300 focus-within:bg-[linear-gradient(to_right,#8981FA,#A333FF)] transition">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter Your Password"
-                    className="w-full px-4 py-3 rounded-lg focus:outline-none bg-white text-black placeholder-gray-400"
-                    disabled={loading}
-                  />
-                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter Your Password"
+                  className="w-full px-4 py-3 rounded-3xl border border-gray-300 focus:border-[#8981FA] focus:ring-2 focus:ring-[#8981FA]/20 focus:outline-none bg-white text-black placeholder-gray-400 transition"
+                  disabled={loading}
+                />
               </div>
 
-              <div className="text-right">
+              <div className="text-right mb-4">
                 <Link
                   href="/forget-password"
-                  className="text-[#8981FA] text-sm font-medium hover:underline"
+                  className="text-[#8B7FF7] text-sm font-medium hover:underline"
                 >
                   Forget Password?
                 </Link>
@@ -222,7 +218,7 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#8981FA] text-white py-3 rounded-lg font-semibold hover:bg-[#725BF3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className="w-full bg-[#8B7FF7] text-white py-3 rounded-lg font-semibold hover:bg-[#725BF3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 disabled={loading || isButtonDisabled}
               >
                 {loading || isButtonDisabled ? (
@@ -235,9 +231,9 @@ const Login: React.FC = () => {
                 )}
               </button>
 
-              <p className="text-center text-sm text-gray-600 pt-4">
+              <p className="text-center text-sm text-[#5E5E5E] pt-4">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-[#8981FA] font-semibold hover:underline">
+                <Link href="/signup" className="text-[#8B7FF7] font-semibold hover:underline">
                   Sign up here
                 </Link>
               </p>

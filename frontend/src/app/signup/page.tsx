@@ -413,10 +413,10 @@ const SignupForm: React.FC = () => {
       case 2:
         return (
           <div className="flex flex-col items-center">
-            <h1 className="text-4xl font-bold text-center text-black mb-4">
+            <h1 className="text-4xl font-bold text-center text-[#8B7FF7] mb-4">
               Join to the Streak Up Community
             </h1>
-            <p className="text-center text-[#2E2E38] mb-6">
+            <p className="text-center text-[#8A8A8A] mb-6">
               Start your Challenge journey to creative excellence
             </p>
             <div className="flex items-center justify-center mb-6">
@@ -435,12 +435,9 @@ const SignupForm: React.FC = () => {
               </span>
             </div>
             <div className="w-full">
-              <h2 className="text-xl font-bold text-left text-black mb-4">
+              <h2 className="text-xl font-bold text-center text-black mb-4">
                 Choose Your Track
               </h2>
-              <p className="text-left text-[#2E2E38] mb-6">
-                Select the creative field you want to focus on for the Challenge
-              </p>
               <div
                 className={`gap-4 mb-6 ${tracks.length % 2 === 0
                   ? "grid grid-cols-1 md:grid-cols-2"
@@ -465,7 +462,7 @@ const SignupForm: React.FC = () => {
                   >
                     <div className="flex flex-row items-center md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
                       <span
-                        className={`text-xl rounded-full flex items-center justify-center p-2 transition ${formData.track === track.name
+                        className={`text-xl rounded-lg flex items-center justify-center p-2 transition ${formData.track === track.name
                           ? "text-black"
                           : "text-white bg-[#B0B0B8]"
                           }`}
@@ -495,11 +492,11 @@ const SignupForm: React.FC = () => {
               {error && (
                 <p className="text-red-500 text-sm text-center">{error}</p>
               )}
-              <div className="flex justify-between mt-6">
+              <div className="flex gap-4 mt-6">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
+                  className="flex-1 w-full px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
                   disabled={loading}
                   suppressHydrationWarning
                 >
@@ -508,7 +505,7 @@ const SignupForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleButtonClick(() => handleContinue())}
-                  className="px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 w-full px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   suppressHydrationWarning
                   disabled={loading || isButtonDisabled || !formData.track}
                 >
@@ -528,10 +525,10 @@ const SignupForm: React.FC = () => {
       case 3:
         return (
           <div className="flex flex-col items-center">
-            <h1 className="text-4xl font-bold text-center text-black mb-4">
+            <h1 className="text-4xl font-bold text-center text-[#8B7FF7] mb-4">
               Join to the Streak Up Community
             </h1>
-            <p className="text-center text-[#2E2E38] mb-6">
+            <p className="text-center text-[#8A8A8A] mb-6">
               Start your Challenge journey to creative excellence
             </p>
             <div className="flex items-center justify-center mb-6">
@@ -550,7 +547,7 @@ const SignupForm: React.FC = () => {
               </span>
             </div>
             <div className="w-full">
-              <h2 className="text-xl font-bold text-left text-[#000000] mb-4">
+              <h2 className="text-xl font-bold text-center text-[#000000] mb-4">
                 What&apos;s your current skill level?
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -667,7 +664,7 @@ const SignupForm: React.FC = () => {
                   </label>
                 </div>
                 <div>
-                  <label className="block text-[#2E2E38] text-sm font-bold mb-2">
+                  <label className="block text-black text-xl font-bold mb-2 text-center font-bold">
                     Profile Picture (Optional)
                   </label>
                   <div className="flex items-center pl-0 pt-3 pr-3 pb-0 border border-none rounded-lg">
@@ -694,18 +691,18 @@ const SignupForm: React.FC = () => {
                         suppressHydrationWarning
                       />
                       <FiUpload className="mr-2 text-xl" />
-                      {imagePreview ? "Change Photo" : "Upload Photo"}
+                      {imagePreview ? "Change Photo" : "Upload Profile Picture"}
                     </label>
                   </div>
                 </div>
                 {error && (
                   <p className="text-red-500 text-sm text-center">{error}</p>
                 )}
-                <div className="flex justify-between mt-6">
+                <div className="flex gap-4 mt-6">
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
+                    className="flex-1 w-full px-4 py-2 bg-white text-[#766ee9] border-2 border-[#766ee9] rounded-3xl hover:bg-[#766ee9] hover:text-white"
                     disabled={loading}
                     suppressHydrationWarning
                   >
@@ -713,7 +710,7 @@ const SignupForm: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center"
+                    className="flex-1 w-full px-4 py-2 bg-[#8981FA] text-white rounded-3xl hover:bg-[#766ee9] flex items-center justify-center"
                     disabled={loading}
                     suppressHydrationWarning
                   >

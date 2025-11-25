@@ -55,7 +55,7 @@ const HeroSection: React.FC = () => {
           <span className="inline-flex items-center gap-2 rounded-full text-white font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base mt-8">
             <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 ">
               <Image
-                src="/imgs/Star.png"
+                src="/imgs/star.png"
                 alt="star icon"
                 width={24}
                 height={24}
