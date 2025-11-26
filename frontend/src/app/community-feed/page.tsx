@@ -28,6 +28,7 @@ interface SharedChallenge {
     lastName: string;
     username: string;
     profilePicture?: string;
+    track?: string;
   };
   highlighted: boolean;
 }
@@ -137,9 +138,9 @@ export default function CommunityFeedPage() {
         <HomeHeader />
 
         {/* === HERO SECTION (نفس الـ Home) === */}
-        <div className="container rounded-lg mx-auto mt-10 mb-5 py-5 px-6 xl:max-w-7xl bg-[linear-gradient(135deg,#FFDD65,#FFD9DD,#DEB5FF,#AAEBFF,#C1BCFF,#C173FF)] flex flex-col items-center justify-center text-white">
+        <div className="container rounded-lg mx-auto mt-10 mb-5 py-5 px-6 xl:max-w-7xl bg-[url('/imgs/banner.jpg')] bg-cover bg-center flex flex-col items-center justify-center text-white">
           <div className="mb-6">
-            <span className="inline-flex items-center gap-2 rounded-full text-[#A333FF] font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
+            <span className="inline-flex items-center gap-2 rounded-full text-[#ffffff] font-semibold shadow pt-2 pr-4.5 pb-2 pl-2.25 bg-white/32 border border-white/12 text-sm sm:text-base">
               <span className="bg-white/12 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8">
                 <Image
                   src="/imgs/star.png"
@@ -153,11 +154,11 @@ export default function CommunityFeedPage() {
             </span>
           </div>
 
-          <h1 className="text-[#000000] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-center px-2">
+          <h1 className="text-[#ffffff] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-center px-2">
             Welcome Back, {firstName}!
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg max-w-2xl text-[#2E2E38] mb-6 sm:mb-8 px-4 text-center">
+          <p className="text-sm sm:text-base md:text-lg max-w-2xl text-[#ffffff] mb-6 sm:mb-8 px-4 text-center">
             Explore the latest challenges shared by the community and get
             inspired!
           </p>
@@ -165,7 +166,7 @@ export default function CommunityFeedPage() {
           <button
             onClick={() => handleButtonClick(() => router.push("/challenge-center"))}
             disabled={isButtonDisabled}
-            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#A333FF] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-3 text-[#ffffff] font-semibold rounded-full hover:bg-white/20 transition bg-white/40 border border-white/30 backdrop-blur-[20px] shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_0_10px_rgba(255,255,255,0.1)] text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isButtonDisabled ? "Loading..." : "Go to Challenge Center"}
           </button>
@@ -175,7 +176,7 @@ export default function CommunityFeedPage() {
         <div className="container mx-auto px-4 py-10 xl:max-w-7xl">
           {/* === Tabs (نفس الـ Home) === */}
           <div className="flex sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 px-3">
-            <h2 className="mt-[6px] text-xl sm:text-3xl font-bold text-[#000000]">
+            <h2 className="mt-[6px] text-xl sm:text-3xl font-bold text-[#8981FA]">
               Community Feed
             </h2>
             <div className="flex bg-[#B0B0B8] p-1 rounded-full">
@@ -185,8 +186,8 @@ export default function CommunityFeedPage() {
                   setPage(1);
                 }}
                 className={`px-2 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition mr-1 text-sm sm:text-base ${activeTab === "recent"
-                    ? "bg-[#F5F5F7] text-[#000000] shadow"
-                    : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                  ? "bg-[#F5F5F7] text-[#000000] shadow"
+                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
                   }`}
               >
                 Recent
@@ -197,8 +198,8 @@ export default function CommunityFeedPage() {
                   setPage(1);
                 }}
                 className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium transition text-sm sm:text-base ${activeTab === "trending"
-                    ? "bg-[#F5F5F7] text-[#000000] shadow"
-                    : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                  ? "bg-[#F5F5F7] text-[#000000] shadow"
+                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
                   }`}
               >
                 Trending
@@ -229,58 +230,95 @@ export default function CommunityFeedPage() {
                   return (
                     <div
                       key={item._id}
-                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
+                      className="group relative bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-2xl border border-white/20"
                       onClick={() => handleButtonClick(() => router.push(route))}
-                      style={{ cursor: isButtonDisabled ? 'not-allowed' : 'pointer', opacity: isButtonDisabled ? 0.6 : 1 }}
+                      style={{
+                        cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+                        opacity: isButtonDisabled ? 0.6 : 1,
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+                        boxShadow: '0 8px 32px 0 rgba(137, 129, 250, 0.1)',
+                      }}
                     >
-                      <Image
-                        src={
-                          item.images[0]
-                            ? getImageUrl(item.images[0])
-                            : "/imgs/projectImage.png"
-                        }
-                        alt={item.challenge.name}
-                        width={400}
-                        height={250}
-                        className="w-full h-48 object-cover"
-                        onError={(e) =>
-                          (e.currentTarget.src = "/imgs/projectImage.png")
-                        }
-                      />
-                      <div className="p-4">
-                        <p className="text-sm text-[#2E2E38] mb-1 truncate">
-                          {item.challenge.project?.name || "No Project"}
-                        </p>
-                        <h3 className="text-lg font-semibold mb-2 line-clamp-2 text-[#2E2E38]">
-                          {item.challenge.name}
-                          {item.highlighted && (
-                            <span className="ml-2 text-yellow-500 text-xs">
-                              [Highlighted]
-                            </span>
-                          )}
-                        </h3>
+                      {/* Gradient Border Effect */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#8981FA]/20 via-[#A333FF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                      {/* User Info Section - At the top */}
+                      <div className="relative p-4 pb-3 bg-gradient-to-r from-white/50 to-transparent backdrop-blur-md">
                         <div className="flex items-center gap-3">
-                          <Image
-                            src={getImageUrl(item.user?.profilePicture)}
-                            alt="Profile"
-                            width={36}
-                            height={36}
-                            className="w-9 h-9 rounded-full object-cover border-2 border-white shadow"
-                          />
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 truncate">
-                              {item.user?.firstName} {item.user?.lastName}
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#8981FA] to-[#A333FF] rounded-full opacity-50"></div>
+                            <Image
+                              src={getImageUrl(item.user?.profilePicture)}
+                              alt="Profile"
+                              width={48}
+                              height={48}
+                              className="relative w-12 h-12 rounded-full object-cover border-2 border-white"
+                              onError={(e) =>
+                                (e.currentTarget.src = "/imgs/default-profile.jpg")
+                              }
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-base font-bold text-gray-900 truncate bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+                              {item.user?.firstName || "Unknown"}{" "}
+                              {item.user?.lastName || "User"}
                             </p>
-                            {username ? (
-                              <p className="text-xs text-gray-500">@{username}</p>
-                            ) : (
-                              <p className="text-xs text-red-500">
-                                username missing
-                              </p>
-                            )}
+                            <p className="text-sm font-medium text-[#828282] truncate">
+                              {item.user?.track || "No Track"}
+                            </p>
                           </div>
                         </div>
                       </div>
+
+                      {/* Challenge Image with Overlay */}
+                      <div className="relative overflow-hidden rounded-lg px-4">
+                        <Image
+                          src={
+                            item.images[0]
+                              ? getImageUrl(item.images[0])
+                              : "/imgs/projectImage.png"
+                          }
+                          alt={item.challenge.name}
+                          width={400}
+                          height={250}
+                          className="w-full h-auto object-cover transition-transform duration-300 rounded-lg"
+                          onError={(e) =>
+                            (e.currentTarget.src = "/imgs/projectImage.png")
+                          }
+                        />
+                      </div>
+
+                      {/* Challenge Info Section */}
+                      <div className="relative p-4 pt-3 bg-white/60 backdrop-blur-sm">
+                        <div className="flex items-center gap-2 mb-2">
+                          <p className="text-base font-semibold text-[#000000] uppercase tracking-wide truncate">
+                            {item.challenge.project
+                              ? item.challenge.project.name
+                              : "No Project"}
+                          </p>
+                        </div>
+                        <h3
+                          className={`text-sm sm:text-base font-bold line-clamp-2 transition-colors duration-200 ${activeTab === "trending"
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-[#A333FF] to-[#8981FA]"
+                            : "text-[#828282] group-hover:text-[#8981FA]"
+                            }`}
+                        >
+                          {activeTab === "trending" && (
+                            <span className="inline-flex items-center gap-1 mr-1">
+                              <span className="text-orange-500">🔥</span>
+                            </span>
+                          )}
+                          {item.challenge.name}
+                          {item.highlighted && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                              ⭐ Featured
+                            </span>
+                          )}
+                        </h3>
+                      </div>
+
+                      {/* Bottom Gradient Accent */}
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8981FA] via-[#A333FF] to-[#8981FA] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                   );
                 })}
@@ -288,41 +326,49 @@ export default function CommunityFeedPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-10">
-                  <button
-                    onClick={() => setPage(Math.max(1, page - 1))}
-                    disabled={page === 1}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${page === 1
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-[#A333FF] text-white hover:bg-[#9225e5]"
-                      }`}
-                  >
-                    Previous
-                  </button>
-
-                  {[...Array(totalPages)].map((_, i) => (
+                <div className="flex justify-center mt-10">
+                  <div className="flex items-center gap-2 bg-white rounded-full shadow-lg px-6 py-2">
                     <button
-                      key={i + 1}
-                      onClick={() => setPage(i + 1)}
-                      className={`w-10 h-10 rounded-lg font-medium transition ${page === i + 1
-                          ? "bg-[#A333FF] text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      onClick={() => setPage(Math.max(1, page - 1))}
+                      disabled={page === 1}
+                      className={`p-2 rounded-full transition ${page === 1
+                        ? "text-gray-300 cursor-not-allowed"
+                        : "text-gray-500 hover:bg-gray-100 hover:text-[#8981FA]"
                         }`}
                     >
-                      {i + 1}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </button>
-                  ))}
 
-                  <button
-                    onClick={() => setPage(Math.min(totalPages, page + 1))}
-                    disabled={page === totalPages}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${page === totalPages
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-[#A333FF] text-white hover:bg-[#9225e5]"
-                      }`}
-                  >
-                    Next
-                  </button>
+                    <div className="flex items-center gap-1">
+                      {[...Array(totalPages)].map((_, i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => setPage(i + 1)}
+                          className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition ${page === i + 1
+                            ? "bg-[#8981FA] text-white shadow-md"
+                            : "text-gray-500 hover:bg-gray-100"
+                            }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setPage(Math.min(totalPages, page + 1))}
+                      disabled={page === totalPages}
+                      className={`p-2 rounded-full transition ${page === totalPages
+                        ? "text-gray-300 cursor-not-allowed"
+                        : "text-gray-500 hover:bg-gray-100 hover:text-[#8981FA]"
+                        }`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               )}
             </>

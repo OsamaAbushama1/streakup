@@ -79,7 +79,7 @@ const GamifiedLearning: React.FC = () => {
 
             >
               <Image
-                src="/imgs/Star.png"
+                src="/imgs/star.png"
                 alt="Points & Rewards Icon"
                 width={32}
                 height={32}

@@ -4,7 +4,7 @@ import { FiSearch, FiBell, FiMenu } from "react-icons/fi";
 import { BsLightbulb } from "react-icons/bs";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
 import { useButtonDisable } from "../../hooks/useButtonDisable";
 import { Skeleton } from "../Skeleton";
@@ -54,6 +54,8 @@ const HomeHeader: React.FC = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsDropdownOpen, setIsNotificationsDropdownOpen] =
     useState(false);
+  const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
+  const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
   const [user, setUser] = useState<{
     profilePicture?: string;
     firstName?: string;
@@ -65,9 +67,11 @@ const HomeHeader: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const router = useRouter();
+  const pathname = usePathname();
   const notificationsDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const [isButtonDisabled, handleButtonClick] = useButtonDisable();
 
   useEffect(() => {
@@ -145,7 +149,8 @@ const HomeHeader: React.FC = () => {
       if (
         notificationsDropdownRef.current?.contains(target) ||
         profileDropdownRef.current?.contains(target) ||
-        menuRef.current?.contains(target)
+        menuRef.current?.contains(target) ||
+        mobileMenuRef.current?.contains(target)
       ) {
         return;
       }
@@ -258,8 +263,8 @@ const HomeHeader: React.FC = () => {
   }
 
   return (
-    <header className="bg-white p-4 border-b border-gray-300">
-      <div className="container mx-auto xl:max-w-7xl flex justify-between items-center">
+    <header className="bg-[#B0B0B8] p-4 border-b border-gray-300">
+      <div className="container mx-auto xl:max-w-7xl flex items-center">
         {/* Logo - Far Left */}
         <Link href="/home" className="flex items-center">
           <Image
@@ -272,35 +277,62 @@ const HomeHeader: React.FC = () => {
           />
         </Link>
 
-        {/* Center to Right - All Elements */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* Desktop Navigation Links */}
+        {/* Center - Navigation Links */}
+        <div className="flex-1 flex justify-center">
           <div className="hidden lg:flex items-center space-x-4">
             <Link
               href="/home"
-              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+              className={`flex items-center gap-2 px-4 py-2 font-medium text-base rounded-full transition ${pathname === '/home'
+                ? 'bg-[#8981FA] text-white'
+                : 'bg-transparent text-[#ffffff] hover:bg-[#8981FA] hover:text-white'
+                }`}
             >
+              {pathname === '/home' && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+              )}
               Home
             </Link>
             <Link
               href="/community-feed"
-              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+              className={`flex items-center gap-2 px-4 py-2 font-medium text-base rounded-full transition ${pathname === '/community-feed'
+                ? 'bg-[#8981FA] text-white'
+                : 'text-[#ffffff] hover:bg-[#8981FA] hover:text-white'
+                }`}
             >
+              {pathname === '/community-feed' && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+              )}
               Community
             </Link>
             <Link
               href="/challenge-center"
-              className="text-[#000000] font-medium text-sm hover:text-[#8981FA] transition"
+              className={`flex items-center gap-2 px-4 py-2 font-medium text-base rounded-full transition ${pathname === '/challenge-center'
+                ? 'bg-[#8981FA] text-white'
+                : 'text-[#ffffff] hover:bg-[#8981FA] hover:text-white'
+                }`}
             >
+              {pathname === '/challenge-center' && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                </svg>
+              )}
               Challenge Center
             </Link>
           </div>
+        </div>
+
+        {/* Right - Icons and Profile */}
+        <div className="flex items-center space-x-2 sm:space-x-4">
 
           {/* Notifications Icon */}
           <div className="hidden sm:block relative">
             <div className="relative">
               <FiBell
-                className="text-[#000000] text-xl cursor-pointer"
+                className="text-[#ffffff] text-xl cursor-pointer"
                 onClick={handleNotificationsClick}
               />
               {unreadCount > 0 && (
@@ -385,7 +417,7 @@ const HomeHeader: React.FC = () => {
               <Skeleton variant="avatar" width={36} height={36} />
             ) : (
               <>
-                <div className="flex items-center space-x-2 cursor-pointer" onClick={handleProfileClick}>
+                <div className="flex items-center space-x-2 cursor-pointer px-3 py-1.5 rounded-full transition bg-[#ffffff1a]" onClick={handleProfileClick}>
                   <Image
                     src={
                       user?.profilePicture
@@ -399,9 +431,12 @@ const HomeHeader: React.FC = () => {
                     height={36}
                     className="rounded-full"
                   />
-                  <span className="text-[#000000] font-medium text-sm hidden md:block">
+                  <span className="text-[#ffffff] font-medium text-sm hidden md:block">
                     {user?.firstName} {user?.lastName}
                   </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#ffffff] hidden md:block" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
 
                 {isProfileDropdownOpen && (
@@ -429,64 +464,193 @@ const HomeHeader: React.FC = () => {
 
           {/* Search Icon */}
           <div className="hidden sm:block">
-            <FiSearch className="text-[#B0B0B8] text-xl cursor-pointer" />
+            <FiSearch className="text-[#ffffff] text-xl cursor-pointer" />
           </div>
 
           {/* Mobile Menu */}
           <div className="relative sm:hidden" ref={menuRef}>
             <FiMenu
-              className="text-[#000000] text-xl cursor-pointer"
+              className="text-[#ffffff] text-2xl cursor-pointer"
               onClick={handleMenuClick}
             />
-            {isMenuOpen && (
-              <div className="absolute -right-6 mt-6 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                <Link
-                  href="/home"
-                  className="p-2 flex items-center hover:bg-gray-100"
-                >
-                  <span className="text-[#000000] font-medium">Home</span>
-                </Link>
+          </div>
+        </div>
+      </div>
 
-                <Link
-                  href="/community-feed"
-                  className="p-2 flex items-center hover:bg-gray-100"
-                >
-                  <span className="text-[#000000] font-medium">Community</span>
-                </Link>
+      {/* Mobile Menu Side Drawer */}
+      {isMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+            onClick={() => setIsMenuOpen(false)}
+          />
 
-                <Link
-                  href="/challenge-center"
-                  className="p-2 flex items-center hover:bg-gray-100"
-                >
-                  <BsLightbulb className="text-[#000000] text-xl mr-2" />
-                  <span className="text-[#000000] font-medium">Challenge</span>
-                </Link>
+          {/* Drawer */}
+          <div
+            ref={mobileMenuRef}
+            className="fixed top-0 bottom-0 right-0 w-3/4 bg-white shadow-xl h-full overflow-y-auto z-50 sm:hidden animate-slide-in-right"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar (removed) */}
 
-                <div className="p-2 flex items-center relative hover:bg-gray-100">
-                  <div className="relative">
-                    <FiBell
-                      className="text-[#000000] text-xl mr-2 cursor-pointer"
-                      onClick={handleNotificationsClick}
-                    />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
+            {/* Menu Items */}
+            <div className="p-4 space-y-2">
+              {/* Navigation Links */}
+              <Link
+                href="/home"
+                className={`flex items-center gap-3 p-3 rounded-lg transition ${pathname === '/home'
+                  ? 'bg-[#8981FA] text-white'
+                  : 'hover:bg-gray-100 text-gray-900'
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {pathname === '/home' && (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                  </svg>
+                )}
+                <span className="font-medium">Home</span>
+              </Link>
+
+              <Link
+                href="/community-feed"
+                className={`flex items-center gap-3 p-3 rounded-lg transition ${pathname === '/community-feed'
+                  ? 'bg-[#8981FA] text-white'
+                  : 'hover:bg-gray-100 text-gray-900'
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {pathname === '/community-feed' && (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                  </svg>
+                )}
+                <span className="font-medium">Community</span>
+              </Link>
+
+              <Link
+                href="/challenge-center"
+                className={`flex items-center gap-3 p-3 rounded-lg transition ${pathname === '/challenge-center'
+                  ? 'bg-[#8981FA] text-white'
+                  : 'hover:bg-gray-100 text-gray-900'
+                  }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {pathname === '/challenge-center' && (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                  </svg>
+                )}
+                <span className="font-medium">Challenge Center</span>
+              </Link>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200 my-2"></div>
+
+              {/* Notifications Accordion */}
+              <div>
+                <div
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-900 select-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMobileNotificationsOpen(!isMobileNotificationsOpen);
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <FiBell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-medium">Notifications</span>
                   </div>
-                  <span
-                    className="text-black cursor-pointer"
-                    onClick={handleNotificationsClick}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 transition-transform ${isMobileNotificationsOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    Notifications
-                  </span>
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
 
-                <div className="p-2 flex items-center relative hover:bg-gray-100">
-                  {loading ? (
-                    <Skeleton variant="avatar" width={24} height={24} />
-                  ) : (
-                    <>
+                {/* Notifications List */}
+                {isMobileNotificationsOpen && (
+                  <div className="pl-4 pr-2 py-2 space-y-2 bg-gray-50 rounded-lg mt-1">
+                    {notifications.length === 0 ? (
+                      <p className="text-gray-500 text-sm text-center py-2">No new notifications</p>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif._id}
+                          className={`p-2 border-b last:border-0 cursor-pointer hover:bg-gray-100 rounded transition ${!notif.read ? "bg-blue-50" : ""}`}
+                          onClick={() => {
+                            goToSharedChallenge(
+                              notif.username,
+                              notif.challengeLinkId,
+                              notif.commentId
+                            );
+                            setIsMenuOpen(false);
+                          }}
+                        >
+                          <div className="flex gap-2">
+                            <Image
+                              src={
+                                notif.sender.profilePicture
+                                  ? notif.sender.profilePicture.startsWith("http")
+                                    ? notif.sender.profilePicture
+                                    : `${API_BASE_URL}/${notif.sender.profilePicture}`
+                                  : "/imgs/default-profile.jpg"
+                              }
+                              alt="Sender"
+                              width={24}
+                              height={24}
+                              className="rounded-full flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-gray-900 truncate">
+                                <span className="font-semibold">
+                                  {notif.sender.firstName}
+                                </span>{" "}
+                                {notif.type === "like" ? "liked" : "commented"}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {formatTimeAgo(notif.createdAt)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                    {unreadCount > 0 && (
+                      <button
+                        className="w-full text-center text-xs text-blue-600 font-medium py-1 hover:underline"
+                        onClick={handleNotificationsClick}
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Accordion */}
+              <div>
+                <div
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-900 select-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMobileProfileOpen(!isMobileProfileOpen);
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    {loading ? (
+                      <Skeleton variant="avatar" width={20} height={20} />
+                    ) : (
                       <Image
                         src={
                           user?.profilePicture
@@ -496,30 +660,56 @@ const HomeHeader: React.FC = () => {
                             : "/imgs/default-profile.jpg"
                         }
                         alt="Profile"
-                        width={24}
-                        height={24}
-                        className="rounded-full mr-2 cursor-pointer"
-                        onClick={handleProfileClick}
+                        width={20}
+                        height={20}
+                        className="rounded-full"
                       />
-                      <span
-                        className="text-black cursor-pointer"
-                        onClick={handleProfileClick}
-                      >
-                        Profile
-                      </span>
-                    </>
-                  )}
+                    )}
+                    <span className="font-medium">Profile</span>
+                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 transition-transform ${isMobileProfileOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
 
-                <div className="p-2 flex items-center hover:bg-gray-100">
-                  <FiSearch className="text-[#B0B0B8] text-xl mr-2" />
-                  <span className="text-[#000000] font-medium">Search</span>
-                </div>
+                {/* Profile Options */}
+                {isMobileProfileOpen && (
+                  <div className="pl-11 pr-2 py-2 space-y-2 bg-gray-50 rounded-lg mt-1">
+                    <Link
+                      href="/profile"
+                      className="block p-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      View Profile
+                    </Link>
+                    <div
+                      className={`block p-2 text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => {
+                        if (!isButtonDisabled) {
+                          handleButtonClick(() => handleLogout());
+                        }
+                      }}
+                    >
+                      {isButtonDisabled ? 'Logging out...' : 'Logout'}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Search */}
+              <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer text-gray-900">
+                <FiSearch className="h-5 w-5" />
+                <span className="font-medium">Search</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Mobile Notifications Modal */}
       {isNotificationsDropdownOpen && (

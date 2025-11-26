@@ -30,19 +30,19 @@ const LandingFooter: React.FC = () => {
           <div className="flex items-center justify-center gap-3">
             <a
               href="#"
-              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-[#C173FF]/40 text-white bg-[#8981FA] transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border text-white bg-[#8981FA] transition"
             >
               <FaWhatsapp size={20} />
             </a>
             <a
               href="#"
-              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-[#C173FF]/40 text-white bg-[#8981FA] transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border text-white bg-[#8981FA] transition"
             >
               <FaFacebookF size={20} />
             </a>
             <a
               href="#"
-              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-[#C173FF]/40 text-white bg-[#8981FA] transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border text-white bg-[#8981FA] transition"
             >
               <FaInstagram size={20} />
             </a>
