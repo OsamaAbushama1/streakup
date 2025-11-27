@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FiClock } from "react-icons/fi";
+import { FiClock, FiChevronDown } from "react-icons/fi";
 import { BsStar } from "react-icons/bs";
 import HomeHeader from "../components/Home/HomeHeader";
 import LandingFooter from "../components/Landing/LandingFooter";
@@ -34,6 +34,24 @@ const ChallengeCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState("All Challenges");
   const [selectedProject, setSelectedProject] =
     useState<string>("All Projects");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,9 +68,8 @@ const ChallengeCenter: React.FC = () => {
     const normalized = path.trim();
     if (!normalized) return fallback;
     if (normalized.startsWith("http")) return normalized;
-    return `${backendUrl}${
-      normalized.startsWith("/") ? normalized : `/${normalized}`
-    }`;
+    return `${backendUrl}${normalized.startsWith("/") ? normalized : `/${normalized}`
+      }`;
   };
   const tabs = ["All Challenges", "Active", "Completed", "Missed"] as const;
 
@@ -127,7 +144,7 @@ const ChallengeCenter: React.FC = () => {
 
   return (
     <section className="bg-white">
-      <Metadata 
+      <Metadata
         title="Challenge Center"
         description="Browse and start creative challenges to level up your skills"
         keywords="challenges, creative challenges, skill development, StreakUp"
@@ -135,10 +152,10 @@ const ChallengeCenter: React.FC = () => {
       <HomeHeader />
       <div className="container mx-auto xl:max-w-7xl px-4 sm:px-0 lg:px-0 mt-10 mb-10">
         <div className="text-left mb-5">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#000000]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#8981FA]">
             Challenge Center
           </h2>
-          <p className="text-gray-500 mt-2 text-xs sm:text-sm md:text-base">
+          <p className="text-[#B0B0B8] mt-2 text-xs sm:text-sm md:text-base">
             Take on daily challenges and level up your creative skills
           </p>
         </div>
@@ -149,29 +166,57 @@ const ChallengeCenter: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-full font-medium transition text-xs sm:text-sm md:text-base ${
-                  activeTab === tab
-                    ? "bg-[#F5F5F7] text-[#000000] shadow"
-                    : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
-                } ${index !== tabs.length - 1 ? "mr-1" : ""}`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-full font-medium transition text-xs sm:text-sm md:text-base ${activeTab === tab
+                  ? "bg-[#F5F5F7] text-[#000000] shadow"
+                  : "bg-transparent text-[#000000] hover:bg-[#e4e4ea]"
+                  } ${index !== tabs.length - 1 ? "mr-1" : ""}`}
               >
                 {tab}
               </button>
             ))}
           </div>
-          <div className="flex bg-[#B0B0B8] p-1 rounded-full">
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="px-2 sm:px-4 py-1 sm:py-2 rounded-full font-medium transition text-xs sm:text-sm md:text-base bg-[#F5F5F7] text-[#000000] focus:outline-none"
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-4 py-3 rounded-full font-medium transition text-xs sm:text-sm md:text-base bg-[#ffffff] text-[#8981FA] focus:outline-none shadow-[0_10px_20px_rgba(0,0,0,0.15)]"
             >
-              <option value="All Projects">All Projects</option>
-              {projects.map((project) => (
-                <option key={project._id} value={project._id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
+              <span>
+                {selectedProject === "All Projects"
+                  ? "All Projects"
+                  : projects.find((p) => p._id === selectedProject)?.name ||
+                  "All Projects"}
+              </span>
+              <FiChevronDown
+                className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                  }`}
+              />
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl z-50 overflow-hidden border border-gray-100">
+                <div
+                  className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700 transition"
+                  onClick={() => {
+                    setSelectedProject("All Projects");
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  All Projects
+                </div>
+                {projects.map((project) => (
+                  <div
+                    key={project._id}
+                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700 transition"
+                    onClick={() => {
+                      setSelectedProject(project._id);
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    {project.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -190,7 +235,7 @@ const ChallengeCenter: React.FC = () => {
                   <Image
                     src={
                       challenge.previewImages &&
-                      challenge.previewImages.length > 0
+                        challenge.previewImages.length > 0
                         ? getImageUrl(challenge.previewImages[0])
                         : "/imgs/default-challenge.jpg"
                     }
@@ -200,13 +245,12 @@ const ChallengeCenter: React.FC = () => {
                     className="h-60 rounded-xl mb-4 object-cover w-full"
                   />
                   <span
-                    className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded-xl ${
-                      challenge.status === "Active"
-                        ? "bg-green-100 text-green-600"
-                        : challenge.status === "Completed"
+                    className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded-xl ${challenge.status === "Active"
+                      ? "bg-green-100 text-green-600"
+                      : challenge.status === "Completed"
                         ? "bg-blue-100 text-blue-600"
                         : "bg-red-100 text-red-600"
-                    }`}
+                      }`}
                   >
                     {challenge.status}
                   </span>
@@ -218,16 +262,17 @@ const ChallengeCenter: React.FC = () => {
                 <h3 className="font-semibold text-[#000000] text-lg mt-1">
                   {challenge.challengeId}: {challenge.name}
                 </h3>
-                <p className="text-[#2E2E38] text-sm mt-1 mb-4">
-                  {challenge.overview}
-                </p>
 
-                <div className="flex items-center text-gray-400 text-sm mb-4 space-x-4">
-                  <div className="flex items-center gap-1">
-                    <FiClock /> {challenge.duration} Days
+
+                <div className="flex items-center justify-center gap-8 mb-6 mt-2">
+                  <div className="text-center">
+                    <p className="text-[#958EFA] text-lg font-bold">{challenge.duration}</p>
+                    <p className="text-[#828282] text-xs">Days</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <BsStar /> {challenge.points} pts
+                  <div className="w-px h-8 bg-gray-200"></div>
+                  <div className="text-center">
+                    <p className="text-[#E3309E] text-lg font-bold">{challenge.points}</p>
+                    <p className="text-[#828282] text-xs">Point</p>
                   </div>
                 </div>
 
@@ -236,9 +281,9 @@ const ChallengeCenter: React.FC = () => {
                     router.push(`/challenges/${challenge.challengeId}`)
                   )}
                   disabled={isButtonDisabled}
-                  className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-medium rounded-lg px-3 sm:px-4 py-2 sm:py-2 mt-auto flex items-center justify-center gap-2 transition-all text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#8981FA] hover:bg-[#7c73e6] text-white font-semibold rounded-full py-3 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
-                  {isButtonDisabled ? "Loading..." : "View Details →"}
+                  {isButtonDisabled ? "Loading..." : "View Details"}
                 </button>
               </div>
             ))
