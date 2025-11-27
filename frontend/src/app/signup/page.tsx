@@ -260,15 +260,15 @@ const SignupForm: React.FC = () => {
     }
     switch (trackName) {
       case "UI/UX Design":
-        return <FiFigma className={isSelected ? "text-black" : "text-white"} />;
+        return <FiFigma className="text-white" />;
       case "Graphic Design":
         return (
-          <FaPaintBrush className={isSelected ? "text-black" : "text-white"} />
+          <FaPaintBrush className="text-white" />
         );
       case "Frontend Development":
-        return <FiCode className={isSelected ? "text-black" : "text-white"} />;
+        return <FiCode className="text-white" />;
       default:
-        return <FiUser className={isSelected ? "text-black" : "text-white"} />;
+        return <FiUser className="text-white" />;
     }
   };
 
@@ -398,13 +398,13 @@ const SignupForm: React.FC = () => {
                     <span>Processing...</span>
                   </div>
                 ) : (
-                  "Continue →"
+                  "Continue"
                 )}
               </button>
             </form>
             <p className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#A333FF] hover:underline">
+              <Link href="/login" className="text-[#8B7FF7] font-semibold hover:underline">
                 Sign in here
               </Link>
             </p>
@@ -449,28 +449,20 @@ const SignupForm: React.FC = () => {
                     key={track.name}
                     type="button"
                     onClick={() => handleTrackSelect(track.name)}
-                    className="p-[2px] bg-white rounded-lg text-center border border-[#B0B0B8] hover:bg-gray-100 transition-colors"
-                    style={
-                      formData.track === track.name
-                        ? {
-                          background:
-                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                          backgroundOrigin: "border-box",
-                        }
-                        : {}
-                    }
+                    className={`p-[2px] bg-white rounded-lg text-center border transition-colors ${formData.track === track.name ? "border-[#8981FA]" : "border-[#B0B0B8]"
+                      } hover:bg-gray-100`}
+
                   >
                     <div className="flex flex-row items-center md:justify-start  space-x-2 bg-white rounded-lg h-full p-2">
                       <span
                         className={`text-xl rounded-lg flex items-center justify-center p-2 transition ${formData.track === track.name
-                          ? "text-black"
+                          ? "text-white"
                           : "text-white bg-[#B0B0B8]"
                           }`}
                         style={
                           formData.track === track.name
                             ? {
-                              background:
-                                "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
+                              background: "#8981FA",
                             }
                             : {}
                         }
@@ -500,7 +492,7 @@ const SignupForm: React.FC = () => {
                   disabled={loading}
                   suppressHydrationWarning
                 >
-                  ← Back
+                  Back
                 </button>
                 <button
                   type="button"
@@ -515,7 +507,7 @@ const SignupForm: React.FC = () => {
                       <span>Processing...</span>
                     </div>
                   ) : (
-                    "Continue →"
+                    "Continue"
                   )}
                 </button>
               </div>
@@ -553,18 +545,7 @@ const SignupForm: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label
-                    className="flex items-center border border-gray-300 rounded-lg"
-                    style={
-                      formData.skillLevel === "Beginner"
-                        ? {
-                          backgroundImage:
-                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                          padding: "1px",
-                          backgroundOrigin: "border-box",
-                          backgroundClip: "padding-box",
-                        }
-                        : {}
-                    }
+                    className={`flex items-center border rounded-lg ${formData.skillLevel === "Beginner" ? "border-[#8981FA]" : "border-gray-300"}`}
                   >
                     <div className="bg-white rounded-lg p-2 w-full flex items-center justify-between">
                       <div className="flex flex-col items-start">
@@ -576,31 +557,23 @@ const SignupForm: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <input
-                          type="radio"
-                          name="skillLevel"
-                          value="Beginner"
-                          checked={formData.skillLevel === "Beginner"}
-                          onChange={handleSkillLevelChange}
-                          className="mr-2"
-                          disabled={loading}
-                        />
+                        <div className="relative flex items-center justify-center">
+                          <input
+                            type="radio"
+                            name="skillLevel"
+                            value="Beginner"
+                            checked={formData.skillLevel === "Beginner"}
+                            onChange={handleSkillLevelChange}
+                            className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#8981FA] checked:bg-white transition-all cursor-pointer"
+                            disabled={loading}
+                          />
+                          <div className="absolute w-2.5 h-2.5 rounded-full bg-[#8981FA] scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                        </div>
                       </div>
                     </div>
                   </label>
                   <label
-                    className="flex items-center border border-gray-300 rounded-lg"
-                    style={
-                      formData.skillLevel === "Intermediate"
-                        ? {
-                          backgroundImage:
-                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                          padding: "1px",
-                          backgroundOrigin: "border-box",
-                          backgroundClip: "padding-box",
-                        }
-                        : {}
-                    }
+                    className={`flex items-center border rounded-lg ${formData.skillLevel === "Intermediate" ? "border-[#8981FA]" : "border-gray-300"}`}
                   >
                     <div className="bg-white rounded-lg p-2 w-full flex items-center justify-between">
                       <div className="flex flex-col items-start">
@@ -612,32 +585,24 @@ const SignupForm: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <input
-                          type="radio"
-                          name="skillLevel"
-                          value="Intermediate"
-                          checked={formData.skillLevel === "Intermediate"}
-                          onChange={handleSkillLevelChange}
-                          className="mr-2"
-                          disabled={loading}
-                          suppressHydrationWarning
-                        />
+                        <div className="relative flex items-center justify-center">
+                          <input
+                            type="radio"
+                            name="skillLevel"
+                            value="Intermediate"
+                            checked={formData.skillLevel === "Intermediate"}
+                            onChange={handleSkillLevelChange}
+                            className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#8981FA] checked:bg-white transition-all cursor-pointer"
+                            disabled={loading}
+                            suppressHydrationWarning
+                          />
+                          <div className="absolute w-2.5 h-2.5 rounded-full bg-[#8981FA] scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                        </div>
                       </div>
                     </div>
                   </label>
                   <label
-                    className="flex items-center border border-gray-300 rounded-lg"
-                    style={
-                      formData.skillLevel === "Advanced"
-                        ? {
-                          backgroundImage:
-                            "linear-gradient(to right, #FFDD65, #FFD9DD, #DEB5FF, #AAEBFF, #C1BCFF, #C173FF)",
-                          padding: "1px",
-                          backgroundOrigin: "border-box",
-                          backgroundClip: "padding-box",
-                        }
-                        : {}
-                    }
+                    className={`flex items-center border rounded-lg ${formData.skillLevel === "Advanced" ? "border-[#8981FA]" : "border-gray-300"}`}
                   >
                     <div className="bg-white rounded-lg p-2 w-full flex items-center justify-between">
                       <div className="flex flex-col items-start">
@@ -649,16 +614,19 @@ const SignupForm: React.FC = () => {
                         </span>
                       </div>
                       <div>
-                        <input
-                          type="radio"
-                          name="skillLevel"
-                          value="Advanced"
-                          checked={formData.skillLevel === "Advanced"}
-                          onChange={handleSkillLevelChange}
-                          className="mr-2"
-                          disabled={loading}
-                          suppressHydrationWarning
-                        />
+                        <div className="relative flex items-center justify-center">
+                          <input
+                            type="radio"
+                            name="skillLevel"
+                            value="Advanced"
+                            checked={formData.skillLevel === "Advanced"}
+                            onChange={handleSkillLevelChange}
+                            className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-full checked:border-[#8981FA] checked:bg-white transition-all cursor-pointer"
+                            disabled={loading}
+                            suppressHydrationWarning
+                          />
+                          <div className="absolute w-2.5 h-2.5 rounded-full bg-[#8981FA] scale-0 peer-checked:scale-100 transition-transform pointer-events-none"></div>
+                        </div>
                       </div>
                     </div>
                   </label>
@@ -706,7 +674,7 @@ const SignupForm: React.FC = () => {
                     disabled={loading}
                     suppressHydrationWarning
                   >
-                    ← Back
+                    Back
                   </button>
                   <button
                     type="submit"
@@ -720,7 +688,7 @@ const SignupForm: React.FC = () => {
                         <span>Processing...</span>
                       </div>
                     ) : (
-                      "Finish →"
+                      "Finish"
                     )}
                   </button>
                 </div>

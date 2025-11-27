@@ -450,7 +450,7 @@ export default function HomePage() {
 
         <div className="flex justify-center mt-8">
           <button
-            className="px-6 py-2 sm:px-10 sm:py-3 bg-[#A333FF] text-white rounded-[10px] font-semibold text-base sm:text-lg shadow-md hover:bg-[#9225e5] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 sm:px-10 sm:py-3 bg-[#8981FA] text-white rounded-3xl font-semibold text-base sm:text-lg shadow-md hover:bg-[#9225e5] transition disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => handleButtonClick(() => router.push("/community-feed"))}
             disabled={isButtonDisabled}
           >
@@ -588,11 +588,11 @@ export default function HomePage() {
                     {/* Stats */}
                     <div className="flex items-center justify-center gap-8 mb-6 w-full">
                       <div className="text-center">
-                        <p className="text-3xl font-medium text-[#8981FA]">30</p>
+                        <p className="text-xl font-bold text-[#8981FA]">30</p>
                         <p className="text-xs text-gray-600">Minute</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl font-medium text-pink-500">400</p>
+                        <p className="text-xl font-bold text-pink-500">400</p>
                         <p className="text-xs text-gray-600">Point</p>
                       </div>
                     </div>
@@ -630,17 +630,17 @@ export default function HomePage() {
                     {/* Stats */}
                     <div className="flex items-center justify-center gap-8 mb-6 w-full">
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-[#8981FA]">40</p>
+                        <p className="text-xl font-bold text-[#8981FA]">40</p>
                         <p className="text-xs text-gray-600">Minute</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-pink-500">300</p>
+                        <p className="text-xl font-bold text-pink-500">300</p>
                         <p className="text-xs text-gray-600">Point</p>
                       </div>
                     </div>
 
                     {/* Redeem Button */}
-                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-3xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
                       Redeem
                     </button>
                   </div>
@@ -672,17 +672,17 @@ export default function HomePage() {
                     {/* Stats */}
                     <div className="flex items-center justify-center gap-8 mb-6 w-full">
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-[#8981FA]">60</p>
+                        <p className="text-xl font-bold text-[#8981FA]">60</p>
                         <p className="text-xs text-gray-600">Minute</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-pink-500">500</p>
+                        <p className="text-xl font-bold text-pink-500">500</p>
                         <p className="text-xs text-gray-600">Point</p>
                       </div>
                     </div>
 
                     {/* Redeem Button */}
-                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
+                    <button className="w-full bg-white text-[#8981FA] font-semibold py-3 rounded-3xl hover:bg-[#8981FA] hover:text-white transition-all duration-300 shadow-md">
                       Redeem
                     </button>
                   </div>
@@ -797,7 +797,7 @@ export default function HomePage() {
                           )
                         )}
                         disabled={isButtonDisabled}
-                        className="group flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#A333FF] to-[#C173FF] text-white rounded-lg font-medium hover:from-[#9225e5] hover:to-[#b05eff] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="group flex items-center gap-2 px-6 py-2.5 bg-[#8981FA] text-white rounded-3xl font-medium hover:from-[#9225e5] hover:to-[#b05eff] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <FaFire className="w-5 h-5 text-white bg-transparent group-hover:animate-pulse group-hover:scale-110 transition-all duration-200" />
                         {isButtonDisabled ? "Loading..." : "Start Challenge"}

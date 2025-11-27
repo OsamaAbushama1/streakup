@@ -205,7 +205,7 @@ const Login: React.FC = () => {
                 />
               </div>
 
-              <div className="text-right mb-4">
+              <div className="text-right mb-4 -mt-3">
                 <Link
                   href="/forget-password"
                   className="text-[#8B7FF7] text-sm font-medium hover:underline"
@@ -218,7 +218,7 @@ const Login: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#8B7FF7] text-white py-3 rounded-lg font-semibold hover:bg-[#725BF3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className="w-full bg-[#8B7FF7] text-white py-3 rounded-3xl font-semibold hover:bg-[#725BF3] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 disabled={loading || isButtonDisabled}
               >
                 {loading || isButtonDisabled ? (
@@ -227,7 +227,7 @@ const Login: React.FC = () => {
                     <span>Processing...</span>
                   </div>
                 ) : (
-                  "Login →"
+                  "Login"
                 )}
               </button>
 
