@@ -49,9 +49,12 @@ import {
 } from "../controllers/challengeController";
 
 const router = Router();
-// Use memory storage for Cloudinary uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+
+// Import file validation utilities
+import { uploadConfig } from "../utils/fileValidation";
+
+// Use secure upload configuration with file validation
+const upload = multer(uploadConfig);
 
 // ==================== ADMIN ROUTES ====================
 // All routes require authentication (protect) AND admin privileges (restrictToAdmin)

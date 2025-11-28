@@ -25,6 +25,14 @@ import {
 import multer from "multer";
 import { protect } from "../middleware/authMiddleware";
 import { authLimiter, passwordResetLimiter } from "../middleware/rateLimiter";
+import { validate } from "../middleware/validationMiddleware";
+import {
+  registerUserSchema,
+  loginUserSchema,
+  updateProfileSchema,
+  forgetPasswordSchema,
+  resetPasswordSchema,
+} from "../utils/validationSchemas";
 
 import { getAllProjects } from "../controllers/projectController";
 import { getPublicTracks } from "../controllers/trackController";
@@ -36,9 +44,11 @@ import {
 
 const router = express.Router();
 
-// Use memory storage for Cloudinary uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Import file validation utilities
+import { uploadConfig } from "../utils/fileValidation";
+
+// Use secure upload configuration with file validation
+const upload = multer(uploadConfig);
 
 // ==================== PUBLIC ENDPOINTS ====================
 // These endpoints are accessible without authentication
@@ -56,16 +66,32 @@ router.get("/tracks", getPublicTracks);
 // Protected with special rate limiters to prevent brute force attacks
 
 // User registration (rate limited: 10 req/15min)
-router.post("/register", authLimiter, upload.single("profilePicture"), registerUser);
+router.post(
+  "/register",
+  authLimiter,
+  upload.single("profilePicture"),
+  validate(registerUserSchema),
+  registerUser
+);
 
 // User login (rate limited: 10 req/15min)
-router.post("/login", authLimiter, loginUser);
+router.post("/login", authLimiter, validate(loginUserSchema), loginUser);
 
 // Password reset request (rate limited: 3 req/hour)
-router.post("/forget-password", passwordResetLimiter, forgetPassword);
+router.post(
+  "/forget-password",
+  passwordResetLimiter,
+  validate(forgetPasswordSchema),
+  forgetPassword
+);
 
 // Password reset confirmation (rate limited: 3 req/hour)
-router.post("/reset-password", passwordResetLimiter, resetPassword);
+router.post(
+  "/reset-password",
+  passwordResetLimiter,
+  validate(resetPasswordSchema),
+  resetPassword
+);
 
 // Logout (no auth required, clears cookies)
 router.post("/logout", logoutUser);
@@ -87,6 +113,7 @@ router.put(
   "/update-profile",
   authenticateToken,
   upload.single("profilePicture"),
+  validate(updateProfileSchema),
   updateProfile
 );
 

@@ -695,7 +695,7 @@ export default function HomePage() {
         {/* === Pick Up Where You Left Off === */}
         <div className="mt-16 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 xl:max-w-7xl mx-auto">
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="mb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <h2 className="text-2xl sm:text-3xl font-bold text-[#8981FA]">
                 Pick Up Where You Left Off
               </h2>
@@ -720,7 +720,7 @@ export default function HomePage() {
               )}
             </div>
 
-            <p className="text-sm sm:text-base text-[#909097] max-w-2xl mb-6">
+            <p className="text-sm sm:text-base text-[#909097] max-w-2xl mb-3">
               Your next challenge awaits — keep your streak alive!
             </p>
 
@@ -777,7 +777,7 @@ export default function HomePage() {
                         {nextChallenge.project && (
                           <span className="text-[#2E2E38] font-normal">
                             {" - "}
-                            <span className="text-[#A333FF] font-semibold">
+                            <span className="text-[#8981FA] font-semibold">
                               {nextChallenge.project.name}
                             </span>
                           </span>

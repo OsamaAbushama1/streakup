@@ -22,8 +22,8 @@ const isProduction = process.env.NODE_ENV === "production";
 const baseCookieOptions = {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
-    maxAge: 3600000,
+    sameSite: isProduction ? "none" : "strict", // Changed to strict for better CSRF protection
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours to match JWT expiry
 };
 const cookieOptionsWithDomain = {
     ...baseCookieOptions,
@@ -57,7 +57,7 @@ const authenticateToken = (req, res, next) => {
         });
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "your-secret-key-here");
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         console.log('Token decoded successfully for user:', decoded.id); // للـ debugging
         req.user = { id: decoded.id };
         next();
@@ -178,7 +178,8 @@ const registerUser = async (req, res) => {
             profilePicture,
             lastLogin: new Date(),
         });
-        const token = jsonwebtoken_1.default.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
+        const token = jsonwebtoken_1.default.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: "24h" } // Changed to 24h to match cookie maxAge
+        );
         res.cookie("token", token, cookieOptionsWithDomain);
         res.status(201).json({
             user: {
@@ -217,7 +218,7 @@ const loginUser = async (req, res) => {
             email: user.email,
             username: user.username,
             role: user.role
-        }, process.env.JWT_SECRET || "secret", { expiresIn: "24h" });
+        }, process.env.JWT_SECRET, { expiresIn: "24h" });
         res.cookie("token", token, cookieOptionsWithDomain);
         res.status(200).json({
             user: {
@@ -275,7 +276,7 @@ const logoutUser = async (req, res) => {
     const token = req.cookies.token;
     if (token) {
         try {
-            const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "secret");
+            const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
             const user = await userModel_1.default.findById(decoded.id);
             if (user) {
                 user.isOnline = false;

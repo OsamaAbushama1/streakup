@@ -17,10 +17,46 @@ const db_1 = __importDefault(require("./config/db"));
 // Security Middleware
 const botDetection_1 = require("./middleware/botDetection");
 const rateLimiter_1 = require("./middleware/rateLimiter");
+const errorHandler_1 = require("./middleware/errorHandler");
+// Utilities
+const validateEnv_1 = require("./utils/validateEnv");
+// Load environment variables
 dotenv_1.default.config();
+// Validate environment variables before starting server
+(0, validateEnv_1.validateEnv)();
+// Connect to database
 (0, db_1.default)();
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
+// === Security Headers & HTTPS Enforcement ===
+const isProduction = process.env.NODE_ENV === "production";
+// Force HTTPS in production
+if (isProduction) {
+    app.use((req, res, next) => {
+        if (req.header("x-forwarded-proto") !== "https") {
+            return res.redirect(`https://${req.header("host")}${req.url}`);
+        }
+        next();
+    });
+}
+// Security headers
+app.use((req, res, next) => {
+    // HTTP Strict Transport Security (HSTS)
+    if (isProduction) {
+        res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    // Prevent clickjacking
+    res.setHeader("X-Frame-Options", "DENY");
+    // Prevent MIME type sniffing
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    // XSS Protection (legacy browsers)
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    // Referrer Policy
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    // Permissions Policy (restrict features)
+    res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    next();
+});
 // === Middleware ===
 app.use((0, cookie_parser_1.default)());
 // CORS Configuration - Restricted to main domain only
@@ -63,14 +99,28 @@ app.use("/api", rateLimiter_1.strictApiLimiter); // 30 requests per minute limit
 app.use("/api", routes_1.default);
 // === Health Check ===
 app.get("/", (req, res) => {
-    res.json({ message: "Server is running" });
+    res.json({
+        message: "Server is running",
+        environment: process.env.NODE_ENV || "development",
+        timestamp: new Date().toISOString()
+    });
 });
+// === Error Handling ===
+// 404 handler - must be after all routes
+app.use(errorHandler_1.notFoundHandler);
+// Centralized error handler - must be last
+app.use(errorHandler_1.errorHandler);
 // === MongoDB ===
 mongoose_1.default
     .connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.error("Database connection error:", err));
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch((err) => {
+    console.error("❌ Database connection error:", err);
+    process.exit(1); // Exit if database connection fails
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`\n🚀 Server running on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`🔗 API: http://localhost:${PORT}/api\n`);
 });

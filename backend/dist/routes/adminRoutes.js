@@ -14,9 +14,10 @@ const trackController_1 = require("../controllers/trackController");
 const adminController_2 = require("../controllers/adminController");
 const challengeController_1 = require("../controllers/challengeController");
 const router = (0, express_1.Router)();
-// Use memory storage for Cloudinary uploads
-const storage = multer_1.default.memoryStorage();
-const upload = (0, multer_1.default)({ storage });
+// Import file validation utilities
+const fileValidation_1 = require("../utils/fileValidation");
+// Use secure upload configuration with file validation
+const upload = (0, multer_1.default)(fileValidation_1.uploadConfig);
 // ==================== ADMIN ROUTES ====================
 // All routes require authentication (protect) AND admin privileges (restrictToAdmin)
 router.use(authMiddleware_1.protect, restrictToAdmin_1.restrictToAdmin);

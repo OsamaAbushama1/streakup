@@ -23,8 +23,8 @@ const isProduction = process.env.NODE_ENV === "production";
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: isProduction ? "none" : "lax",
-  maxAge: 3600000,
+  sameSite: isProduction ? "none" : "strict", // Changed to strict for better CSRF protection
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours to match JWT expiry
 };
 
 const cookieOptionsWithDomain: CookieOptions = {
@@ -77,7 +77,7 @@ export const authenticateToken = (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key-here") as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       id: string;
       email?: string;
       username?: string;
@@ -213,8 +213,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { id: newUser._id, role: newUser.role },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "1h" }
+      process.env.JWT_SECRET!,
+      { expiresIn: "24h" } // Changed to 24h to match cookie maxAge
     );
 
     res.cookie("token", token, cookieOptionsWithDomain);
@@ -262,7 +262,7 @@ export const loginUser = async (req: Request, res: Response) => {
         username: user.username,
         role: user.role
       },
-      process.env.JWT_SECRET || "secret",
+      process.env.JWT_SECRET!,
       { expiresIn: "24h" }
     );
 
@@ -325,7 +325,7 @@ export const logoutUser = async (req: Request, res: Response) => {
   const token = req.cookies.token;
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
         id: string;
       };
       const user = await User.findById(decoded.id);

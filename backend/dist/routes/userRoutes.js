@@ -8,13 +8,16 @@ const userController_1 = require("../controllers/userController");
 const multer_1 = __importDefault(require("multer"));
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const rateLimiter_1 = require("../middleware/rateLimiter");
+const validationMiddleware_1 = require("../middleware/validationMiddleware");
+const validationSchemas_1 = require("../utils/validationSchemas");
 const projectController_1 = require("../controllers/projectController");
 const trackController_1 = require("../controllers/trackController");
 const notificationController_1 = require("../controllers/notificationController");
 const router = express_1.default.Router();
-// Use memory storage for Cloudinary uploads
-const storage = multer_1.default.memoryStorage();
-const upload = (0, multer_1.default)({ storage });
+// Import file validation utilities
+const fileValidation_1 = require("../utils/fileValidation");
+// Use secure upload configuration with file validation
+const upload = (0, multer_1.default)(fileValidation_1.uploadConfig);
 // ==================== PUBLIC ENDPOINTS ====================
 // These endpoints are accessible without authentication
 // Check username availability (public for registration form)
@@ -26,13 +29,13 @@ router.get("/tracks", trackController_1.getPublicTracks);
 // ==================== AUTHENTICATION ENDPOINTS ====================
 // Protected with special rate limiters to prevent brute force attacks
 // User registration (rate limited: 10 req/15min)
-router.post("/register", rateLimiter_1.authLimiter, upload.single("profilePicture"), userController_1.registerUser);
+router.post("/register", rateLimiter_1.authLimiter, upload.single("profilePicture"), (0, validationMiddleware_1.validate)(validationSchemas_1.registerUserSchema), userController_1.registerUser);
 // User login (rate limited: 10 req/15min)
-router.post("/login", rateLimiter_1.authLimiter, userController_1.loginUser);
+router.post("/login", rateLimiter_1.authLimiter, (0, validationMiddleware_1.validate)(validationSchemas_1.loginUserSchema), userController_1.loginUser);
 // Password reset request (rate limited: 3 req/hour)
-router.post("/forget-password", rateLimiter_1.passwordResetLimiter, userController_1.forgetPassword);
+router.post("/forget-password", rateLimiter_1.passwordResetLimiter, (0, validationMiddleware_1.validate)(validationSchemas_1.forgetPasswordSchema), userController_1.forgetPassword);
 // Password reset confirmation (rate limited: 3 req/hour)
-router.post("/reset-password", rateLimiter_1.passwordResetLimiter, userController_1.resetPassword);
+router.post("/reset-password", rateLimiter_1.passwordResetLimiter, (0, validationMiddleware_1.validate)(validationSchemas_1.resetPasswordSchema), userController_1.resetPassword);
 // Logout (no auth required, clears cookies)
 router.post("/logout", userController_1.logoutUser);
 // ==================== PROTECTED USER ENDPOINTS ====================
@@ -44,7 +47,7 @@ router.post("/heartbeat", authMiddleware_1.protect, userController_1.heartbeat);
 // Get user profile
 router.get("/profile", userController_1.authenticateToken, userController_1.getUserProfile);
 // Update user profile
-router.put("/update-profile", userController_1.authenticateToken, upload.single("profilePicture"), userController_1.updateProfile);
+router.put("/update-profile", userController_1.authenticateToken, upload.single("profilePicture"), (0, validationMiddleware_1.validate)(validationSchemas_1.updateProfileSchema), userController_1.updateProfile);
 // User analytics and statistics
 router.get("/analytics", userController_1.authenticateToken, userController_1.getAnalytics);
 // User rewards
