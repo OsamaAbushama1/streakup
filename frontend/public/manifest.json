@@ -1,20 +1,65 @@
 {
-    "name": "StreakUp",
+    "name": "StreakUp - Gamified Learning Platform",
     "short_name": "StreakUp",
+    "description": "Build consistent learning habits through challenges, streaks, and community engagement",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
+    "orientation": "portrait-primary",
     "background_color": "#ffffff",
-    "theme_color": "#A333FF",
+    "theme_color": "#8981FA",
+    "lang": "en-US",
+    "dir": "ltr",
+    "categories": [
+        "education",
+        "productivity",
+        "lifestyle"
+    ],
     "icons": [
         {
             "src": "/imgs/streakupLogo.png",
-            "sizes": "512x512",
-            "type": "image/png"
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "/imgs/streakupLogo.png",
-            "sizes": "192x192",
-            "type": "image/png"
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/imgs/streakupLogo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Home",
+            "short_name": "Home",
+            "description": "Go to home page",
+            "url": "/home",
+            "icons": [
+                {
+                    "src": "/imgs/streakupLogo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Challenges",
+            "short_name": "Challenges",
+            "description": "Browse challenges",
+            "url": "/challenge-center",
+            "icons": [
+                {
+                    "src": "/imgs/streakupLogo.png",
+                    "sizes": "192x192"
+                }
+            ]
         }
     ]
 }

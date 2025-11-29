@@ -82,6 +82,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* PWA Meta Tags for iOS */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="StreakUp" />
+
+        {/* iOS Splash Screens - using logo as fallback */}
+        <link rel="apple-touch-startup-image" href="/imgs/streakupLogo.png" />
+
+        {/* Additional PWA Meta Tags */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
